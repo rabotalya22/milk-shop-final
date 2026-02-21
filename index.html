@@ -1520,23 +1520,17 @@
 
         // Функция для отправки в Telegram через мой сервер (токен скрыт)
         async function sendToTelegram(orderText) {
-            const chatId = '353422630';
-            
-            try {
-                await fetch('https://moloko-bot-server.vercel.app/api/send', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        chatId: chatId,
-                        text: `🔔 Новый заказ!\n\n${orderText}`
-                    })
-                });
-            } catch (e) {
-                console.log('Ошибка отправки в Telegram:', e);
-            }
-        }
+    const token = '8553841090:AAHJx6x0qLY6Ur53cFPtuOCKRUu_JUOWT-A';
+    const chatId = '353422630';
+    
+    const message = encodeURIComponent(`🔔 Новый заказ!\n\n${orderText}`);
+    
+    try {
+        await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${message}`);
+    } catch (e) {
+        console.log('Ошибка отправки в Telegram:', e);
+    }
+}
 
         // Основная функция отправки заказа
         function prepareOrder(event) {
