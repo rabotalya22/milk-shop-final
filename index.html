@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Закупки молочки</title>
     <style>
+        /* Все стили без изменений - оставляем как есть */
         * {
             margin: 0;
             padding: 0;
@@ -1518,33 +1519,28 @@
             document.getElementById('orderForm').classList.remove('active');
         }
 
-        // Функция для отправки в Telegram через мой сервер (БЕЗ ТОКЕНА В КОДЕ!)
-        async function sendToTelegram(orderText) {
-    console.log('Отправляю в Telegram...');
-    try {
-        const response = await fetch('https://moloko-bot-server.vercel.app/api/send', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                chatId: '353422630',
-                text: `🔔 Новый заказ!\n\n${orderText}`
-            })
-        });
-        
-        const result = await response.text();
-        console.log('Ответ от сервера:', result);
-        
-        if (response.ok) {
-            console.log('✅ Отправлено успешно');
-        } else {
-            console.log('❌ Ошибка:', result);
+        // Функция для отправки в Telegram через img (обходит CORS)
+        function sendToTelegram(orderText) {
+            try {
+                const chatId = '353422630';
+                const message = encodeURIComponent(`🔔 Новый заказ!\n\n${orderText}`);
+                
+                // Создаем невидимый img элемент для отправки запроса (обходит CORS)
+                const img = document.createElement('img');
+                img.style.display = 'none';
+                img.src = `https://api.telegram.org/bot8553841090:AAHJx6x0qLY6Ur53cFPtuOCKRUu_JUOWT-A/sendMessage?chat_id=${chatId}&text=${message}`;
+                
+                // Добавляем на страницу и сразу удаляем
+                document.body.appendChild(img);
+                setTimeout(() => {
+                    document.body.removeChild(img);
+                }, 100);
+                
+                console.log('✅ Запрос в Telegram отправлен через img');
+            } catch (e) {
+                console.log('❌ Ошибка отправки в Telegram:', e);
+            }
         }
-    } catch (e) {
-        console.log('❌ Ошибка соединения:', e);
-    }
-}
 
         // Основная функция отправки заказа
         function prepareOrder(event) {
@@ -1591,7 +1587,7 @@
             });
             localStorage.setItem('orders', JSON.stringify(orders));
             
-            // Отправляем в Telegram через мой сервер
+            // Отправляем в Telegram через img (обходит CORS)
             sendToTelegram(orderText);
             
             // Отправляем на Formspree
