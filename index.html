@@ -1520,21 +1520,31 @@
 
         // Функция для отправки в Telegram через мой сервер (БЕЗ ТОКЕНА В КОДЕ!)
         async function sendToTelegram(orderText) {
-            try {
-                await fetch('https://moloko-bot-server.vercel.app/api/send', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        chatId: '353422630',
-                        text: `🔔 Новый заказ!\n\n${orderText}`
-                    })
-                });
-            } catch (e) {
-                console.log('Ошибка отправки в Telegram:', e);
-            }
+    console.log('Отправляю в Telegram...');
+    try {
+        const response = await fetch('https://moloko-bot-server.vercel.app/api/send', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                chatId: '353422630',
+                text: `🔔 Новый заказ!\n\n${orderText}`
+            })
+        });
+        
+        const result = await response.text();
+        console.log('Ответ от сервера:', result);
+        
+        if (response.ok) {
+            console.log('✅ Отправлено успешно');
+        } else {
+            console.log('❌ Ошибка:', result);
         }
+    } catch (e) {
+        console.log('❌ Ошибка соединения:', e);
+    }
+}
 
         // Основная функция отправки заказа
         function prepareOrder(event) {
