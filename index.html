@@ -255,24 +255,31 @@
 
     <!-- Модальное окно авторизации через Telegram -->
     <div class="modal" id="authModal">
-        <div class="modal-content auth-modal">
-            <button class="close-modal" onclick="hideAuthModal()">×</button>
-            <h2 style="color: #6b4f3c; margin-bottom: 20px;">🔐 Вход через Telegram</h2>
-            
-            <p style="text-align: center; margin-bottom: 20px; color: #6b4f3c;">
-                Нажмите кнопку ниже, чтобы войти с помощью Telegram
-            </p>
-            
-            <!-- Контейнер для Telegram кнопки -->
-            <div class="telegram-login-wrapper" id="telegram-login-container">
-                <!-- Сюда будет вставлен скрипт Telegram -->
-            </div>
-            
-            <p style="text-align: center; margin-top: 20px; font-size: 12px; color: #8b6b4f;">
-                Мы получаем только ваш ID, имя и фото профиля
-            </p>
+    <div class="modal-content auth-modal">
+        <button class="close-modal" onclick="hideAuthModal()">×</button>
+        <h2 style="color: #6b4f3c; margin-bottom: 20px;">🔐 Вход через Telegram</h2>
+        
+        <p style="text-align: center; margin-bottom: 20px; color: #6b4f3c;">
+            Нажмите кнопку ниже, чтобы войти с помощью Telegram
+        </p>
+        
+        <!-- Контейнер для Telegram кнопки -->
+        <div class="telegram-login-wrapper" id="telegram-login-container">
+            <!-- Простой способ: вставляем скрипт прямо сюда -->
+            <script async src="https://telegram.org/js/telegram-widget.js?22"
+                data-telegram-login="dairy_shop_2026_bot"
+                data-size="large"
+                data-radius="30"
+                data-auth-url="https://molochko.byethost12.com/auth.php"
+                data-request-access="write">
+            </script>
         </div>
+        
+        <p style="text-align: center; margin-top: 20px; font-size: 12px; color: #8b6b4f;">
+            Мы получаем только ваш ID, имя и фото профиля
+        </p>
     </div>
+</div>
 
     <!-- Модальное окно заказов -->
     <div class="modal" id="ordersModal">
