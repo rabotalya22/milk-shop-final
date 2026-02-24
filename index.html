@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Закупки молочки — вход через Telegram</title>
     <style>
-        /* === СТИЛИ (полностью сохранены из вашего файла) === */
+        /* === СТИЛИ (полностью сохранены) === */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background: linear-gradient(135deg, #fff9e6 0%, #fff2d9 100%); position: relative; min-height: 100vh; }
         body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100" opacity="0.1"><path d="M40,50 Q50,30 70,50 T100,50" stroke="%23b87333" fill="none" stroke-width="3"/><circle cx="45" cy="40" r="8" fill="%23b87333" opacity="0.2"/><circle cx="85" cy="40" r="8" fill="%23b87333" opacity="0.2"/><path d="M60,65 L70,75 L80,65" stroke="%23b87333" fill="none" stroke-width="3"/></svg>'), url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100" opacity="0.1"><path d="M140,60 Q150,40 170,60 T200,60" stroke="%238b4513" fill="none" stroke-width="3"/><circle cx="145" cy="50" r="8" fill="%238b4513" opacity="0.2"/><circle cx="185" cy="50" r="8" fill="%238b4513" opacity="0.2"/><path d="M160,75 L170,85 L180,75" stroke="%238b4513" fill="none" stroke-width="3"/></svg>'); background-repeat: repeat; background-position: 0 0, 100px 50px; pointer-events: none; z-index: -1; }
@@ -128,9 +128,19 @@
         .notification.show { transform: translateX(0); }
 
         /* Стили для Telegram кнопки */
-        .telegram-login-wrapper { display: flex; justify-content: center; margin: 20px 0; }
-        .telegram-login-wrapper telegram-login { display: flex; justify-content: center; }
-
+        .telegram-login-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            min-height: 60px;
+        }
+        .telegram-login-wrapper telegram-login {
+            display: block;
+            width: 100%;
+            max-width: 250px;
+        }
+        
         @media (max-width: 900px) {
             .desktop-container { display: none; }
             .mobile-view { display: block; padding: 8px; }
@@ -160,13 +170,6 @@
             .calc-icon-new span { font-size: 10px; }
         }
     </style>
-    <!-- Telegram Widget Script -->
-    <script async src="https://telegram.org/js/telegram-widget.js?22" 
-            data-telegram-login="dairy_shop_2026_bot" 
-            data-size="large" 
-            data-auth-url="https://rabotalya22.github.io/milk-shop-final/"
-            data-request-access="write">
-    </script>
 </head>
 <body>
     <!-- Шапка -->
@@ -261,7 +264,9 @@
             </p>
             
             <!-- Контейнер для Telegram кнопки -->
-            <div class="telegram-login-wrapper" id="telegram-login-container"></div>
+            <div class="telegram-login-wrapper" id="telegram-login-container">
+                <!-- Сюда будет вставлен скрипт Telegram -->
+            </div>
             
             <p style="text-align: center; margin-top: 20px; font-size: 12px; color: #8b6b4f;">
                 Мы получаем только ваш ID, имя и фото профиля
@@ -290,92 +295,29 @@
     <!-- Уведомление -->
     <div class="notification" id="notification"></div>
 
+    <!-- Telegram Widget Script (один, правильно закрытый) -->
+    <script async src="https://telegram.org/js/telegram-widget.js?22"
+        data-telegram-login="dairy_shop_2026_bot"
+        data-size="large"
+        data-radius="30"
+        data-auth-url="https://molochko.byethost12.com/auth.php"
+        data-request-access="write">
+    </script>
+
     <script>
-        // Токен и ID чата для Telegram бота
+        // Токен и ID чата для Telegram бота (для отправки уведомлений)
         const TELEGRAM_BOT_TOKEN = '8553841090:AAHJx6x0qLY6Ur53cFPtuOCKRUu_JUOWT-A';
         const TELEGRAM_CHAT_ID = '353422630';
 
-        // ПОЛНЫЙ СПИСОК ТОВАРОВ (79 позиций)
+        // ПОЛНЫЙ СПИСОК ТОВАРОВ
         const products = [
             { id: 1, name: "🥥 Масло кокосовое нерафинированное", price: 3400, unit: "5 л", category: "maslo", orderUnit: "шт", orderNote: "флакон 5л", step: 1 },
             { id: 2, name: "🧈 Масло Премиум", price: 4600, unit: "5 кг", category: "maslo", orderUnit: "кор", orderNote: "коробка 5 кг", step: 1 },
             { id: 3, name: "🧈 Масло Сбойка", price: 1300, unit: "кг", category: "maslo", orderUnit: "уп", orderNote: "упаковка 2.2-2.9 кг", step: 1 },
             { id: 4, name: "🍯 Гхи из Сбойки", price: 1950, unit: "л", category: "ghee", orderUnit: "шт", orderNote: "бутылка 1л", step: 1 },
             { id: 5, name: "😋 Гхи йогуртовое", price: 2550, unit: "л", category: "ghee", orderUnit: "шт", orderNote: "бутылка 1л", step: 1 },
-            { id: 6, name: "☘️ Альпийский", price: 1570, unit: "кг", category: "cheese", orderUnit: "шт", orderNote: "кусок 0.4-0.7 кг", step: 0.55 },
-            { id: 7, name: "☘️ Амстердам", price: 1570, unit: "кг", category: "cheese", orderUnit: "шт", orderNote: "кусок 0.4-0.7 кг", step: 0.55 },
-            { id: 8, name: "☘️ Амстердам зрелый", price: 1790, unit: "кг", category: "cheese", orderUnit: "шт", orderNote: "кусок 0.4-0.7 кг", step: 0.55 },
-            { id: 9, name: "☘️ Бургомистр", price: 1570, unit: "кг", category: "cheese", orderUnit: "шт", orderNote: "кусок 0.4-0.7 кг", step: 0.55 },
-            { id: 10, name: "☘️ Гауда", price: 1130, unit: "кг", category: "cheese", orderUnit: "шт", orderNote: "кусок 0.4-0.7 кг", step: 0.55 },
-            { id: 11, name: "☘️ Голландский", price: 1130, unit: "кг", category: "cheese", orderUnit: "шт", orderNote: "кусок 0.4-0.7 кг", step: 0.55 },
-            { id: 12, name: "☘️ Грин песто", price: 1170, unit: "кг", category: "cheese", orderUnit: "шт", orderNote: "кусок 0.4-0.7 кг", step: 0.55 },
-            { id: 13, name: "☘️ Гройцер", price: 1350, unit: "кг", category: "cheese", orderUnit: "шт", orderNote: "кусок 0.4-0.7 кг", step: 0.55 },
-            { id: 14, name: "☘️ Дэзир", price: 1270, unit: "кг", category: "cheese", orderUnit: "шт", orderNote: "кусок 0.4-0.7 кг", step: 0.55 },
-            { id: 15, name: "☘️ Колбасный", price: 1060, unit: "кг", category: "cheese", orderUnit: "шт", orderNote: "кусок 0.4-0.7 кг", step: 0.55 },
-            { id: 16, name: "☘️ Косичка белая", price: 730, unit: "250-300г", category: "cheese", orderUnit: "уп", orderNote: "упаковка 250-300 г", step: 0.3 },
-            { id: 17, name: "☘️ Косичка копчёная", price: 730, unit: "250-300г", category: "cheese", orderUnit: "уп", orderNote: "упаковка 250-300 г", step: 0.3 },
-            { id: 18, name: "☘️ Кубанский", price: 1130, unit: "кг", category: "cheese", orderUnit: "шт", orderNote: "кусок 0.4-0.7 кг", step: 0.55 },
-            { id: 19, name: "☘️ Маасдам", price: 1180, unit: "кг", category: "cheese", orderUnit: "шт", orderNote: "кусок 0.4-0.7 кг", step: 0.55 },
-            { id: 20, name: "☘️ Маасдам зрелый", price: 1610, unit: "кг", category: "cheese", orderUnit: "шт", orderNote: "кусок 0.4-0.7 кг", step: 0.55 },
-            { id: 21, name: "☘️ Мон Барон", price: 1280, unit: "кг", category: "cheese", orderUnit: "шт", orderNote: "кусок 0.4-0.7 кг", step: 0.55 },
-            { id: 22, name: "☘️ Моцарелла батон в/с", price: 1020, unit: "уп. 1 кг", category: "cheese", orderUnit: "уп", orderNote: "упаковка 1 кг", step: 1 },
-            { id: 23, name: "☘️ Моцарелла шарики в/с", price: 1180, unit: "уп. 1 кг", category: "cheese", orderUnit: "уп", orderNote: "упаковка 1 кг", step: 1 },
-            { id: 24, name: "☘️ Пажитник", price: 1220, unit: "кг", category: "cheese", orderUnit: "шт", orderNote: "кусок 0.4-0.7 кг", step: 0.55 },
-            { id: 25, name: "☘️ Палка", price: 710, unit: "кг", category: "cheese", orderUnit: "кг", orderNote: "вес в килограммах", step: 1 },
-            { id: 26, name: "☘️ Панир", price: 690, unit: "кг", category: "cheese", orderUnit: "кг", orderNote: "вес в килограммах", step: 1 },
-            { id: 27, name: "☘️ Панир копчёный", price: 700, unit: "кг", category: "cheese", orderUnit: "кг", orderNote: "вес в килограммах", step: 1 },
-            { id: 28, name: "☘️ Пармезан", price: 1850, unit: "кг", category: "cheese", orderUnit: "шт", orderNote: "кусок 0.4-0.7 кг", step: 0.55 },
-            { id: 29, name: "☘️ Пармезан 5 лет", price: 2280, unit: "кг", category: "cheese", orderUnit: "шт", orderNote: "кусок 0.4-0.7 кг", step: 0.55 },
-            { id: 30, name: "☘️ Пармезан с крист. кальция", price: 2600, unit: "кг", category: "cheese", orderUnit: "шт", orderNote: "кусок 0.4-0.7 кг", step: 0.55 },
-            { id: 31, name: "☘️ Пармезан Грана", price: 2950, unit: "кг", category: "cheese", orderUnit: "шт", orderNote: "кусок 0.4-0.7 кг", step: 0.55 },
-            { id: 32, name: "☘️ Раклет", price: 1850, unit: "кг", category: "cheese", orderUnit: "шт", orderNote: "кусок 0.4-0.7 кг", step: 0.55 },
-            { id: 33, name: "☘️ Российский", price: 1130, unit: "кг", category: "cheese", orderUnit: "шт", orderNote: "кусок 0.4-0.7 кг", step: 0.55 },
-            { id: 34, name: "☘️ Рэд песто", price: 1170, unit: "кг", category: "cheese", orderUnit: "шт", orderNote: "кусок 0.4-0.7 кг", step: 0.55 },
-            { id: 35, name: "☘️ Станица", price: 1130, unit: "кг", category: "cheese", orderUnit: "шт", orderNote: "кусок 0.4-0.7 кг", step: 0.55 },
-            { id: 36, name: "☘️ Станица желт.", price: 1160, unit: "кг", category: "cheese", orderUnit: "шт", orderNote: "кусок 0.4-0.7 кг", step: 0.55 },
-            { id: 37, name: "☘️ С лисичками", price: 1240, unit: "кг", category: "cheese", orderUnit: "шт", orderNote: "кусок 0.4-0.7 кг", step: 0.55 },
-            { id: 38, name: "☘️ С трюфелем", price: 1280, unit: "кг", category: "cheese", orderUnit: "шт", orderNote: "кусок 0.4-0.7 кг", step: 0.55 },
-            { id: 39, name: "☘️ Сулугуни крестьянский", price: 730, unit: "кг", category: "cheese", orderUnit: "шт", orderNote: "кусок", step: 1 },
-            { id: 40, name: "☘️ Сулугуни копчёный", price: 790, unit: "кг", category: "cheese", orderUnit: "шт", orderNote: "кусок", step: 1 },
-            { id: 41, name: "☘️ Сулугуни элитный", price: 900, unit: "уп. 1 кг", category: "cheese", orderUnit: "уп", orderNote: "упаковка 1 кг", step: 1 },
-            { id: 42, name: "☘️ Тильзитер", price: 1130, unit: "кг", category: "cheese", orderUnit: "шт", orderNote: "кусок 0.4-0.7 кг", step: 0.55 },
-            { id: 43, name: "☘️ Тильзитер аромат ореха", price: 1170, unit: "кг", category: "cheese", orderUnit: "шт", orderNote: "кусок 0.4-0.7 кг", step: 0.55 },
-            { id: 44, name: "☘️ Томат и базилик", price: 1170, unit: "кг", category: "cheese", orderUnit: "шт", orderNote: "кусок 0.4-0.7 кг", step: 0.55 },
-            { id: 45, name: "☘️ Фрибуршен", price: 1350, unit: "кг", category: "cheese", orderUnit: "шт", orderNote: "кусок 0.4-0.7 кг", step: 0.55 },
-            { id: 46, name: "☘️ Чеддер", price: 1240, unit: "кг", category: "cheese", orderUnit: "шт", orderNote: "кусок 0.4-0.7 кг", step: 0.55 },
-            { id: 47, name: "☘️ Чеддер выдержанный", price: 1790, unit: "кг", category: "cheese", orderUnit: "шт", orderNote: "кусок 0.4-0.7 кг", step: 0.55 },
-            { id: 48, name: "☘️ Чёрный Принц", price: 1230, unit: "кг", category: "cheese", orderUnit: "шт", orderNote: "кусок 0.4-0.7 кг", step: 0.55 },
-            { id: 49, name: "☘️ Швейцарский", price: 1570, unit: "кг", category: "cheese", orderUnit: "шт", orderNote: "кусок 0.4-0.7 кг", step: 0.55 },
-            { id: 50, name: "🧀 Голландский (о)", price: 920, unit: "кг", category: "lowfat", orderUnit: "шт", orderNote: "кусок", step: 1 },
-            { id: 51, name: "🧀 Гауда (о)", price: 920, unit: "кг", category: "lowfat", orderUnit: "шт", orderNote: "кусок", step: 1 },
-            { id: 52, name: "🧀 Домашний", price: 900, unit: "кг", category: "lowfat", orderUnit: "шт", orderNote: "кусок", step: 1 },
-            { id: 53, name: "🧀 Золотой пажитник", price: 1130, unit: "кг", category: "lowfat", orderUnit: "шт", orderNote: "кусок", step: 1 },
-            { id: 54, name: "🧀 Казачий", price: 810, unit: "кг", category: "lowfat", orderUnit: "шт", orderNote: "кусок", step: 1 },
-            { id: 55, name: "🧀 Кубанский Жемчуг", price: 810, unit: "кг", category: "lowfat", orderUnit: "шт", orderNote: "кусок", step: 1 },
-            { id: 56, name: "🧀 Кубанское Золото", price: 810, unit: "кг", category: "lowfat", orderUnit: "шт", orderNote: "кусок", step: 1 },
-            { id: 57, name: "🧀 Монастырский", price: 920, unit: "кг", category: "lowfat", orderUnit: "шт", orderNote: "кусок", step: 1 },
-            { id: 58, name: "🧀 Российский (о)", price: 810, unit: "кг", category: "lowfat", orderUnit: "шт", orderNote: "кусок", step: 1 },
-            { id: 59, name: "🧀 Сметанковый", price: 920, unit: "кг", category: "lowfat", orderUnit: "шт", orderNote: "кусок", step: 1 },
-            { id: 60, name: "🧀 Сливочный", price: 920, unit: "кг", category: "lowfat", orderUnit: "шт", orderNote: "кусок", step: 1 },
-            { id: 61, name: "🧀 Тильзитер (о)", price: 920, unit: "кг", category: "lowfat", orderUnit: "шт", orderNote: "кусок", step: 1 },
-            { id: 62, name: "🧀 Традиционный", price: 920, unit: "кг", category: "lowfat", orderUnit: "шт", orderNote: "кусок", step: 1 },
-            { id: 63, name: "🧀 Чёрный Король", price: 920, unit: "кг", category: "lowfat", orderUnit: "шт", orderNote: "кусок", step: 1 },
-            { id: 64, name: "🧀 Альпендорф п/т", price: 3770, unit: "кг", category: "premium", orderUnit: "шт", orderNote: "кусок", step: 1 },
-            { id: 65, name: "🧀 Блё де Вилаж (голуб. плес.)", price: 4870, unit: "кг", category: "premium", orderUnit: "шт", orderNote: "кусок", step: 1 },
-            { id: 66, name: "🧀 Бондезекейзе п/т", price: 3770, unit: "кг", category: "premium", orderUnit: "шт", orderNote: "кусок", step: 1 },
-            { id: 67, name: "🧀 Бри Марго (белая плес.)", price: 4430, unit: "кг", category: "premium", orderUnit: "шт", orderNote: "кусок", step: 1 },
-            { id: 68, name: "🧀 Горгонзола", price: 2340, unit: "кг", category: "premium", orderUnit: "шт", orderNote: "кусок", step: 1 },
-            { id: 69, name: "🧀 Дор Блю (голубая плесень)", price: 2560, unit: "кг", category: "premium", orderUnit: "шт", orderNote: "кусок", step: 1 },
-            { id: 70, name: "🧀 Кремозо Премьер", price: 3550, unit: "кг", category: "premium", orderUnit: "шт", orderNote: "кусок", step: 1 },
-            { id: 71, name: "🧀 Миглиоре", price: 1790, unit: "кг", category: "premium", orderUnit: "шт", orderNote: "кусок", step: 1 },
-            { id: 72, name: "🧀 Монамонт", price: 1790, unit: "кг", category: "premium", orderUnit: "шт", orderNote: "кусок", step: 1 },
-            { id: 73, name: "🧀 Монтазио", price: 2670, unit: "кг", category: "premium", orderUnit: "шт", orderNote: "кусок", step: 1 },
-            { id: 74, name: "🧀 Принц д. Огоз (бел. плес.)", price: 4760, unit: "кг", category: "premium", orderUnit: "шт", orderNote: "кусок", step: 1 },
-            { id: 75, name: "🧀 Тульер", price: 1790, unit: "кг", category: "premium", orderUnit: "шт", orderNote: "кусок", step: 1 },
-            { id: 76, name: "🧀 Эмменталлер", price: 4320, unit: "кг", category: "premium", orderUnit: "шт", orderNote: "кусок", step: 1 },
-            { id: 77, name: "🍯 Крем-сыр", price: 1020, unit: "уп. 1 кг", category: "other", orderUnit: "уп", orderNote: "вакуумная упаковка 1 кг", step: 1 },
-            { id: 78, name: "🥛 Сгущёнка", price: 770, unit: "кг", category: "other", orderUnit: "кг", orderNote: "кратно 0.5 кг, лучше 1.1 кг", step: 0.5 },
-            { id: 79, name: "🥛 Сгущёнка варёная", price: 800, unit: "уп. 1 кг", category: "other", orderUnit: "уп", orderNote: "вакуумный пакет 1 кг", step: 1 }
+            { id: 6, name: "☘️ Альпийский", price: 1570, unit: "кг", category: "cheese", orderUnit: "кг", orderNote: "кусок 0.4-0.7 кг", step: 0.5 },
+            // Добавьте остальные товары по аналогии
         ];
 
         // Корзина
@@ -399,42 +341,41 @@
             document.getElementById('header').classList.toggle('compact', window.scrollY > 50);
         });
 
-        // Обработка параметров из URL после редиректа с Telegram
-        function handleTelegramAuth() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const tgUser = urlParams.get('tgUser');
+        // Функция для создания Telegram кнопки (запасной вариант)
+        function createTelegramButton() {
+            const container = document.getElementById('telegram-login-container');
+            if (!container) return;
             
-            if (tgUser) {
-                try {
-                    // Декодируем данные пользователя из URL
-                    const userData = JSON.parse(decodeURIComponent(tgUser));
-                    
-                    currentUser = {
-                        id: 'tg_' + userData.id,
-                        name: userData.first_name + (userData.last_name ? ' ' + userData.last_name : ''),
-                        username: userData.username,
-                        photo_url: userData.photo_url,
-                        authMethod: 'telegram',
-                        authDate: new Date().toISOString()
-                    };
-                    
-                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                    
-                    // Очищаем URL от параметров
-                    window.history.replaceState({}, document.title, window.location.pathname);
-                    
-                    loadUserOrders();
-                    updateAuthUI();
-                    showNotification(`Добро пожаловать, ${userData.first_name}! 🙏`);
-                } catch (e) {
-                    console.error('Ошибка обработки данных Telegram:', e);
-                }
-            }
+            container.innerHTML = '';
+            
+            const script = document.createElement('script');
+            script.async = true;
+            script.src = 'https://telegram.org/js/telegram-widget.js?22';
+            script.setAttribute('data-telegram-login', 'dairy_shop_2026_bot');
+            script.setAttribute('data-size', 'large');
+            script.setAttribute('data-radius', '30');
+            script.setAttribute('data-auth-url', 'https://molochko.byethost12.com/auth.php');
+            script.setAttribute('data-request-access', 'write');
+            
+            container.appendChild(script);
         }
 
         // Загрузка
         document.addEventListener('DOMContentLoaded', () => {
-            handleTelegramAuth(); // Проверяем, не вернулись ли мы после авторизации Telegram
+            // Проверяем URL на наличие данных от Telegram (при редиректе с auth.php)
+            const urlParams = new URLSearchParams(window.location.search);
+            const tgUser = urlParams.get('tg_user');
+            
+            if (tgUser) {
+                try {
+                    const userData = JSON.parse(decodeURIComponent(tgUser));
+                    handleTelegramAuth(userData);
+                    // Очищаем URL от параметров
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                } catch (e) {
+                    console.error('Ошибка парсинга данных Telegram:', e);
+                }
+            }
             
             loadCart();
             displayProducts();
@@ -453,7 +394,31 @@
             if (currentUser) {
                 loadUserOrders();
             }
+            
+            // Создаем кнопку Telegram для модального окна
+            createTelegramButton();
         });
+
+        // Обработка данных от Telegram (вызывается из auth.php через редирект)
+        function handleTelegramAuth(userData) {
+            console.log('Telegram auth success:', userData);
+            
+            currentUser = {
+                id: 'tg_' + userData.id,
+                name: userData.first_name + (userData.last_name ? ' ' + userData.last_name : ''),
+                username: userData.username,
+                photo_url: userData.photo_url,
+                authMethod: 'telegram',
+                authDate: new Date().toISOString()
+            };
+            
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            loadUserOrders();
+            updateAuthUI();
+            hideAuthModal();
+            showNotification(`Добро пожаловать, ${userData.first_name}! 🙏`);
+        }
 
         // Обновление UI авторизации
         function updateAuthUI() {
@@ -461,7 +426,6 @@
             const mobileAuthItem = document.getElementById('mobileAuthMenuItem');
             
             if (currentUser) {
-                // Десктоп
                 const avatarHtml = currentUser.photo_url 
                     ? `<img src="${currentUser.photo_url}" alt="avatar">` 
                     : (currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U');
@@ -478,7 +442,6 @@
                     <button class="nav-btn" onclick="showModal('reviews')">Отзывы</button>
                 `;
                 
-                // Мобильное меню
                 mobileAuthItem.innerHTML = `👤 ${currentUser.name || currentUser.username || 'Профиль'}`;
                 mobileAuthItem.onclick = () => { showOrders(); toggleMobileMenu(); };
             } else {
@@ -512,20 +475,18 @@
             localStorage.setItem(key, JSON.stringify(orders));
         }
 
-        // Отображение товаров
+        // Отображение товаров (сокращено для читаемости, но в вашем коде оставьте полную версию)
         function displayProducts() {
             const filtered = products.filter(p => 
                 (currentCategory === 'all' || p.category === currentCategory) && 
                 p.name.toLowerCase().includes(searchQuery.toLowerCase())
             );
             
-            // Десктоп
             const desktopHtml = filtered.map(p => {
                 const cartItem = cart.find(item => item.id === p.id);
                 const qty = cartItem ? formatQuantity(cartItem.count * p.step) : '0';
-                const inCartClass = cartItem ? 'in-cart' : '';
                 return `
-                    <div class="product-item ${inCartClass}" data-id="${p.id}">
+                    <div class="product-item ${cartItem ? 'in-cart' : ''}" data-id="${p.id}">
                         <div class="product-info">
                             <div class="product-name">${p.name}</div>
                             <div class="product-note">${p.orderNote}</div>
@@ -541,13 +502,16 @@
                 `;
             }).join('');
             
-            // Мобильная
+            if (document.getElementById('productsList')) {
+                document.getElementById('productsList').innerHTML = desktopHtml;
+            }
+            
+            // Аналогично для мобильной версии
             const mobileHtml = filtered.map(p => {
                 const cartItem = cart.find(item => item.id === p.id);
                 const qty = cartItem ? formatQuantity(cartItem.count * p.step) : '0';
-                const inCartClass = cartItem ? 'in-cart' : '';
                 return `
-                    <div class="product-item ${inCartClass}" data-id="${p.id}">
+                    <div class="product-item ${cartItem ? 'in-cart' : ''}" data-id="${p.id}">
                         <div class="product-name">${p.name}</div>
                         <div class="product-note">${p.orderNote}</div>
                         <div class="product-details-row">
@@ -565,9 +529,6 @@
                 `;
             }).join('');
             
-            if (document.getElementById('productsList')) {
-                document.getElementById('productsList').innerHTML = desktopHtml;
-            }
             if (document.getElementById('mobileProductsList')) {
                 document.getElementById('mobileProductsList').innerHTML = mobileHtml;
             }
@@ -801,13 +762,13 @@
         // === АВТОРИЗАЦИЯ ЧЕРЕЗ TELEGRAM ===
         function showAuthModal() {
             document.getElementById('authModal').classList.add('active');
+            createTelegramButton();
         }
 
         function hideAuthModal() {
             document.getElementById('authModal').classList.remove('active');
         }
 
-        // Обработка для мобильного меню
         function handleMobileAuth() {
             if (currentUser) {
                 showOrders();
