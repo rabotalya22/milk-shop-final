@@ -644,6 +644,20 @@
             showNotification(`Добро пожаловать, ${userData.first_name}! 🙏`);
         }
 
+        // Полная очистка сессии Telegram
+        function terminateTelegramSession() {
+            // Создаем iframe для выхода из Telegram
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = 'https://oauth.telegram.org/auth/quit';
+            document.body.appendChild(iframe);
+            
+            // Удаляем через секунду
+            setTimeout(() => {
+                document.body.removeChild(iframe);
+            }, 1000);
+        }
+
         // Показать профиль
         function showProfile() {
             if (!currentUser) return;
@@ -712,6 +726,9 @@
             localStorage.removeItem('currentUser');
             orders = [];
             
+            // Принудительно завершаем сессию Telegram
+            terminateTelegramSession();
+            
             updateAuthUI();
             showNotification('Сессия очищена. Теперь вы можете войти как другой пользователь.');
             
@@ -721,7 +738,7 @@
             // Пересоздаём виджет Telegram
             setTimeout(() => {
                 createTelegramWidget();
-            }, 200);
+            }, 500);
         }
 
         function logout() {
@@ -730,6 +747,10 @@
             currentUser = null;
             localStorage.removeItem('currentUser');
             orders = [];
+            
+            // Принудительно завершаем сессию Telegram
+            terminateTelegramSession();
+            
             updateAuthUI();
             showNotification('Вы вышли из аккаунта');
             
