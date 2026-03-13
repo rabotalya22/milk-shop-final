@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <!-- Запрет кэширования -->
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>Закупки молочки — вход через Telegram</title>
@@ -516,7 +516,20 @@
 
         // Загрузка
         document.addEventListener('DOMContentLoaded', () => {
+            // Проверяем, не было ли выхода
             const urlParams = new URLSearchParams(window.location.search);
+            const logoutParam = urlParams.get('logout');
+            
+            if (logoutParam) {
+                // Если есть параметр logout, принудительно очищаем данные
+                currentUser = null;
+                localStorage.removeItem('currentUser');
+                orders = [];
+                // Удаляем параметр из URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+                console.log('Выход выполнен, данные очищены');
+            }
+            
             const tgUser = urlParams.get('tg_user');
             
             if (tgUser) {
