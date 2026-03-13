@@ -296,7 +296,13 @@
                 </script>
             </div>
             
-            <!-- Кнопка для смены пользователя (будет показана, если есть сохранённый пользователь) -->
+            <!-- Информация о текущем пользователе (если есть) -->
+            <div id="currentUserInfo" style="display: none; margin: 15px 0; padding: 10px; background: #fff2d9; border-radius: 10px; text-align: center;">
+                <p style="margin-bottom: 5px;">Сейчас выполнен вход как:</p>
+                <p style="font-weight: bold;" id="currentUserName"></p>
+            </div>
+            
+            <!-- Кнопка для смены пользователя -->
             <div id="switchUserContainer" style="display: none; margin-top: 15px; text-align: center;">
                 <button class="btn btn-secondary" onclick="forceNewLogin()" style="width: 100%;">🔄 Войти как другой пользователь</button>
             </div>
@@ -584,6 +590,8 @@
             const mobileSwitchUserItem = document.getElementById('mobileSwitchUserItem');
             const switchUserContainer = document.getElementById('switchUserContainer');
             const switchUserInOrders = document.getElementById('switchUserInOrders');
+            const currentUserInfo = document.getElementById('currentUserInfo');
+            const currentUserName = document.getElementById('currentUserName');
             
             if (currentUser) {
                 const avatarHtml = currentUser.photo_url 
@@ -609,7 +617,13 @@
                 if (mobileLogoutItem) mobileLogoutItem.style.display = 'block';
                 if (mobileSwitchUserItem) mobileSwitchUserItem.style.display = 'block';
                 
-                // Показываем кнопку смены пользователя в модалке авторизации
+                // Показываем информацию о текущем пользователе в модалке авторизации
+                if (currentUserInfo) {
+                    currentUserInfo.style.display = 'block';
+                    if (currentUserName) currentUserName.textContent = currentUser.name || currentUser.username || 'Пользователь';
+                }
+                
+                // Показываем кнопку смены пользователя
                 if (switchUserContainer) switchUserContainer.style.display = 'block';
                 if (switchUserInOrders) switchUserInOrders.style.display = 'inline';
             } else {
@@ -625,6 +639,7 @@
                 // Скрываем кнопки выйти и сменить пользователя
                 if (mobileLogoutItem) mobileLogoutItem.style.display = 'none';
                 if (mobileSwitchUserItem) mobileSwitchUserItem.style.display = 'none';
+                if (currentUserInfo) currentUserInfo.style.display = 'none';
                 if (switchUserContainer) switchUserContainer.style.display = 'none';
                 if (switchUserInOrders) switchUserInOrders.style.display = 'none';
             }
@@ -632,14 +647,13 @@
 
         // Функция для смены пользователя
         function switchUser() {
-            // Просто выходим и показываем окно авторизации
-            logout(false); // false = не показывать подтверждение
-            showAuthModal();
+            // Принудительный выход с очисткой сессии Telegram
+            forceNewLogin();
         }
         
         // Функция для принудительного входа как другой пользователь
         function forceNewLogin() {
-            // Очищаем все данные авторизации
+            // Очищаем все данные авторизации на сайте
             localStorage.removeItem('currentUser');
             currentUser = null;
             orders = [];
@@ -648,10 +662,39 @@
             updateAuthUI();
             
             // Показываем сообщение
-            showNotification('Теперь вы можете войти как другой пользователь');
+            showNotification('Сессия очищена. Теперь вы можете войти как другой пользователь.');
             
-            // Перезагружаем страницу? Нет, просто показываем кнопку Telegram
-            // Кнопка уже должна быть видна
+            // Пытаемся очистить кэш Telegram, пересоздавая виджет
+            refreshTelegramWidget();
+        }
+
+        // Функция для обновления виджета Telegram (принудительный сброс)
+        function refreshTelegramWidget() {
+            const container = document.getElementById('telegram-login-container');
+            if (!container) return;
+            
+            // Сохраняем текущее содержимое
+            const currentHTML = container.innerHTML;
+            
+            // Очищаем контейнер
+            container.innerHTML = '';
+            
+            // Небольшая задержка и восстановление
+            setTimeout(() => {
+                container.innerHTML = currentHTML;
+                
+                // Перезагружаем скрипт, добавив его заново
+                const script = document.createElement('script');
+                script.async = true;
+                script.src = 'https://telegram.org/js/telegram-widget.js?22';
+                script.setAttribute('data-telegram-login', 'dairy_shop_2026_bot');
+                script.setAttribute('data-size', 'large');
+                script.setAttribute('data-radius', '30');
+                script.setAttribute('data-auth-url', 'https://molochko.byethost12.com/auth.php');
+                script.setAttribute('data-request-access', 'write');
+                
+                container.appendChild(script);
+            }, 100);
         }
 
         // Мобильный выход
@@ -669,6 +712,9 @@
             orders = [];
             updateAuthUI();
             showNotification('Вы вышли из аккаунта');
+            
+            // Обновляем виджет Telegram
+            refreshTelegramWidget();
         }
 
         // Отображение товаров (функция полностью сохранена)
@@ -960,6 +1006,9 @@
         // === АВТОРИЗАЦИЯ ЧЕРЕЗ TELEGRAM ===
         function showAuthModal() {
             document.getElementById('authModal').classList.add('active');
+            
+            // При открытии модалки обновляем информацию о текущем пользователе
+            updateAuthUI();
         }
 
         function hideAuthModal() {
