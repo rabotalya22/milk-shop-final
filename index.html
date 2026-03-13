@@ -3,10 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <!-- Запрет кэширования -->
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
     <title>Закупки молочки — вход через Telegram</title>
     <style>
         /* === СТИЛИ (полностью сохранены) === */
@@ -31,12 +27,11 @@
         .nav-btn:hover { background: #d4a373; color: white; }
         .auth-btn { background: #6b4f3c; border-color: #8b6b4f; color: white; }
         .auth-btn:hover { background: #8b6b4f; }
-        .user-info { display: flex; align-items: center; gap: 10px; background: #fff2d9; border: 2px solid #d4a373; border-radius: 30px; padding: 5px 15px 5px 10px; cursor: pointer; transition: all 0.2s; }
-        .user-info:hover { background: #d4a373; }
-        .user-info:hover .user-name { color: white; }
-        .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: #d4a373; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; overflow: hidden; flex-shrink: 0; }
+        .user-info { display: flex; align-items: center; gap: 10px; background: #fff2d9; border: 2px solid #d4a373; border-radius: 30px; padding: 5px 15px 5px 10px; }
+        .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: #d4a373; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; overflow: hidden; }
         .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
         .user-name { font-weight: bold; color: #6b4f3c; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .logout-btn { background: none; border: none; color: #c41e3a; cursor: pointer; font-size: 18px; padding: 0 5px; }
         .mobile-menu { position: fixed; top: 0; left: -300px; width: 280px; height: 100vh; background: #fff9e6; border-right: 3px solid #d4a373; z-index: 2000; transition: left 0.3s ease; padding: 80px 20px 20px; }
         .mobile-menu.active { left: 0; }
         .mobile-menu-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1999; }
@@ -142,78 +137,6 @@
             min-height: 60px;
         }
         
-        /* Модальное окно профиля */
-        .profile-modal .modal-content {
-            max-width: 350px;
-            text-align: center;
-        }
-        
-        .profile-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            margin: 0 auto 15px;
-            background: #d4a373;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            color: white;
-            overflow: hidden;
-        }
-        
-        .profile-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .profile-name {
-            font-size: 20px;
-            font-weight: bold;
-            color: #6b4f3c;
-            margin-bottom: 5px;
-        }
-        
-        .profile-username {
-            color: #b87333;
-            margin-bottom: 20px;
-        }
-        
-        .profile-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        
-        .profile-btn {
-            padding: 12px;
-            border: none;
-            border-radius: 30px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-        }
-        
-        .profile-btn.primary {
-            background: #d4a373;
-            color: white;
-            border: 2px solid #b87333;
-        }
-        
-        .profile-btn.secondary {
-            background: #fff2d9;
-            color: #6b4f3c;
-            border: 2px solid #d4a373;
-        }
-        
-        .profile-btn.danger {
-            background: #ffe4e0;
-            color: #c41e3a;
-            border: 2px solid #c41e3a;
-        }
-        
         @media (max-width: 900px) {
             .desktop-container { display: none; }
             .mobile-view { display: block; padding: 8px; }
@@ -276,6 +199,8 @@
         <div class="mobile-menu-item" onclick="showModal('reviews'); toggleMobileMenu()">⭐ Отзывы покупателей</div>
         <div class="mobile-menu-item" onclick="handleMobileOrders(); toggleMobileMenu()">📋 Мои заказы</div>
         <div class="mobile-menu-item" id="mobileAuthMenuItem" onclick="handleMobileAuth(); toggleMobileMenu()">🔐 Войти</div>
+        <!-- Кнопка выйти в мобильном меню -->
+        <div class="mobile-menu-item logout" id="mobileLogoutItem" style="display: none;" onclick="mobileLogout()">🚪 Выйти</div>
     </div>
 
     <!-- Десктопная версия -->
@@ -336,28 +261,31 @@
     <div class="modal" id="producerModal"><div class="modal-content"><button class="close-modal" onclick="hideModal('producer')">×</button><h2 style="color: #6b4f3c; margin-bottom: 20px;">🐄 О производителе</h2><p style="margin-bottom: 15px;">Наше хозяйство находится в экологически чистом районе. Мы заботимся о коровах и следуем ведическим принципам.</p><p>✅ Натуральное питание без ГМО</p><p>✅ Свободный выпас на лугах</p><p>✅ Ручное доение с любовью</p></div></div>
     <div class="modal" id="rulesModal"><div class="modal-content"><button class="close-modal" onclick="hideModal('rules')">×</button><h2 style="color: #6b4f3c; margin-bottom: 20px;">📝 Правила заказа</h2><p><strong>1.</strong> В первой строчке указываем, как подписать пакет (имя и фамилия или духовное имя)</p><p><strong>2.</strong> Последней строчкой пишем одним словом условное название точки самовывоза (из списка)</p><p><strong>3.</strong> Почти все наименования мы заказываем штуками или упаковками (шт./уп.)</p><p><strong>4.</strong> Панир и Палку пишем в килограммах</p><p><strong>5.</strong> Сулугуни элитный и Моцарелла упакованы по 1 кг</p><p><strong>6.</strong> Косичка приходит небольшими упаковками примерно по 250-300 г</p><p><strong>7.</strong> Остальные сыры нарезают примерно по 0,4-0,7 кг кусками</p><p><strong>8.</strong> Сгущёнку разливаем по контейнерам (можно приобрести любой вес, кратный 0,5 кг, но лучше всего писать 1,1 кг, что равнозначно 1 л)</p><p><strong>9.</strong> Варёная сгущёнка приходит в вакуумных пакетах по 1 кг</p><p><strong>10.</strong> Крем-сыр также в вакуумных упаковках по 1 кг</p><p><strong>11.</strong> Масло Премиум заказываем коробками по 5 кг</p><p><strong>12.</strong> Масло Сбойка приходит весом 2,2-2,9 кг в вакуумных упаковках</p></div></div>
 
-    <!-- Модальное окно профиля -->
-    <div class="modal profile-modal" id="profileModal">
-        <div class="modal-content">
-            <button class="close-modal" onclick="hideProfileModal()">×</button>
-            <h2 style="color: #6b4f3c; margin-bottom: 20px;">👤 Мой профиль</h2>
-            
-            <div id="profileContent"></div>
-        </div>
-    </div>
-
     <!-- Модальное окно авторизации через Telegram -->
     <div class="modal" id="authModal">
         <div class="modal-content auth-modal">
             <button class="close-modal" onclick="hideAuthModal()">×</button>
             <h2 style="color: #6b4f3c; margin-bottom: 20px;">🔐 Вход через Telegram</h2>
             
-            <p style="text-align: center; margin-bottom: 20px; color: #6b4f3c;" id="authModalMessage">
-                Нажмите кнопку ниже, чтобы войти с помощью Telegram
-            </p>
+            <!-- Блок с текущим пользователем (показывается если есть) -->
+            <div id="currentUserBlock" style="display: none; margin-bottom: 20px; padding: 15px; background: #fff2d9; border-radius: 10px; text-align: center;">
+                <p style="margin-bottom: 5px; color: #6b4f3c;">Выполнен вход как:</p>
+                <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px;">
+                    <div class="user-avatar" id="currentUserAvatar" style="width: 40px; height: 40px;">👤</div>
+                    <span style="font-weight: bold; color: #6b4f3c;" id="currentUserNameDisplay"></span>
+                </div>
+                <button class="btn btn-secondary" onclick="switchUser()" style="width: 100%;">🔄 Сменить пользователя</button>
+            </div>
             
-            <!-- Контейнер для Telegram кнопки -->
-            <div class="telegram-login-wrapper" id="telegram-login-container"></div>
+            <!-- Блок входа (показывается когда нет пользователя) -->
+            <div id="loginBlock">
+                <p style="text-align: center; margin-bottom: 20px; color: #6b4f3c;" id="authModalMessage">
+                    Нажмите кнопку ниже, чтобы войти с помощью Telegram
+                </p>
+                
+                <!-- Контейнер для Telegram кнопки -->
+                <div class="telegram-login-wrapper" id="telegram-login-container"></div>
+            </div>
             
             <p style="text-align: center; margin-top: 20px; font-size: 12px; color: #8b6b4f;">
                 Мы получаем только ваш ID, имя и фото профиля
@@ -372,6 +300,7 @@
             <div class="orders-header">
                 <span class="orders-title">📋 Мои заказы</span>
                 <span id="ordersUserInfo" style="font-size: 12px; color: #b87333;"></span>
+                <button class="switch-user-btn" id="switchUserInOrders" onclick="switchUser()" style="display: none;">(сменить)</button>
             </div>
             <div class="orders-container" id="ordersContainer"></div>
         </div>
@@ -516,22 +445,10 @@
 
         // Загрузка
         document.addEventListener('DOMContentLoaded', () => {
+            // Проверяем URL на наличие данных от Telegram (при редиректе с auth.php) - оставляем для совместимости
             const urlParams = new URLSearchParams(window.location.search);
-            
-            // Обработка выхода (параметр logout_done от auth.php)
-            const logoutDone = urlParams.get('logout_done');
-            if (logoutDone) {
-                // Очищаем данные пользователя
-                currentUser = null;
-                localStorage.removeItem('currentUser');
-                orders = [];
-                updateAuthUI();
-                window.history.replaceState({}, document.title, window.location.pathname);
-                showNotification('Выход выполнен');
-            }
-            
-            // Обработка данных авторизации от Telegram (параметр tg_user)
             const tgUser = urlParams.get('tg_user');
+            
             if (tgUser) {
                 try {
                     const userData = JSON.parse(decodeURIComponent(tgUser));
@@ -559,9 +476,11 @@
                 loadUserOrdersFromFirebase();
             }
             
+            // Создаём Telegram виджет с JS-колбэком
             createTelegramWidget();
         });
 
+        // Создание Telegram виджета с JS-колбэком
         function createTelegramWidget() {
             const container = document.getElementById('telegram-login-container');
             if (!container) return;
@@ -574,13 +493,19 @@
             script.setAttribute('data-telegram-login', 'dairy_shop_2026_bot');
             script.setAttribute('data-size', 'large');
             script.setAttribute('data-radius', '30');
-            // ВАЖНО: используем data-auth-url вместо data-onauth
-            script.setAttribute('data-auth-url', 'https://molochko.byethost12.com/auth.php');
+            script.setAttribute('data-onauth', 'onTelegramAuth(user)');
             script.setAttribute('data-request-access', 'write');
             
             container.appendChild(script);
         }
 
+        // Глобальная функция для обработки авторизации
+        window.onTelegramAuth = function(user) {
+            console.log('Telegram auth success:', user);
+            handleTelegramAuth(user);
+        };
+
+        // Загрузка заказов из Firebase
         async function loadUserOrdersFromFirebase() {
             if (!currentUser) return;
             
@@ -602,6 +527,7 @@
             }
         }
 
+        // Сохранение заказа в Firebase
         async function saveOrderToFirebase(order) {
             if (!currentUser) return;
             
@@ -623,6 +549,7 @@
             }
         }
 
+        // Удаление заказа из Firebase
         async function deleteOrderFromFirebase(orderId, firebaseId) {
             try {
                 await db.collection('orders').doc(firebaseId).delete();
@@ -636,6 +563,7 @@
             }
         }
 
+        // Обработка данных от Telegram
         async function handleTelegramAuth(userData) {
             console.log('Telegram auth success:', userData);
             
@@ -657,49 +585,28 @@
             showNotification(`Добро пожаловать, ${userData.first_name}! 🙏`);
         }
 
-        // Функция полного выхода: перенаправляем на auth.php с параметром logout
-        function telegramLogout() {
-            window.location.href = 'https://molochko.byethost12.com/auth.php?logout=1';
-        }
-
-        // Показать профиль
-        function showProfile() {
-            if (!currentUser) return;
-            
-            const profileContent = document.getElementById('profileContent');
-            const avatarHtml = currentUser.photo_url 
-                ? `<img src="${currentUser.photo_url}" alt="avatar">` 
-                : (currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U');
-            
-            profileContent.innerHTML = `
-                <div class="profile-avatar">${avatarHtml}</div>
-                <div class="profile-name">${currentUser.name || ''}</div>
-                ${currentUser.username ? `<div class="profile-username">@${currentUser.username}</div>` : ''}
-                <div class="profile-buttons">
-                    <button class="profile-btn danger" onclick="telegramLogout(); hideProfileModal();">🚪 Выйти</button>
-                </div>
-            `;
-            
-            document.getElementById('profileModal').classList.add('active');
-        }
-
-        function hideProfileModal() {
-            document.getElementById('profileModal').classList.remove('active');
-        }
-
+        // Обновление UI авторизации
         function updateAuthUI() {
             const navButtons = document.getElementById('navButtons');
             const mobileAuthItem = document.getElementById('mobileAuthMenuItem');
+            const mobileLogoutItem = document.getElementById('mobileLogoutItem');
+            const switchUserInOrders = document.getElementById('switchUserInOrders');
+            const currentUserBlock = document.getElementById('currentUserBlock');
+            const loginBlock = document.getElementById('loginBlock');
+            const currentUserNameDisplay = document.getElementById('currentUserNameDisplay');
+            const currentUserAvatar = document.getElementById('currentUserAvatar');
             
             if (currentUser) {
+                // Верхнее меню (шапка)
                 const avatarHtml = currentUser.photo_url 
                     ? `<img src="${currentUser.photo_url}" alt="avatar">` 
                     : (currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U');
                 
                 navButtons.innerHTML = `
-                    <div class="user-info" onclick="showProfile()">
+                    <div class="user-info">
                         <div class="user-avatar">${avatarHtml}</div>
                         <span class="user-name">${currentUser.name || currentUser.username || 'Пользователь'}</span>
+                        <button class="logout-btn" onclick="logout()" title="Выйти">✕</button>
                     </div>
                     <button class="nav-btn" onclick="showOrders()">📋 Мои заказы</button>
                     <button class="nav-btn" onclick="showModal('producer')">О производителе</button>
@@ -707,10 +614,32 @@
                     <button class="nav-btn" onclick="showModal('reviews')">Отзывы</button>
                 `;
                 
+                // Мобильное меню
                 mobileAuthItem.innerHTML = `👤 ${currentUser.name || currentUser.username || 'Профиль'}`;
-                mobileAuthItem.onclick = () => { showProfile(); toggleMobileMenu(); };
+                mobileAuthItem.onclick = () => { showOrders(); toggleMobileMenu(); };
+                
+                // Показываем кнопку выйти в мобильном меню
+                if (mobileLogoutItem) mobileLogoutItem.style.display = 'block';
+                
+                // Показываем кнопку сменить в окне заказов
+                if (switchUserInOrders) switchUserInOrders.style.display = 'inline';
+                
+                // Обновляем блок в модальном окне авторизации
+                if (currentUserBlock) {
+                    currentUserBlock.style.display = 'block';
+                    if (currentUserNameDisplay) currentUserNameDisplay.textContent = currentUser.name || currentUser.username || 'Пользователь';
+                    if (currentUserAvatar) {
+                        if (currentUser.photo_url) {
+                            currentUserAvatar.innerHTML = `<img src="${currentUser.photo_url}" style="width:100%; height:100%; border-radius:50%;">`;
+                        } else {
+                            currentUserAvatar.innerHTML = currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U';
+                        }
+                    }
+                }
+                if (loginBlock) loginBlock.style.display = 'none';
                 
             } else {
+                // Верхнее меню (шапка) - не авторизован
                 navButtons.innerHTML = `
                     <button class="nav-btn auth-btn" onclick="showAuthModal()">🔐 Войти</button>
                     <button class="nav-btn" onclick="showModal('producer')">О производителе</button>
@@ -718,164 +647,54 @@
                     <button class="nav-btn" onclick="showModal('reviews')">Отзывы</button>
                 `;
                 
+                // Мобильное меню
                 mobileAuthItem.innerHTML = '🔐 Войти';
                 mobileAuthItem.onclick = () => { showAuthModal(); toggleMobileMenu(); };
+                
+                // Скрываем кнопки выйти и сменить пользователя
+                if (mobileLogoutItem) mobileLogoutItem.style.display = 'none';
+                if (switchUserInOrders) switchUserInOrders.style.display = 'none';
+                
+                // Скрываем блок с пользователем в модальном окне, показываем блок входа
+                if (currentUserBlock) currentUserBlock.style.display = 'none';
+                if (loginBlock) loginBlock.style.display = 'block';
             }
         }
 
-        // Мобильное меню
-        function toggleMobileMenu() {
-            document.getElementById('mobileMenu').classList.toggle('active');
-            document.getElementById('menuOverlay').classList.toggle('active');
-        }
-
-        function toggleMobileCalculator() {
-            document.getElementById('mobileCalculator').classList.toggle('active');
-        }
-
-        function toggleMobileCart() {
-            updateAllCarts();
-            document.getElementById('mobileCartModal').classList.add('active');
-            updateAllCarts();
-        }
-
-        function hideMobileCart() {
-            document.getElementById('mobileCartModal').classList.remove('active');
-        }
-
-        // Модальные окна
-        function showModal(type) {
-            document.getElementById(type + 'Modal').classList.add('active');
-            if (type === 'reviews') displayReviews();
-        }
-
-        function hideModal(type) {
-            document.getElementById(type + 'Modal').classList.remove('active');
-        }
-
-        function showAuthModal() {
-            document.getElementById('authModal').classList.add('active');
-        }
-
-        function hideAuthModal() {
-            document.getElementById('authModal').classList.remove('active');
-        }
-
-        function handleMobileAuth() {
-            if (currentUser) {
-                showProfile();
-            } else {
-                showAuthModal();
-            }
-        }
-
-        function handleMobileOrders() {
-            if (currentUser) {
-                showOrders();
-            } else {
-                showNotification('Сначала войдите в аккаунт');
-                showAuthModal();
-            }
-        }
-
-        // Заказы
-        async function showOrders() {
-            if (!currentUser) {
-                showNotification('Сначала войдите в аккаунт');
-                showAuthModal();
-                return;
-            }
+        // Функция для смены пользователя
+        function switchUser() {
+            // Очищаем все данные
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            orders = [];
             
-            await loadUserOrdersFromFirebase();
-            displayOrders();
-            document.getElementById('ordersModal').classList.add('active');
-            document.getElementById('ordersUserInfo').textContent = `Пользователь: ${currentUser.name || currentUser.username || ''}`;
-        }
-
-        function hideOrders() {
-            document.getElementById('ordersModal').classList.remove('active');
-        }
-
-        function displayOrders() {
-            const container = document.getElementById('ordersContainer');
-            if (orders.length === 0) {
-                container.innerHTML = '<div class="no-orders">📭 У вас пока нет заказов</div>';
-                return;
-            }
-            const sorted = [...orders].sort((a,b) => new Date(b.date) - new Date(a.date));
-            container.innerHTML = sorted.map(order => {
-                const total = order.items.reduce((sum, item) => sum + (item.price * item.count * item.step), 0);
-                let itemsHtml = '';
-                order.items.forEach(item => {
-                    const qty = item.count * item.step;
-                    itemsHtml += `<div class="order-item-line"><span class="order-item-name">${item.name}</span><span class="order-item-qty">${formatQuantity(qty)} ${item.orderUnit}</span></div>`;
-                });
-                return `
-                <div class="order-card">
-                    <div class="order-header">
-                        <span class="order-id">Заказ #${order.id.toString().slice(-6)}</span>
-                        <span class="order-date">${order.date}</span>
-                    </div>
-                    <div class="order-body">
-                        <div class="order-field"><span class="label">📦 Подпись:</span> <span class="value">${order.packageName || (order.orderText ? order.orderText.split('\n')[0] : '—')}</span></div>
-                        <div class="order-field"><span class="label">👤 Имя:</span> <span class="value">${order.customerName || '—'}</span></div>
-                        <div class="order-field"><span class="label">📞 Телефон:</span> <span class="value">${order.phone || '—'}</span></div>
-                        <div class="order-field"><span class="label">📍 Точка:</span> <span class="value">${order.pickupPoint || (order.orderText ? order.orderText.split('\n').pop() : '—')}</span></div>
-                        <div class="order-items-title">🛒 Состав заказа</div>
-                        ${itemsHtml}
-                        <div class="order-total-preview">💰 Предварительно: ${total.toFixed(2)} ₽</div>
-                    </div>
-                    <div class="order-actions">
-                        <button class="order-copy-btn" onclick="copyOrder('${order.id}')">📋 Копировать</button>
-                        <button class="order-delete-btn" onclick="deleteOrder('${order.id}', '${order.firebaseId || ''}')">🗑 Удалить</button>
-                    </div>
-                </div>`;
-            }).join('');
-        }
-
-        async function deleteOrder(orderId, firebaseId) {
-            if (!confirm('Удалить заказ?')) return;
+            updateAuthUI();
+            showNotification('Сессия очищена. Теперь вы можете войти как другой пользователь.');
             
-            if (firebaseId) {
-                const success = await deleteOrderFromFirebase(orderId, firebaseId);
-                if (success) {
-                    displayOrders();
-                    showNotification('Заказ удалён');
-                }
-            } else {
-                orders = orders.filter(o => o.id != orderId);
-                displayOrders();
-                showNotification('Заказ удалён');
-            }
+            // Показываем модальное окно входа
+            showAuthModal();
+            
+            // Пересоздаём виджет Telegram (это сбросит кэш и позволит ввести новый номер)
+            setTimeout(() => {
+                createTelegramWidget();
+            }, 200);
         }
 
-        function copyOrder(orderId) {
-            const order = orders.find(o => o.id == orderId);
-            if (order) {
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(order.orderText).then(() => showNotification('Заказ скопирован 📋')).catch(() => fallbackCopy(order.orderText));
-                } else {
-                    fallbackCopy(order.orderText);
-                }
-            }
+        // Мобильный выход
+        function mobileLogout() {
+            toggleMobileMenu();
+            logout();
         }
 
-        function fallbackCopy(text) {
-            const textarea = document.createElement('textarea');
-            textarea.value = text;
-            textarea.style.position = 'fixed';
-            textarea.style.top = '-9999px';
-            textarea.style.left = '-9999px';
-            document.body.appendChild(textarea);
-            textarea.focus();
-            textarea.select();
-            try {
-                document.execCommand('copy');
-                showNotification('Заказ скопирован 📋');
-            } catch (err) {
-                showNotification('Не удалось скопировать');
-            }
-            document.body.removeChild(textarea);
+        // Выход
+        function logout(showConfirm = true) {
+            if (showConfirm && !confirm('Выйти из аккаунта?')) return;
+            
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            orders = [];
+            updateAuthUI();
+            showNotification('Вы вышли из аккаунта');
         }
 
         // Отображение товаров
@@ -885,7 +704,6 @@
                 p.name.toLowerCase().includes(searchQuery.toLowerCase())
             );
             
-            // Десктоп
             const desktopHtml = filtered.map(p => {
                 const cartItem = cart.find(item => item.id === p.id);
                 const qty = cartItem ? formatQuantity(cartItem.count * p.step) : '0';
@@ -907,7 +725,6 @@
                 `;
             }).join('');
             
-            // Мобильная
             const mobileHtml = filtered.map(p => {
                 const cartItem = cart.find(item => item.id === p.id);
                 const qty = cartItem ? formatQuantity(cartItem.count * p.step) : '0';
@@ -1081,6 +898,36 @@
             document.getElementById('mobileCalcResult').textContent = `Стоимость: ${((gram/1000)*price).toFixed(2)} ₽`;
         }
 
+        // Мобильное меню
+        function toggleMobileMenu() {
+            document.getElementById('mobileMenu').classList.toggle('active');
+            document.getElementById('menuOverlay').classList.toggle('active');
+        }
+
+        function toggleMobileCalculator() {
+            document.getElementById('mobileCalculator').classList.toggle('active');
+        }
+
+        function toggleMobileCart() {
+            updateAllCarts();
+            document.getElementById('mobileCartModal').classList.add('active');
+            updateAllCarts();
+        }
+
+        function hideMobileCart() {
+            document.getElementById('mobileCartModal').classList.remove('active');
+        }
+
+        // Модальные окна
+        function showModal(type) {
+            document.getElementById(type + 'Modal').classList.add('active');
+            if (type === 'reviews') displayReviews();
+        }
+
+        function hideModal(type) {
+            document.getElementById(type + 'Modal').classList.remove('active');
+        }
+
         // Отзывы
         function displayReviews() {
             const list = document.getElementById('reviewsList');
@@ -1132,6 +979,131 @@
             let numbers = value.substring(2).replace(/[^0-9]/g, '');
             if (numbers.length > 10) numbers = numbers.substring(0, 10);
             input.value = '+7' + numbers;
+        }
+
+        // === АВТОРИЗАЦИЯ ===
+        function showAuthModal() {
+            document.getElementById('authModal').classList.add('active');
+        }
+
+        function hideAuthModal() {
+            document.getElementById('authModal').classList.remove('active');
+        }
+
+        function handleMobileAuth() {
+            if (currentUser) {
+                showOrders();
+            } else {
+                showAuthModal();
+            }
+        }
+
+        function handleMobileOrders() {
+            if (currentUser) {
+                showOrders();
+            } else {
+                showNotification('Сначала войдите в аккаунт');
+                showAuthModal();
+            }
+        }
+
+        // === ЗАКАЗЫ ===
+        async function showOrders() {
+            if (!currentUser) {
+                showNotification('Сначала войдите в аккаунт');
+                showAuthModal();
+                return;
+            }
+            
+            await loadUserOrdersFromFirebase();
+            displayOrders();
+            document.getElementById('ordersModal').classList.add('active');
+            document.getElementById('ordersUserInfo').textContent = `Пользователь: ${currentUser.name || currentUser.username || ''}`;
+        }
+
+        function hideOrders() {
+            document.getElementById('ordersModal').classList.remove('active');
+        }
+
+        function displayOrders() {
+            const container = document.getElementById('ordersContainer');
+            if (orders.length === 0) {
+                container.innerHTML = '<div class="no-orders">📭 У вас пока нет заказов</div>';
+                return;
+            }
+            container.innerHTML = orders.map(order => {
+                const total = order.items.reduce((sum, item) => sum + (item.price * item.count * item.step), 0);
+                let itemsHtml = '';
+                order.items.forEach(item => {
+                    const qty = item.count * item.step;
+                    itemsHtml += `<div class="order-item-line"><span class="order-item-name">${item.name}</span><span class="order-item-qty">${formatQuantity(qty)} ${item.orderUnit}</span></div>`;
+                });
+                return `
+                <div class="order-card">
+                    <div class="order-header">
+                        <span class="order-id">Заказ #${order.id.toString().slice(-6)}</span>
+                        <span class="order-date">${order.date}</span>
+                    </div>
+                    <div class="order-body">
+                        <div class="order-field"><span class="label">📦 Подпись:</span> <span class="value">${order.packageName || (order.orderText ? order.orderText.split('\n')[0] : '—')}</span></div>
+                        <div class="order-field"><span class="label">👤 Имя:</span> <span class="value">${order.customerName || '—'}</span></div>
+                        <div class="order-field"><span class="label">📞 Телефон:</span> <span class="value">${order.phone || '—'}</span></div>
+                        <div class="order-field"><span class="label">📍 Точка:</span> <span class="value">${order.pickupPoint || (order.orderText ? order.orderText.split('\n').pop() : '—')}</span></div>
+                        <div class="order-items-title">🛒 Состав заказа</div>
+                        ${itemsHtml}
+                        <div class="order-total-preview">💰 Предварительно: ${total.toFixed(2)} ₽</div>
+                    </div>
+                    <div class="order-actions">
+                        <button class="order-copy-btn" onclick="copyOrder('${order.id}')">📋 Копировать</button>
+                        <button class="order-delete-btn" onclick="deleteOrder('${order.id}', '${order.firebaseId || ''}')">🗑 Удалить</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        async function deleteOrder(orderId, firebaseId) {
+            if (!confirm('Удалить заказ?')) return;
+            
+            if (firebaseId) {
+                const success = await deleteOrderFromFirebase(orderId, firebaseId);
+                if (success) {
+                    displayOrders();
+                    showNotification('Заказ удалён');
+                }
+            } else {
+                orders = orders.filter(o => o.id != orderId);
+                displayOrders();
+                showNotification('Заказ удалён');
+            }
+        }
+
+        function copyOrder(orderId) {
+            const order = orders.find(o => o.id == orderId);
+            if (order) {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(order.orderText).then(() => showNotification('Заказ скопирован 📋')).catch(() => fallbackCopy(order.orderText));
+                } else {
+                    fallbackCopy(order.orderText);
+                }
+            }
+        }
+
+        function fallbackCopy(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.top = '-9999px';
+            textarea.style.left = '-9999px';
+            document.body.appendChild(textarea);
+            textarea.focus();
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showNotification('Заказ скопирован 📋');
+            } catch (err) {
+                showNotification('Не удалось скопировать');
+            }
+            document.body.removeChild(textarea);
         }
 
         // Форма заказа
