@@ -7,7 +7,6 @@
     <!-- Подключаем Telegram Web App SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        /* === ПОЛНЫЕ СТИЛИ (как в оригинале) === */
         * {
             margin: 0;
             padding: 0;
@@ -1209,7 +1208,6 @@
         <div class="mobile-menu-item" onclick="showModal('producer'); toggleMobileMenu()">📋 О производителе</div>
         <div class="mobile-menu-item" onclick="showModal('rules'); toggleMobileMenu()">📝 Правила заказа</div>
         <div class="mobile-menu-item" id="mobileOrdersItem" style="display: none;" onclick="showOrders(); toggleMobileMenu()">📋 Мои заказы</div>
-        <!-- ЭТУ КНОПКУ МЫ БУДЕМ СКРЫВАТЬ В TELEGRAM -->
         <div class="mobile-menu-item" id="mobileAuthMenuItem" onclick="handleMobileAuth(); toggleMobileMenu()">🔐 Войти</div>
         <div class="mobile-menu-item logout" id="mobileLogoutItem" style="display: none;" onclick="showLogoutConfirm()">🚪 Выйти</div>
     </div>
@@ -1446,7 +1444,13 @@
             { id: 7, name: "🧀 Палка", price: 1400, unit: "кг", category: "cheese", orderUnit: "кг", orderNote: "весовой", step: 1 },
             { id: 8, name: "🧀 Сулугуни элитный", price: 1800, unit: "кг", category: "cheese", orderUnit: "уп", orderNote: "упаковка 1 кг", step: 1 },
             { id: 9, name: "🧀 Моцарелла", price: 1900, unit: "кг", category: "cheese", orderUnit: "уп", orderNote: "упаковка 1 кг", step: 1 },
-            { id: 10, name: "🧀 Сыр косичка", price: 1800, unit: "кг", category: "cheese", orderUnit: "уп", orderNote: "упаковка 250-300 г", step: 0.25 }
+            { id: 10, name: "🧀 Сыр косичка", price: 1800, unit: "кг", category: "cheese", orderUnit: "уп", orderNote: "упаковка 250-300 г", step: 0.25 },
+            { id: 11, name: "🥛 Творог обезжиренный", price: 800, unit: "кг", category: "lowfat", orderUnit: "кг", orderNote: "весовой", step: 1 },
+            { id: 12, name: "🥛 Мацони", price: 400, unit: "л", category: "lowfat", orderUnit: "л", orderNote: "бутылка", step: 1 },
+            { id: 13, name: "🥛 Кефир", price: 350, unit: "л", category: "lowfat", orderUnit: "л", orderNote: "бутылка", step: 1 },
+            { id: 14, name: "🥛 Сгущёнка", price: 700, unit: "кг", category: "other", orderUnit: "кг", orderNote: "контейнер (1.1 кг = 1 л)", step: 1 },
+            { id: 15, name: "🥛 Варёная сгущёнка", price: 800, unit: "кг", category: "other", orderUnit: "уп", orderNote: "вакуумная упаковка 1 кг", step: 1 },
+            { id: 16, name: "🧀 Крем-сыр", price: 2000, unit: "кг", category: "cheese", orderUnit: "уп", orderNote: "вакуумная упаковка 1 кг", step: 1 }
         ];
 
         // ========== ПЕРЕМЕННЫЕ ==========
@@ -1549,7 +1553,6 @@
             }
         }
 
-        // ========== ИСПРАВЛЕННАЯ АВТОРИЗАЦИЯ ==========
         async function handleTelegramAuth(userData) {
             console.log('Telegram auth:', userData);
             
@@ -1568,7 +1571,6 @@
             updateAuthUI();
         }
 
-        // ОБНОВЛЕННАЯ функция обновления UI - ТЕПЕРЬ БЕЗ КНОПКИ ВОЙТИ В TELEGRAM
         function updateAuthUI() {
             const navButtons = document.getElementById('navButtons');
             const mobileAuthItem = document.getElementById('mobileAuthMenuItem');
@@ -1576,7 +1578,6 @@
             const mobileOrdersItem = document.getElementById('mobileOrdersItem');
             
             if (currentUser) {
-                // Пользователь авторизован
                 const avatarHtml = currentUser.photo_url 
                     ? `<img src="${currentUser.photo_url}" alt="avatar">` 
                     : (currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U');
@@ -1591,19 +1592,15 @@
                     <button class="nav-btn" onclick="showModal('rules')">Правила</button>
                 `;
                 
-                if (mobileAuthItem) {
-                    mobileAuthItem.innerHTML = `👤 ${currentUser.name || currentUser.username || 'Профиль'}`;
-                    mobileAuthItem.onclick = () => { showProfile(); toggleMobileMenu(); };
-                    mobileAuthItem.style.display = 'block'; // Показываем как профиль
-                }
+                mobileAuthItem.innerHTML = `👤 ${currentUser.name || currentUser.username || 'Профиль'}`;
+                mobileAuthItem.onclick = () => { showProfile(); toggleMobileMenu(); };
+                mobileAuthItem.style.display = 'block';
                 
                 if (mobileOrdersItem) mobileOrdersItem.style.display = 'block';
                 if (mobileLogoutItem) mobileLogoutItem.style.display = 'block';
                 
             } else {
-                // Нет пользователя - проверяем, открыто ли в Telegram
                 if (tg) {
-                    // В Telegram - показываем заглушку или просто имя бота
                     navButtons.innerHTML = `
                         <div class="user-info" style="cursor: default; background: transparent; border-color: transparent;">
                             <div class="user-avatar">🤖</div>
@@ -1613,13 +1610,11 @@
                         <button class="nav-btn" onclick="showModal('rules')">Правила</button>
                     `;
                     
-                    // В мобильном меню скрываем кнопку входа
                     if (mobileAuthItem) {
                         mobileAuthItem.style.display = 'none';
                     }
                     
                 } else {
-                    // В браузере - показываем кнопку входа
                     navButtons.innerHTML = `
                         <button class="nav-btn auth-btn" onclick="showAuthModal()">🔐 Войти</button>
                         <button class="nav-btn" onclick="showModal('producer')">О производителе</button>
@@ -1638,21 +1633,14 @@
             }
         }
 
-        // Функция для браузерной авторизации (если открыли не в Telegram)
         function showAuthModal() {
             if (tg) {
-                // В Telegram не показываем окно входа
                 tg.showAlert('Вы уже авторизованы через Telegram!');
                 return;
             }
-            // Здесь можно добавить логику для браузерной авторизации
             alert('Для входа используйте Telegram Mini App');
         }
 
-        // Остальные функции (заказы, корзина и т.д.) остаются без изменений
-        // ... (скопируйте все остальные функции из предыдущего ответа) ...
-        
-        // Загрузка заказов из Firebase
         async function loadUserOrdersFromFirebase() {
             if (!currentUser) return;
             
@@ -1671,7 +1659,25 @@
             }
         }
 
-        // Отображение товаров
+        async function saveOrderToFirebase(order) {
+            if (!currentUser) return false;
+            
+            try {
+                const docRef = await db.collection('orders').add({
+                    ...order,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                order.firebaseId = docRef.id;
+                orders.unshift(order);
+                
+                return true;
+            } catch (error) {
+                console.error('Ошибка сохранения заказа:', error);
+                return false;
+            }
+        }
+
         function displayProducts() {
             const currentProducts = products.length > 0 ? products : fallbackProducts;
             
@@ -1680,10 +1686,58 @@
                 p.name.toLowerCase().includes(searchQuery.toLowerCase())
             );
             
-            // ... код отображения
+            const desktopHtml = filtered.map(p => {
+                const cartItem = cart.find(item => item.id === p.id);
+                const qty = cartItem ? formatQuantity(cartItem.count * p.step) : '0';
+                const inCartClass = cartItem ? 'in-cart' : '';
+                return `
+                    <div class="product-item ${inCartClass}" data-id="${p.id}">
+                        <div class="product-info">
+                            <div class="product-name">${p.name}</div>
+                            <div class="product-note">${p.orderNote}</div>
+                        </div>
+                        <span class="product-price">${p.price} ₽</span>
+                        <span class="product-unit">${p.unit}</span>
+                        <div class="product-controls">
+                            <button class="product-qty-btn" onclick="updateProductQuantity(${p.id}, -${p.step})">−</button>
+                            <span class="product-qty-value" id="qty-${p.id}">${qty}</span>
+                            <button class="product-qty-btn" onclick="updateProductQuantity(${p.id}, ${p.step})">+</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            const mobileHtml = filtered.map(p => {
+                const cartItem = cart.find(item => item.id === p.id);
+                const qty = cartItem ? formatQuantity(cartItem.count * p.step) : '0';
+                const inCartClass = cartItem ? 'in-cart' : '';
+                return `
+                    <div class="product-item ${inCartClass}" data-id="${p.id}">
+                        <div class="product-name">${p.name}</div>
+                        <div class="product-note">${p.orderNote}</div>
+                        <div class="product-details-row">
+                            <div class="product-price-unit">
+                                <span class="product-price">${p.price} ₽</span>
+                                <span class="product-unit">${p.unit}</span>
+                            </div>
+                            <div class="product-controls">
+                                <button class="product-qty-btn" onclick="updateProductQuantity(${p.id}, -${p.step})">−</button>
+                                <span class="product-qty-value" id="qty-${p.id}">${qty}</span>
+                                <button class="product-qty-btn" onclick="updateProductQuantity(${p.id}, ${p.step})">+</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            if (document.getElementById('productsList')) {
+                document.getElementById('productsList').innerHTML = desktopHtml;
+            }
+            if (document.getElementById('mobileProductsList')) {
+                document.getElementById('mobileProductsList').innerHTML = mobileHtml;
+            }
         }
 
-        // Обновление количества товара
         function updateProductQuantity(productId, delta) {
             const currentProducts = products.length > 0 ? products : fallbackProducts;
             const product = currentProducts.find(p => p.id === productId);
@@ -1706,12 +1760,10 @@
             updateAllCarts();
         }
 
-        // Сохранение корзины
         function saveCart() {
             localStorage.setItem('cart', JSON.stringify(cart));
         }
 
-        // Загрузка корзины
         function loadCart() {
             const saved = localStorage.getItem('cart');
             if (saved) {
@@ -1723,7 +1775,6 @@
             }
         }
 
-        // Обновление корзин
         function updateAllCarts() {
             const totalUnits = cart.reduce((sum, item) => sum + item.count, 0);
             document.getElementById('cartCount').textContent = totalUnits > 99 ? '99+' : totalUnits;
@@ -1736,10 +1787,57 @@
                 }
             }
             
-            // ... остальной код обновления корзин
+            const createCartHtml = () => {
+                if (cart.length === 0) {
+                    return { html: '<p style="color: #b87333; text-align: center; padding: 10px;">🛒 Корзина пуста</p>', total: 0 };
+                }
+                
+                let totalSum = 0;
+                const itemsHtml = cart.map(item => {
+                    const quantity = item.count * item.step;
+                    const itemTotal = item.price * quantity;
+                    totalSum += itemTotal;
+                    return `
+                        <div class="cart-item">
+                            <div class="cart-item-info">
+                                <div class="cart-item-name">${item.name}</div>
+                                <div class="cart-item-note">${item.orderNote}</div>
+                            </div>
+                            <div class="cart-item-controls">
+                                <button class="cart-item-btn" onclick="updateProductQuantity(${item.id}, -${item.step})">−</button>
+                                <span class="cart-item-quantity">${formatQuantity(quantity)}</span>
+                                <button class="cart-item-btn" onclick="updateProductQuantity(${item.id}, ${item.step})">+</button>
+                                <button class="cart-item-remove" onclick="removeFromCart(${item.id})">×</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                return { html: itemsHtml, total: totalSum };
+            };
+            
+            const { html, total } = createCartHtml();
+            
+            const desktopCart = document.getElementById('desktopCartItems');
+            const desktopTotal = document.getElementById('desktopCartTotal')?.querySelector('span');
+            if (desktopCart) desktopCart.innerHTML = html;
+            if (desktopTotal) desktopTotal.textContent = `${total.toFixed(2)} ₽`;
+            
+            const mobileCart = document.getElementById('mobileCartItems');
+            const mobileTotal = document.getElementById('mobileCartTotal')?.querySelector('span');
+            if (mobileCart && document.getElementById('mobileCartModal').classList.contains('active')) {
+                mobileCart.innerHTML = html;
+            }
+            if (mobileTotal) mobileTotal.textContent = `${total.toFixed(2)} ₽`;
         }
 
-        // Очистка корзины
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            saveCart();
+            displayProducts();
+            updateAllCarts();
+        }
+
         function clearCart() {
             if (cart.length === 0) return;
             
@@ -1766,13 +1864,11 @@
             }
         }
 
-        // Поиск
         function searchProducts() {
             searchQuery = document.getElementById('searchInput').value;
             displayProducts();
         }
 
-        // Фильтр
         function filterProducts(category) {
             currentCategory = category;
             document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
@@ -1780,7 +1876,18 @@
             displayProducts();
         }
 
-        // Мобильное меню
+        function updateWidgetCalc() {
+            const price = parseFloat(document.getElementById('widgetPriceKg').value) || 0;
+            const gram = parseFloat(document.getElementById('widgetGram').value) || 0;
+            document.getElementById('widgetResult').textContent = `Стоимость: ${((gram/1000)*price).toFixed(2)} ₽`;
+        }
+
+        function updateMobileCalc() {
+            const price = parseFloat(document.getElementById('mobilePriceKg').value) || 0;
+            const gram = parseFloat(document.getElementById('mobileGram').value) || 0;
+            document.getElementById('mobileCalcResult').textContent = `Стоимость: ${((gram/1000)*price).toFixed(2)} ₽`;
+        }
+
         function toggleMobileMenu() {
             document.getElementById('mobileMenu').classList.toggle('active');
             document.getElementById('menuOverlay').classList.toggle('active');
@@ -1799,7 +1906,6 @@
             document.getElementById('mobileCartModal').classList.remove('active');
         }
 
-        // Модальные окна
         function showModal(type) {
             document.getElementById(type + 'Modal').classList.add('active');
         }
@@ -1808,7 +1914,6 @@
             document.getElementById(type + 'Modal').classList.remove('active');
         }
 
-        // Профиль
         function showProfile() {
             if (!currentUser) return;
             
@@ -1832,7 +1937,6 @@
             document.getElementById('profileModal').classList.remove('active');
         }
 
-        // Выход
         function showLogoutConfirm() {
             document.getElementById('logoutConfirmModal').classList.add('active');
         }
@@ -1866,7 +1970,6 @@
             }
         }
 
-        // Заказы
         async function showOrders() {
             if (!currentUser) {
                 if (tg) {
@@ -1885,23 +1988,84 @@
         }
 
         function displayOrders() {
-            // ... код отображения заказов
+            const container = document.getElementById('ordersContainer');
+            if (orders.length === 0) {
+                container.innerHTML = '<div class="no-orders">📭 У вас пока нет заказов</div>';
+                return;
+            }
+            
+            container.innerHTML = orders.map(order => {
+                const total = order.items.reduce((sum, item) => sum + (item.price * item.count * item.step), 0);
+                let itemsHtml = '';
+                order.items.forEach(item => {
+                    const qty = item.count * item.step;
+                    itemsHtml += `<div class="order-item-line"><span class="order-item-name">${item.name}</span><span class="order-item-qty">${formatQuantity(qty)} ${item.orderUnit}</span></div>`;
+                });
+                
+                return `
+                    <div class="order-card">
+                        <div class="order-header">
+                            <span class="order-id">Заказ #${order.id.toString().slice(-6)}</span>
+                            <span class="order-date">${order.date}</span>
+                        </div>
+                        <div class="order-body">
+                            <div class="order-field"><span class="label">📦 Подпись:</span> <span class="value">${order.packageName}</span></div>
+                            <div class="order-field"><span class="label">👤 Имя:</span> <span class="value">${order.customerName}</span></div>
+                            <div class="order-field"><span class="label">📞 Телефон:</span> <span class="value">${order.phone}</span></div>
+                            <div class="order-field"><span class="label">📍 Точка:</span> <span class="value">${order.pickupPoint}</span></div>
+                            <div class="order-items-title">🛒 Состав заказа</div>
+                            ${itemsHtml}
+                            <div class="order-total-preview">💰 Предварительно: ${total.toFixed(2)} ₽</div>
+                        </div>
+                        <div class="order-actions">
+                            <button class="order-copy-btn" onclick="copyOrder('${order.id}')">📋 Копировать</button>
+                            <button class="order-delete-btn" onclick="deleteOrder('${order.id}', '${order.firebaseId || ''}')">🗑 Удалить</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
-        // Калькуляторы
-        function updateWidgetCalc() {
-            const price = parseFloat(document.getElementById('widgetPriceKg').value) || 0;
-            const gram = parseFloat(document.getElementById('widgetGram').value) || 0;
-            document.getElementById('widgetResult').textContent = `Стоимость: ${((gram/1000)*price).toFixed(2)} ₽`;
+        async function deleteOrder(orderId, firebaseId) {
+            if (!confirm('Удалить заказ?')) return;
+            
+            if (firebaseId) {
+                try {
+                    await db.collection('orders').doc(firebaseId).delete();
+                    orders = orders.filter(o => o.id != orderId);
+                    displayOrders();
+                } catch (error) {
+                    console.error('Ошибка удаления заказа:', error);
+                }
+            } else {
+                orders = orders.filter(o => o.id != orderId);
+                displayOrders();
+            }
         }
 
-        function updateMobileCalc() {
-            const price = parseFloat(document.getElementById('mobilePriceKg').value) || 0;
-            const gram = parseFloat(document.getElementById('mobileGram').value) || 0;
-            document.getElementById('mobileCalcResult').textContent = `Стоимость: ${((gram/1000)*price).toFixed(2)} ₽`;
+        function copyOrder(orderId) {
+            const order = orders.find(o => o.id == orderId);
+            if (order) {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(order.orderText).then(() => {
+                        if (tg) {
+                            tg.showPopup({ message: 'Заказ скопирован', buttons: [{ type: 'ok' }] });
+                        }
+                    });
+                } else {
+                    const textarea = document.createElement('textarea');
+                    textarea.value = order.orderText;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    if (tg) {
+                        tg.showPopup({ message: 'Заказ скопирован', buttons: [{ type: 'ok' }] });
+                    }
+                }
+            }
         }
 
-        // Телефон
         function handlePhoneInput(input) {
             let value = input.value;
             if (!value.startsWith('+7')) {
@@ -1913,7 +2077,6 @@
             input.value = '+7' + numbers;
         }
 
-        // Форма заказа
         function showOrderForm() {
             if (!currentUser) {
                 if (tg) {
@@ -1929,7 +2092,22 @@
                 return;
             }
 
-            // ... код показа формы
+            const summary = document.getElementById('orderSummary');
+            summary.innerHTML = '<h3 style="margin-bottom: 10px;">Ваш заказ:</h3>' + 
+                cart.map(item => {
+                    const quantity = item.count * item.step;
+                    let itemText = `${item.name} — ${formatQuantity(quantity)} `;
+                    if (item.orderUnit === 'кг') {
+                        itemText += 'кг';
+                    } else if (item.name.includes('Сгущёнка') && !item.name.includes('варёная')) {
+                        itemText += `кг (рекомендуется ${(quantity * 1.1).toFixed(2)} кг = ${quantity} л)`;
+                    } else {
+                        itemText += item.orderUnit;
+                    }
+                    return `<p>• ${itemText}</p>`;
+                }).join('');
+            
+            document.getElementById('phone').value = '+7';
             document.getElementById('orderForm').classList.add('active');
         }
 
@@ -1937,7 +2115,6 @@
             document.getElementById('orderForm').classList.remove('active');
         }
 
-        // Отправка заказа
         async function submitOrder(event) {
             event.preventDefault();
             
@@ -1946,10 +2123,109 @@
                 return;
             }
             
-            // ... код отправки заказа
+            const packageName = document.getElementById('packageName').value;
+            const pickupPoint = document.getElementById('pickupPoint').value;
+            const customerName = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+            
+            const phoneDigits = phone.substring(2).replace(/\D/g, '');
+            if (phoneDigits.length < 10) {
+                if (tg) {
+                    tg.showAlert('Введите полный номер телефона (10 цифр)');
+                }
+                return;
+            }
+            
+            let orderText = `${packageName}\n\n`;
+            
+            cart.forEach(item => {
+                const quantity = item.count * item.step;
+                if (item.name.includes('Панир') || item.name.includes('Палка')) {
+                    orderText += `${item.name} — ${formatQuantity(quantity)} кг\n`;
+                } else if (item.name.includes('Сгущёнка') && !item.name.includes('варёная')) {
+                    orderText += `${item.name} — ${(quantity * 1.1).toFixed(2)} кг (рекомендуется 1.1 кг = 1 л)\n`;
+                } else if (item.name.includes('Масло Премиум')) {
+                    orderText += `${item.name} — ${item.count} коробок по 5 кг\n`;
+                } else if (item.name.includes('Масло Сбойка')) {
+                    orderText += `${item.name} — ${item.count} упаковок (2.2-2.9 кг)\n`;
+                } else {
+                    orderText += `${item.name} — ${item.count} ${item.orderUnit} (${item.orderNote})\n`;
+                }
+            });
+            
+            orderText += `\n${pickupPoint}`;
+
+            const orderId = Date.now();
+            const order = {
+                id: orderId,
+                date: new Date().toLocaleString(),
+                orderText,
+                items: [...cart],
+                customerName,
+                phone,
+                pickupPoint,
+                packageName,
+                userId: currentUser.id
+            };
+
+            await saveOrderToFirebase(order);
+
+            const totalSum = cart.reduce((sum, item) => sum + (item.price * item.count * item.step), 0);
+            const telegramMessage = `
+<b>🛍 НОВЫЙ ЗАКАЗ #${orderId.toString().slice(-6)}</b>
+<b>👤 Пользователь:</b> ${currentUser.name || currentUser.username || 'Неизвестно'}
+
+<b>📦 Подпись на пакете:</b> ${packageName}
+<b>👤 Имя:</b> ${customerName}
+<b>📞 Телефон:</b> ${phone}
+<b>📍 Точка самовывоза:</b> ${pickupPoint}
+<b>📅 Дата:</b> ${new Date().toLocaleString()}
+
+<b>🛒 Состав заказа:</b>
+${orderText.replace(/\n/g, '\n')}
+
+<b>💰 Предварительная сумма:</b> ${totalSum.toFixed(2)} ₽
+            `;
+
+            fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    chat_id: TELEGRAM_CHAT_ID, 
+                    text: telegramMessage, 
+                    parse_mode: 'HTML' 
+                })
+            }).catch(e => console.error('Ошибка отправки в Telegram:', e));
+            
+            if (tg) {
+                tg.MainButton.hide();
+                tg.showPopup({
+                    title: 'Заказ принят!',
+                    message: '🙏 Харе Кришна! Ваш заказ успешно отправлен.',
+                    buttons: [{ type: 'ok' }]
+                });
+            }
+            
+            cart = [];
+            saveCart();
+            displayProducts();
+            updateAllCarts();
+            hideOrderForm();
+            hideMobileCart();
+            event.target.reset();
+            document.getElementById('phone').value = '+7';
         }
 
-        // Инициализация
+        window.addEventListener('scroll', function() {
+            document.getElementById('header').classList.toggle('compact', window.scrollY > 50);
+        });
+
+        window.onclick = (event) => {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active');
+            }
+        };
+
         document.addEventListener('DOMContentLoaded', () => {
             loadProductsFromGoogleSheet();
             loadCart();
@@ -1967,11 +2243,6 @@
             if (currentUser) {
                 loadUserOrdersFromFirebase();
             }
-        });
-
-        // Скролл
-        window.addEventListener('scroll', function() {
-            document.getElementById('header').classList.toggle('compact', window.scrollY > 50);
         });
     </script>
 </body>
