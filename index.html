@@ -644,7 +644,7 @@
             showNotification(`Добро пожаловать, ${userData.first_name}! 🙏`);
         }
 
-        // Функция для выхода из Telegram
+        // Функция для принудительного выхода из Telegram
         function telegramLogout() {
             // Очищаем данные на сайте
             currentUser = null;
@@ -652,7 +652,7 @@
             orders = [];
             updateAuthUI();
             
-            // Открываем страницу выхода Telegram в iframe
+            // Создаем временный iframe для выхода
             const iframe = document.createElement('iframe');
             iframe.style.display = 'none';
             iframe.src = 'https://oauth.telegram.org/auth/quit?bot_id=dairy_shop_2026_bot&origin=https://rabotalya22.github.io';
@@ -661,14 +661,37 @@
             // Показываем уведомление
             showNotification('Выход из Telegram...');
             
-            // Удаляем iframe и показываем окно входа через секунду
+            // Ждем и удаляем iframe
             setTimeout(() => {
                 document.body.removeChild(iframe);
+                
+                // Полная очистка всех данных, связанных с Telegram
+                if (window.Telegram && window.Telegram.Login) {
+                    try {
+                        // Пытаемся очистить кэш Telegram
+                        window.Telegram.Login.auth({ bot_id: 'dairy_shop_2026_bot' }, function() {});
+                    } catch (e) {}
+                }
+                
+                // Пересоздаем виджет с параметром force_reauth
+                const container = document.getElementById('telegram-login-container');
+                container.innerHTML = '';
+                
+                // Создаем новый скрипт с параметром force_reauth=true
+                const script = document.createElement('script');
+                script.async = true;
+                script.src = 'https://telegram.org/js/telegram-widget.js?22';
+                script.setAttribute('data-telegram-login', 'dairy_shop_2026_bot');
+                script.setAttribute('data-size', 'large');
+                script.setAttribute('data-radius', '30');
+                script.setAttribute('data-onauth', 'onTelegramAuth(user)');
+                script.setAttribute('data-request-access', 'write');
+                script.setAttribute('data-force-reauth', 'true'); // КЛЮЧЕВОЙ ПАРАМЕТР!
+                
+                container.appendChild(script);
+                
                 showAuthModal();
-                // Пересоздаём виджет
-                setTimeout(() => {
-                    createTelegramWidget();
-                }, 200);
+                showNotification('Теперь вы можете войти под другим пользователем');
             }, 1500);
         }
 
