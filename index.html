@@ -314,16 +314,16 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <script>
-        // 🔥 ВАЖНО: ЗАМЕНИТЕ ЭТИ ДАННЫЕ НА СВОИ ИЗ КОНСОЛИ FIREBASE!
+        // 🔥 ВАШИ ДАННЫЕ FIREBASE
         const firebaseConfig = {
-    apiKey: "AIzaSyDztZkvuz3vp__7uUY9sv34R2G8d06qvZEA",
-    authDomain: "moloko-15747.firebaseapp.com",
-    projectId: "moloko-15747",
-    storageBucket: "moloko-15747.firebasestorage.app",
-    messagingSenderId: "533713083066",
-    appId: "1:533713083066:web:5e520a9ce2c78d36314083",
-    measurementId: "G-DDVM2WN2J9"
-};
+            apiKey: "AIzaSyDztZkvuz3vp__7uUY9sv34R2G8d06qvZEA",
+            authDomain: "moloko-15747.firebaseapp.com",
+            projectId: "moloko-15747",
+            storageBucket: "moloko-15747.firebasestorage.app",
+            messagingSenderId: "533713083066",
+            appId: "1:533713083066:web:5e520a9ce2c78d36314083",
+            measurementId: "G-DDVM2WN2J9"
+        };
 
         // Инициализация Firebase
         firebase.initializeApp(firebaseConfig);
@@ -491,7 +491,7 @@
                 console.log('Заказы загружены из Firebase:', orders.length);
             } catch (error) {
                 console.error('Ошибка загрузки заказов:', error);
-                showNotification('Ошибка загрузки заказов');
+                showNotification('Ошибка загрузки заказов. Проверьте подключение к Firebase.');
             }
         }
 
@@ -609,7 +609,7 @@
             logout();
         }
 
-        // Отображение товаров (функция полностью сохранена)
+        // Отображение товаров
         function displayProducts() {
             const filtered = products.filter(p => 
                 (currentCategory === 'all' || p.category === currentCategory) && 
