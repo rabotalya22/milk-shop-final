@@ -27,11 +27,12 @@
         .nav-btn:hover { background: #d4a373; color: white; }
         .auth-btn { background: #6b4f3c; border-color: #8b6b4f; color: white; }
         .auth-btn:hover { background: #8b6b4f; }
-        .user-info { display: flex; align-items: center; gap: 10px; background: #fff2d9; border: 2px solid #d4a373; border-radius: 30px; padding: 5px 15px 5px 10px; }
-        .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: #d4a373; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; overflow: hidden; }
+        .user-info { display: flex; align-items: center; gap: 10px; background: #fff2d9; border: 2px solid #d4a373; border-radius: 30px; padding: 5px 15px 5px 10px; cursor: pointer; transition: all 0.2s; }
+        .user-info:hover { background: #d4a373; }
+        .user-info:hover .user-name { color: white; }
+        .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: #d4a373; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; overflow: hidden; flex-shrink: 0; }
         .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
         .user-name { font-weight: bold; color: #6b4f3c; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .logout-btn { background: none; border: none; color: #c41e3a; cursor: pointer; font-size: 18px; padding: 0 5px; }
         .mobile-menu { position: fixed; top: 0; left: -300px; width: 280px; height: 100vh; background: #fff9e6; border-right: 3px solid #d4a373; z-index: 2000; transition: left 0.3s ease; padding: 80px 20px 20px; }
         .mobile-menu.active { left: 0; }
         .mobile-menu-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1999; }
@@ -137,6 +138,78 @@
             min-height: 60px;
         }
         
+        /* Модальное окно профиля */
+        .profile-modal .modal-content {
+            max-width: 350px;
+            text-align: center;
+        }
+        
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            background: #d4a373;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+            overflow: hidden;
+        }
+        
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .profile-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #6b4f3c;
+            margin-bottom: 5px;
+        }
+        
+        .profile-username {
+            color: #b87333;
+            margin-bottom: 20px;
+        }
+        
+        .profile-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .profile-btn {
+            padding: 12px;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        .profile-btn.primary {
+            background: #d4a373;
+            color: white;
+            border: 2px solid #b87333;
+        }
+        
+        .profile-btn.secondary {
+            background: #fff2d9;
+            color: #6b4f3c;
+            border: 2px solid #d4a373;
+        }
+        
+        .profile-btn.danger {
+            background: #ffe4e0;
+            color: #c41e3a;
+            border: 2px solid #c41e3a;
+        }
+        
         @media (max-width: 900px) {
             .desktop-container { display: none; }
             .mobile-view { display: block; padding: 8px; }
@@ -199,8 +272,6 @@
         <div class="mobile-menu-item" onclick="showModal('reviews'); toggleMobileMenu()">⭐ Отзывы покупателей</div>
         <div class="mobile-menu-item" onclick="handleMobileOrders(); toggleMobileMenu()">📋 Мои заказы</div>
         <div class="mobile-menu-item" id="mobileAuthMenuItem" onclick="handleMobileAuth(); toggleMobileMenu()">🔐 Войти</div>
-        <!-- Кнопка выйти в мобильном меню -->
-        <div class="mobile-menu-item logout" id="mobileLogoutItem" style="display: none;" onclick="mobileLogout()">🚪 Выйти</div>
     </div>
 
     <!-- Десктопная версия -->
@@ -261,31 +332,28 @@
     <div class="modal" id="producerModal"><div class="modal-content"><button class="close-modal" onclick="hideModal('producer')">×</button><h2 style="color: #6b4f3c; margin-bottom: 20px;">🐄 О производителе</h2><p style="margin-bottom: 15px;">Наше хозяйство находится в экологически чистом районе. Мы заботимся о коровах и следуем ведическим принципам.</p><p>✅ Натуральное питание без ГМО</p><p>✅ Свободный выпас на лугах</p><p>✅ Ручное доение с любовью</p></div></div>
     <div class="modal" id="rulesModal"><div class="modal-content"><button class="close-modal" onclick="hideModal('rules')">×</button><h2 style="color: #6b4f3c; margin-bottom: 20px;">📝 Правила заказа</h2><p><strong>1.</strong> В первой строчке указываем, как подписать пакет (имя и фамилия или духовное имя)</p><p><strong>2.</strong> Последней строчкой пишем одним словом условное название точки самовывоза (из списка)</p><p><strong>3.</strong> Почти все наименования мы заказываем штуками или упаковками (шт./уп.)</p><p><strong>4.</strong> Панир и Палку пишем в килограммах</p><p><strong>5.</strong> Сулугуни элитный и Моцарелла упакованы по 1 кг</p><p><strong>6.</strong> Косичка приходит небольшими упаковками примерно по 250-300 г</p><p><strong>7.</strong> Остальные сыры нарезают примерно по 0,4-0,7 кг кусками</p><p><strong>8.</strong> Сгущёнку разливаем по контейнерам (можно приобрести любой вес, кратный 0,5 кг, но лучше всего писать 1,1 кг, что равнозначно 1 л)</p><p><strong>9.</strong> Варёная сгущёнка приходит в вакуумных пакетах по 1 кг</p><p><strong>10.</strong> Крем-сыр также в вакуумных упаковках по 1 кг</p><p><strong>11.</strong> Масло Премиум заказываем коробками по 5 кг</p><p><strong>12.</strong> Масло Сбойка приходит весом 2,2-2,9 кг в вакуумных упаковках</p></div></div>
 
+    <!-- Модальное окно профиля -->
+    <div class="modal profile-modal" id="profileModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="hideProfileModal()">×</button>
+            <h2 style="color: #6b4f3c; margin-bottom: 20px;">👤 Мой профиль</h2>
+            
+            <div id="profileContent"></div>
+        </div>
+    </div>
+
     <!-- Модальное окно авторизации через Telegram -->
     <div class="modal" id="authModal">
         <div class="modal-content auth-modal">
             <button class="close-modal" onclick="hideAuthModal()">×</button>
             <h2 style="color: #6b4f3c; margin-bottom: 20px;">🔐 Вход через Telegram</h2>
             
-            <!-- Блок с текущим пользователем (показывается если есть) -->
-            <div id="currentUserBlock" style="display: none; margin-bottom: 20px; padding: 15px; background: #fff2d9; border-radius: 10px; text-align: center;">
-                <p style="margin-bottom: 5px; color: #6b4f3c;">Выполнен вход как:</p>
-                <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px;">
-                    <div class="user-avatar" id="currentUserAvatar" style="width: 40px; height: 40px;">👤</div>
-                    <span style="font-weight: bold; color: #6b4f3c;" id="currentUserNameDisplay"></span>
-                </div>
-                <button class="btn btn-secondary" onclick="switchUser()" style="width: 100%;">🔄 Сменить пользователя</button>
-            </div>
+            <p style="text-align: center; margin-bottom: 20px; color: #6b4f3c;" id="authModalMessage">
+                Нажмите кнопку ниже, чтобы войти с помощью Telegram
+            </p>
             
-            <!-- Блок входа (показывается когда нет пользователя) -->
-            <div id="loginBlock">
-                <p style="text-align: center; margin-bottom: 20px; color: #6b4f3c;" id="authModalMessage">
-                    Нажмите кнопку ниже, чтобы войти с помощью Telegram
-                </p>
-                
-                <!-- Контейнер для Telegram кнопки -->
-                <div class="telegram-login-wrapper" id="telegram-login-container"></div>
-            </div>
+            <!-- Контейнер для Telegram кнопки -->
+            <div class="telegram-login-wrapper" id="telegram-login-container"></div>
             
             <p style="text-align: center; margin-top: 20px; font-size: 12px; color: #8b6b4f;">
                 Мы получаем только ваш ID, имя и фото профиля
@@ -300,7 +368,6 @@
             <div class="orders-header">
                 <span class="orders-title">📋 Мои заказы</span>
                 <span id="ordersUserInfo" style="font-size: 12px; color: #b87333;"></span>
-                <button class="switch-user-btn" id="switchUserInOrders" onclick="switchUser()" style="display: none;">(сменить)</button>
             </div>
             <div class="orders-container" id="ordersContainer"></div>
         </div>
@@ -445,7 +512,6 @@
 
         // Загрузка
         document.addEventListener('DOMContentLoaded', () => {
-            // Проверяем URL на наличие данных от Telegram (при редиректе с auth.php) - оставляем для совместимости
             const urlParams = new URLSearchParams(window.location.search);
             const tgUser = urlParams.get('tg_user');
             
@@ -476,11 +542,9 @@
                 loadUserOrdersFromFirebase();
             }
             
-            // Создаём Telegram виджет с JS-колбэком
             createTelegramWidget();
         });
 
-        // Создание Telegram виджета с JS-колбэком
         function createTelegramWidget() {
             const container = document.getElementById('telegram-login-container');
             if (!container) return;
@@ -499,13 +563,11 @@
             container.appendChild(script);
         }
 
-        // Глобальная функция для обработки авторизации
         window.onTelegramAuth = function(user) {
             console.log('Telegram auth success:', user);
             handleTelegramAuth(user);
         };
 
-        // Загрузка заказов из Firebase
         async function loadUserOrdersFromFirebase() {
             if (!currentUser) return;
             
@@ -527,7 +589,6 @@
             }
         }
 
-        // Сохранение заказа в Firebase
         async function saveOrderToFirebase(order) {
             if (!currentUser) return;
             
@@ -549,7 +610,6 @@
             }
         }
 
-        // Удаление заказа из Firebase
         async function deleteOrderFromFirebase(orderId, firebaseId) {
             try {
                 await db.collection('orders').doc(firebaseId).delete();
@@ -563,7 +623,6 @@
             }
         }
 
-        // Обработка данных от Telegram
         async function handleTelegramAuth(userData) {
             console.log('Telegram auth success:', userData);
             
@@ -585,28 +644,59 @@
             showNotification(`Добро пожаловать, ${userData.first_name}! 🙏`);
         }
 
-        // Обновление UI авторизации
+        // Полная очистка сессии Telegram
+        function terminateTelegramSession() {
+            // Создаем iframe для выхода из Telegram
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = 'https://oauth.telegram.org/auth/quit';
+            document.body.appendChild(iframe);
+            
+            // Удаляем через секунду
+            setTimeout(() => {
+                document.body.removeChild(iframe);
+            }, 1000);
+        }
+
+        // Показать профиль
+        function showProfile() {
+            if (!currentUser) return;
+            
+            const profileContent = document.getElementById('profileContent');
+            const avatarHtml = currentUser.photo_url 
+                ? `<img src="${currentUser.photo_url}" alt="avatar">` 
+                : (currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U');
+            
+            profileContent.innerHTML = `
+                <div class="profile-avatar">${avatarHtml}</div>
+                <div class="profile-name">${currentUser.name || ''}</div>
+                ${currentUser.username ? `<div class="profile-username">@${currentUser.username}</div>` : ''}
+                <div class="profile-buttons">
+                    <button class="profile-btn secondary" onclick="switchUser(); hideProfileModal();">🔄 Сменить пользователя</button>
+                    <button class="profile-btn danger" onclick="logout(); hideProfileModal();">🚪 Выйти</button>
+                </div>
+            `;
+            
+            document.getElementById('profileModal').classList.add('active');
+        }
+
+        function hideProfileModal() {
+            document.getElementById('profileModal').classList.remove('active');
+        }
+
         function updateAuthUI() {
             const navButtons = document.getElementById('navButtons');
             const mobileAuthItem = document.getElementById('mobileAuthMenuItem');
-            const mobileLogoutItem = document.getElementById('mobileLogoutItem');
-            const switchUserInOrders = document.getElementById('switchUserInOrders');
-            const currentUserBlock = document.getElementById('currentUserBlock');
-            const loginBlock = document.getElementById('loginBlock');
-            const currentUserNameDisplay = document.getElementById('currentUserNameDisplay');
-            const currentUserAvatar = document.getElementById('currentUserAvatar');
             
             if (currentUser) {
-                // Верхнее меню (шапка)
                 const avatarHtml = currentUser.photo_url 
                     ? `<img src="${currentUser.photo_url}" alt="avatar">` 
                     : (currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U');
                 
                 navButtons.innerHTML = `
-                    <div class="user-info">
+                    <div class="user-info" onclick="showProfile()">
                         <div class="user-avatar">${avatarHtml}</div>
                         <span class="user-name">${currentUser.name || currentUser.username || 'Пользователь'}</span>
-                        <button class="logout-btn" onclick="logout()" title="Выйти">✕</button>
                     </div>
                     <button class="nav-btn" onclick="showOrders()">📋 Мои заказы</button>
                     <button class="nav-btn" onclick="showModal('producer')">О производителе</button>
@@ -614,32 +704,10 @@
                     <button class="nav-btn" onclick="showModal('reviews')">Отзывы</button>
                 `;
                 
-                // Мобильное меню
                 mobileAuthItem.innerHTML = `👤 ${currentUser.name || currentUser.username || 'Профиль'}`;
-                mobileAuthItem.onclick = () => { showOrders(); toggleMobileMenu(); };
-                
-                // Показываем кнопку выйти в мобильном меню
-                if (mobileLogoutItem) mobileLogoutItem.style.display = 'block';
-                
-                // Показываем кнопку сменить в окне заказов
-                if (switchUserInOrders) switchUserInOrders.style.display = 'inline';
-                
-                // Обновляем блок в модальном окне авторизации
-                if (currentUserBlock) {
-                    currentUserBlock.style.display = 'block';
-                    if (currentUserNameDisplay) currentUserNameDisplay.textContent = currentUser.name || currentUser.username || 'Пользователь';
-                    if (currentUserAvatar) {
-                        if (currentUser.photo_url) {
-                            currentUserAvatar.innerHTML = `<img src="${currentUser.photo_url}" style="width:100%; height:100%; border-radius:50%;">`;
-                        } else {
-                            currentUserAvatar.innerHTML = currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U';
-                        }
-                    }
-                }
-                if (loginBlock) loginBlock.style.display = 'none';
+                mobileAuthItem.onclick = () => { showProfile(); toggleMobileMenu(); };
                 
             } else {
-                // Верхнее меню (шапка) - не авторизован
                 navButtons.innerHTML = `
                     <button class="nav-btn auth-btn" onclick="showAuthModal()">🔐 Войти</button>
                     <button class="nav-btn" onclick="showModal('producer')">О производителе</button>
@@ -647,258 +715,51 @@
                     <button class="nav-btn" onclick="showModal('reviews')">Отзывы</button>
                 `;
                 
-                // Мобильное меню
                 mobileAuthItem.innerHTML = '🔐 Войти';
                 mobileAuthItem.onclick = () => { showAuthModal(); toggleMobileMenu(); };
-                
-                // Скрываем кнопки выйти и сменить пользователя
-                if (mobileLogoutItem) mobileLogoutItem.style.display = 'none';
-                if (switchUserInOrders) switchUserInOrders.style.display = 'none';
-                
-                // Скрываем блок с пользователем в модальном окне, показываем блок входа
-                if (currentUserBlock) currentUserBlock.style.display = 'none';
-                if (loginBlock) loginBlock.style.display = 'block';
             }
         }
 
-        // Функция для смены пользователя
         function switchUser() {
-            // Очищаем все данные
+            // Полная очистка
             currentUser = null;
             localStorage.removeItem('currentUser');
             orders = [];
+            
+            // Принудительно завершаем сессию Telegram
+            terminateTelegramSession();
             
             updateAuthUI();
             showNotification('Сессия очищена. Теперь вы можете войти как другой пользователь.');
             
-            // Показываем модальное окно входа
+            // Показываем окно входа
             showAuthModal();
             
-            // Пересоздаём виджет Telegram (это сбросит кэш и позволит ввести новый номер)
+            // Пересоздаём виджет Telegram
             setTimeout(() => {
                 createTelegramWidget();
-            }, 200);
+            }, 500);
         }
 
-        // Мобильный выход
-        function mobileLogout() {
-            toggleMobileMenu();
-            logout();
-        }
-
-        // Выход
-        function logout(showConfirm = true) {
-            if (showConfirm && !confirm('Выйти из аккаунта?')) return;
+        function logout() {
+            if (!confirm('Выйти из аккаунта?')) return;
             
             currentUser = null;
             localStorage.removeItem('currentUser');
             orders = [];
+            
+            // Принудительно завершаем сессию Telegram
+            terminateTelegramSession();
+            
             updateAuthUI();
             showNotification('Вы вышли из аккаунта');
-        }
-
-        // Отображение товаров
-        function displayProducts() {
-            const filtered = products.filter(p => 
-                (currentCategory === 'all' || p.category === currentCategory) && 
-                p.name.toLowerCase().includes(searchQuery.toLowerCase())
-            );
             
-            const desktopHtml = filtered.map(p => {
-                const cartItem = cart.find(item => item.id === p.id);
-                const qty = cartItem ? formatQuantity(cartItem.count * p.step) : '0';
-                const inCartClass = cartItem ? 'in-cart' : '';
-                return `
-                    <div class="product-item ${inCartClass}" data-id="${p.id}">
-                        <div class="product-info">
-                            <div class="product-name">${p.name}</div>
-                            <div class="product-note">${p.orderNote}</div>
-                        </div>
-                        <span class="product-price">${p.price} ₽</span>
-                        <span class="product-unit">${p.unit}</span>
-                        <div class="product-controls">
-                            <button class="product-qty-btn" onclick="updateProductQuantity(${p.id}, -${p.step})">−</button>
-                            <span class="product-qty-value" id="qty-${p.id}">${qty}</span>
-                            <button class="product-qty-btn" onclick="updateProductQuantity(${p.id}, ${p.step})">+</button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-            
-            const mobileHtml = filtered.map(p => {
-                const cartItem = cart.find(item => item.id === p.id);
-                const qty = cartItem ? formatQuantity(cartItem.count * p.step) : '0';
-                const inCartClass = cartItem ? 'in-cart' : '';
-                return `
-                    <div class="product-item ${inCartClass}" data-id="${p.id}">
-                        <div class="product-name">${p.name}</div>
-                        <div class="product-note">${p.orderNote}</div>
-                        <div class="product-details-row">
-                            <div class="product-price-unit">
-                                <span class="product-price">${p.price} ₽</span>
-                                <span class="product-unit">${p.unit}</span>
-                            </div>
-                            <div class="product-controls">
-                                <button class="product-qty-btn" onclick="updateProductQuantity(${p.id}, -${p.step})">−</button>
-                                <span class="product-qty-value" id="qty-${p.id}">${qty}</span>
-                                <button class="product-qty-btn" onclick="updateProductQuantity(${p.id}, ${p.step})">+</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-            
-            if (document.getElementById('productsList')) {
-                document.getElementById('productsList').innerHTML = desktopHtml;
-            }
-            if (document.getElementById('mobileProductsList')) {
-                document.getElementById('mobileProductsList').innerHTML = mobileHtml;
-            }
+            // Показываем окно входа
+            setTimeout(() => {
+                showAuthModal();
+            }, 500);
         }
 
-        // Обновление количества товара
-        function updateProductQuantity(productId, delta) {
-            const product = products.find(p => p.id === productId);
-            const existingItem = cart.find(item => item.id === productId);
-            
-            if (existingItem) {
-                const deltaCount = delta > 0 ? 1 : -1;
-                const newCount = existingItem.count + deltaCount;
-                if (newCount <= 0) {
-                    cart = cart.filter(item => item.id !== productId);
-                } else {
-                    existingItem.count = newCount;
-                }
-            } else if (delta > 0) {
-                cart.push({ ...product, count: 1 });
-            }
-            
-            saveCart();
-            displayProducts();
-            updateAllCarts();
-        }
-
-        // Поиск
-        function searchProducts() {
-            searchQuery = document.getElementById('searchInput').value;
-            displayProducts();
-        }
-
-        // Фильтр по категориям
-        function filterProducts(category) {
-            currentCategory = category;
-            document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-            displayProducts();
-        }
-
-        // Обновление корзин
-        function updateAllCarts() {
-            const totalUnits = cart.reduce((sum, item) => sum + item.count, 0);
-            document.getElementById('cartCount').textContent = totalUnits > 99 ? '99+' : totalUnits;
-            
-            const createCartHtml = () => {
-                if (cart.length === 0) {
-                    return { html: '<p style="color: #b87333; text-align: center; padding: 10px;">🛒 Корзина пуста</p>', total: 0 };
-                }
-                
-                let totalSum = 0;
-                const itemsHtml = cart.map(item => {
-                    const quantity = item.count * item.step;
-                    const itemTotal = item.price * quantity;
-                    totalSum += itemTotal;
-                    return `
-                        <div class="cart-item">
-                            <div class="cart-item-info">
-                                <div class="cart-item-name">${item.name}</div>
-                                <div class="cart-item-note">${item.orderNote}</div>
-                            </div>
-                            <div class="cart-item-controls">
-                                <button class="cart-item-btn" onclick="updateProductQuantity(${item.id}, -${item.step})">−</button>
-                                <span class="cart-item-quantity">${formatQuantity(quantity)}</span>
-                                <button class="cart-item-btn" onclick="updateProductQuantity(${item.id}, ${item.step})">+</button>
-                                <button class="cart-item-remove" onclick="removeFromCart(${item.id})">×</button>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-                
-                return { html: itemsHtml, total: totalSum };
-            };
-            
-            const { html, total } = createCartHtml();
-            
-            const desktopCart = document.getElementById('desktopCartItems');
-            const desktopTotal = document.getElementById('desktopCartTotal')?.querySelector('span');
-            if (desktopCart) desktopCart.innerHTML = html;
-            if (desktopTotal) desktopTotal.textContent = `${total.toFixed(2)} ₽`;
-            
-            const mobileCart = document.getElementById('mobileCartItems');
-            const mobileTotal = document.getElementById('mobileCartTotal')?.querySelector('span');
-            if (mobileCart && document.getElementById('mobileCartModal').classList.contains('active')) {
-                mobileCart.innerHTML = html;
-            }
-            if (mobileTotal) mobileTotal.textContent = `${total.toFixed(2)} ₽`;
-        }
-
-        // Удаление из корзины
-        function removeFromCart(productId) {
-            cart = cart.filter(item => item.id !== productId);
-            saveCart();
-            displayProducts();
-            updateAllCarts();
-        }
-
-        // Сохранение корзины
-        function saveCart() {
-            localStorage.setItem('cart', JSON.stringify(cart));
-        }
-
-        // Загрузка корзины
-        function loadCart() {
-            const saved = localStorage.getItem('cart');
-            if (saved) {
-                try {
-                    const parsed = JSON.parse(saved);
-                    cart = parsed.map(item => {
-                        if (item.count !== undefined) return item;
-                        const product = products.find(p => p.id === item.id);
-                        const step = product ? product.step : (item.step || 1);
-                        const count = Math.round((item.quantity || 1) / step);
-                        return { ...item, count: count || 1 };
-                    }).filter(item => item.count > 0);
-                } catch (e) {
-                    cart = [];
-                }
-            }
-        }
-
-        // Очистка корзины
-        function clearCart() {
-            if (cart.length === 0) return;
-            if (confirm('Очистить корзину?')) {
-                cart = [];
-                saveCart();
-                displayProducts();
-                updateAllCarts();
-                showNotification('Корзина очищена');
-            }
-        }
-
-        // Калькуляторы
-        function updateWidgetCalc() {
-            const price = parseFloat(document.getElementById('widgetPriceKg').value) || 0;
-            const gram = parseFloat(document.getElementById('widgetGram').value) || 0;
-            document.getElementById('widgetResult').textContent = `Стоимость: ${((gram/1000)*price).toFixed(2)} ₽`;
-        }
-
-        function updateMobileCalc() {
-            const price = parseFloat(document.getElementById('mobilePriceKg').value) || 0;
-            const gram = parseFloat(document.getElementById('mobileGram').value) || 0;
-            document.getElementById('mobileCalcResult').textContent = `Стоимость: ${((gram/1000)*price).toFixed(2)} ₽`;
-        }
-
-        // Мобильное меню
         function toggleMobileMenu() {
             document.getElementById('mobileMenu').classList.toggle('active');
             document.getElementById('menuOverlay').classList.toggle('active');
@@ -918,7 +779,6 @@
             document.getElementById('mobileCartModal').classList.remove('active');
         }
 
-        // Модальные окна
         function showModal(type) {
             document.getElementById(type + 'Modal').classList.add('active');
             if (type === 'reviews') displayReviews();
@@ -928,60 +788,6 @@
             document.getElementById(type + 'Modal').classList.remove('active');
         }
 
-        // Отзывы
-        function displayReviews() {
-            const list = document.getElementById('reviewsList');
-            if (reviews.length === 0) {
-                list.innerHTML = '<p style="color: #b87333; text-align: center;">Пока нет отзывов. Будьте первым!</p>';
-            } else {
-                list.innerHTML = reviews.map(r => `
-                    <div class="review-item">
-                        <span class="review-author">${r.name}</span>
-                        <span class="review-date">${r.date}</span>
-                        <div class="review-text">${r.text}</div>
-                    </div>
-                `).join('');
-            }
-        }
-
-        function addReview() {
-            const name = document.getElementById('reviewName').value.trim();
-            const text = document.getElementById('reviewText').value.trim();
-            
-            if (!name || !text) {
-                showNotification('Заполните имя и отзыв');
-                return;
-            }
-            
-            const review = {
-                name: name,
-                text: text,
-                date: new Date().toLocaleString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })
-            };
-            
-            reviews.unshift(review);
-            localStorage.setItem('reviews', JSON.stringify(reviews));
-            
-            document.getElementById('reviewName').value = '';
-            document.getElementById('reviewText').value = '';
-            
-            displayReviews();
-            showNotification('Спасибо за отзыв! 🙏');
-        }
-
-        // Обработка телефона
-        function handlePhoneInput(input) {
-            let value = input.value;
-            if (!value.startsWith('+7')) {
-                input.value = '+7';
-                return;
-            }
-            let numbers = value.substring(2).replace(/[^0-9]/g, '');
-            if (numbers.length > 10) numbers = numbers.substring(0, 10);
-            input.value = '+7' + numbers;
-        }
-
-        // === АВТОРИЗАЦИЯ ===
         function showAuthModal() {
             document.getElementById('authModal').classList.add('active');
         }
@@ -992,7 +798,7 @@
 
         function handleMobileAuth() {
             if (currentUser) {
-                showOrders();
+                showProfile();
             } else {
                 showAuthModal();
             }
@@ -1007,7 +813,6 @@
             }
         }
 
-        // === ЗАКАЗЫ ===
         async function showOrders() {
             if (!currentUser) {
                 showNotification('Сначала войдите в аккаунт');
@@ -1106,7 +911,248 @@
             document.body.removeChild(textarea);
         }
 
-        // Форма заказа
+        function displayProducts() {
+            const filtered = products.filter(p => 
+                (currentCategory === 'all' || p.category === currentCategory) && 
+                p.name.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+            
+            const desktopHtml = filtered.map(p => {
+                const cartItem = cart.find(item => item.id === p.id);
+                const qty = cartItem ? formatQuantity(cartItem.count * p.step) : '0';
+                const inCartClass = cartItem ? 'in-cart' : '';
+                return `
+                    <div class="product-item ${inCartClass}" data-id="${p.id}">
+                        <div class="product-info">
+                            <div class="product-name">${p.name}</div>
+                            <div class="product-note">${p.orderNote}</div>
+                        </div>
+                        <span class="product-price">${p.price} ₽</span>
+                        <span class="product-unit">${p.unit}</span>
+                        <div class="product-controls">
+                            <button class="product-qty-btn" onclick="updateProductQuantity(${p.id}, -${p.step})">−</button>
+                            <span class="product-qty-value" id="qty-${p.id}">${qty}</span>
+                            <button class="product-qty-btn" onclick="updateProductQuantity(${p.id}, ${p.step})">+</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            const mobileHtml = filtered.map(p => {
+                const cartItem = cart.find(item => item.id === p.id);
+                const qty = cartItem ? formatQuantity(cartItem.count * p.step) : '0';
+                const inCartClass = cartItem ? 'in-cart' : '';
+                return `
+                    <div class="product-item ${inCartClass}" data-id="${p.id}">
+                        <div class="product-name">${p.name}</div>
+                        <div class="product-note">${p.orderNote}</div>
+                        <div class="product-details-row">
+                            <div class="product-price-unit">
+                                <span class="product-price">${p.price} ₽</span>
+                                <span class="product-unit">${p.unit}</span>
+                            </div>
+                            <div class="product-controls">
+                                <button class="product-qty-btn" onclick="updateProductQuantity(${p.id}, -${p.step})">−</button>
+                                <span class="product-qty-value" id="qty-${p.id}">${qty}</span>
+                                <button class="product-qty-btn" onclick="updateProductQuantity(${p.id}, ${p.step})">+</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            if (document.getElementById('productsList')) {
+                document.getElementById('productsList').innerHTML = desktopHtml;
+            }
+            if (document.getElementById('mobileProductsList')) {
+                document.getElementById('mobileProductsList').innerHTML = mobileHtml;
+            }
+        }
+
+        function updateProductQuantity(productId, delta) {
+            const product = products.find(p => p.id === productId);
+            const existingItem = cart.find(item => item.id === productId);
+            
+            if (existingItem) {
+                const deltaCount = delta > 0 ? 1 : -1;
+                const newCount = existingItem.count + deltaCount;
+                if (newCount <= 0) {
+                    cart = cart.filter(item => item.id !== productId);
+                } else {
+                    existingItem.count = newCount;
+                }
+            } else if (delta > 0) {
+                cart.push({ ...product, count: 1 });
+            }
+            
+            saveCart();
+            displayProducts();
+            updateAllCarts();
+        }
+
+        function searchProducts() {
+            searchQuery = document.getElementById('searchInput').value;
+            displayProducts();
+        }
+
+        function filterProducts(category) {
+            currentCategory = category;
+            document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            displayProducts();
+        }
+
+        function updateAllCarts() {
+            const totalUnits = cart.reduce((sum, item) => sum + item.count, 0);
+            document.getElementById('cartCount').textContent = totalUnits > 99 ? '99+' : totalUnits;
+            
+            const createCartHtml = () => {
+                if (cart.length === 0) {
+                    return { html: '<p style="color: #b87333; text-align: center; padding: 10px;">🛒 Корзина пуста</p>', total: 0 };
+                }
+                
+                let totalSum = 0;
+                const itemsHtml = cart.map(item => {
+                    const quantity = item.count * item.step;
+                    const itemTotal = item.price * quantity;
+                    totalSum += itemTotal;
+                    return `
+                        <div class="cart-item">
+                            <div class="cart-item-info">
+                                <div class="cart-item-name">${item.name}</div>
+                                <div class="cart-item-note">${item.orderNote}</div>
+                            </div>
+                            <div class="cart-item-controls">
+                                <button class="cart-item-btn" onclick="updateProductQuantity(${item.id}, -${item.step})">−</button>
+                                <span class="cart-item-quantity">${formatQuantity(quantity)}</span>
+                                <button class="cart-item-btn" onclick="updateProductQuantity(${item.id}, ${item.step})">+</button>
+                                <button class="cart-item-remove" onclick="removeFromCart(${item.id})">×</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                return { html: itemsHtml, total: totalSum };
+            };
+            
+            const { html, total } = createCartHtml();
+            
+            const desktopCart = document.getElementById('desktopCartItems');
+            const desktopTotal = document.getElementById('desktopCartTotal')?.querySelector('span');
+            if (desktopCart) desktopCart.innerHTML = html;
+            if (desktopTotal) desktopTotal.textContent = `${total.toFixed(2)} ₽`;
+            
+            const mobileCart = document.getElementById('mobileCartItems');
+            const mobileTotal = document.getElementById('mobileCartTotal')?.querySelector('span');
+            if (mobileCart && document.getElementById('mobileCartModal').classList.contains('active')) {
+                mobileCart.innerHTML = html;
+            }
+            if (mobileTotal) mobileTotal.textContent = `${total.toFixed(2)} ₽`;
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            saveCart();
+            displayProducts();
+            updateAllCarts();
+        }
+
+        function saveCart() {
+            localStorage.setItem('cart', JSON.stringify(cart));
+        }
+
+        function loadCart() {
+            const saved = localStorage.getItem('cart');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    cart = parsed.map(item => {
+                        if (item.count !== undefined) return item;
+                        const product = products.find(p => p.id === item.id);
+                        const step = product ? product.step : (item.step || 1);
+                        const count = Math.round((item.quantity || 1) / step);
+                        return { ...item, count: count || 1 };
+                    }).filter(item => item.count > 0);
+                } catch (e) {
+                    cart = [];
+                }
+            }
+        }
+
+        function clearCart() {
+            if (cart.length === 0) return;
+            if (confirm('Очистить корзину?')) {
+                cart = [];
+                saveCart();
+                displayProducts();
+                updateAllCarts();
+                showNotification('Корзина очищена');
+            }
+        }
+
+        function updateWidgetCalc() {
+            const price = parseFloat(document.getElementById('widgetPriceKg').value) || 0;
+            const gram = parseFloat(document.getElementById('widgetGram').value) || 0;
+            document.getElementById('widgetResult').textContent = `Стоимость: ${((gram/1000)*price).toFixed(2)} ₽`;
+        }
+
+        function updateMobileCalc() {
+            const price = parseFloat(document.getElementById('mobilePriceKg').value) || 0;
+            const gram = parseFloat(document.getElementById('mobileGram').value) || 0;
+            document.getElementById('mobileCalcResult').textContent = `Стоимость: ${((gram/1000)*price).toFixed(2)} ₽`;
+        }
+
+        function displayReviews() {
+            const list = document.getElementById('reviewsList');
+            if (reviews.length === 0) {
+                list.innerHTML = '<p style="color: #b87333; text-align: center;">Пока нет отзывов. Будьте первым!</p>';
+            } else {
+                list.innerHTML = reviews.map(r => `
+                    <div class="review-item">
+                        <span class="review-author">${r.name}</span>
+                        <span class="review-date">${r.date}</span>
+                        <div class="review-text">${r.text}</div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function addReview() {
+            const name = document.getElementById('reviewName').value.trim();
+            const text = document.getElementById('reviewText').value.trim();
+            
+            if (!name || !text) {
+                showNotification('Заполните имя и отзыв');
+                return;
+            }
+            
+            const review = {
+                name: name,
+                text: text,
+                date: new Date().toLocaleString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })
+            };
+            
+            reviews.unshift(review);
+            localStorage.setItem('reviews', JSON.stringify(reviews));
+            
+            document.getElementById('reviewName').value = '';
+            document.getElementById('reviewText').value = '';
+            
+            displayReviews();
+            showNotification('Спасибо за отзыв! 🙏');
+        }
+
+        function handlePhoneInput(input) {
+            let value = input.value;
+            if (!value.startsWith('+7')) {
+                input.value = '+7';
+                return;
+            }
+            let numbers = value.substring(2).replace(/[^0-9]/g, '');
+            if (numbers.length > 10) numbers = numbers.substring(0, 10);
+            input.value = '+7' + numbers;
+        }
+
         function showOrderForm() {
             if (!currentUser) {
                 showNotification('Сначала войдите в аккаунт');
@@ -1142,7 +1188,6 @@
             document.getElementById('orderForm').classList.remove('active');
         }
 
-        // Отправка заказа
         async function submitOrder(event) {
             event.preventDefault();
             
@@ -1237,7 +1282,6 @@ ${orderText.replace(/\n/g, '\n')}
             document.getElementById('phone').value = '+7';
         }
 
-        // Уведомления
         function showNotification(message) {
             const n = document.getElementById('notification');
             n.textContent = message;
@@ -1245,7 +1289,6 @@ ${orderText.replace(/\n/g, '\n')}
             setTimeout(() => n.classList.remove('show'), 3000);
         }
 
-        // Закрытие модалок по клику на фон
         window.onclick = (event) => {
             if (event.target.classList.contains('modal')) {
                 event.target.classList.remove('active');
