@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <!-- Запрещаем кэширование страницы -->
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <!-- Полный запрет кэширования -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>Закупки молочки — вход через Telegram</title>
@@ -557,7 +557,7 @@
             
             const script = document.createElement('script');
             script.async = true;
-            script.src = 'https://telegram.org/js/telegram-widget.js?22&nocache=' + Date.now();
+            script.src = 'https://telegram.org/js/telegram-widget.js?22&_=' + Date.now();
             script.setAttribute('data-telegram-login', 'dairy_shop_2026_bot');
             script.setAttribute('data-size', 'large');
             script.setAttribute('data-radius', '30');
@@ -648,47 +648,45 @@
             showNotification(`Добро пожаловать, ${userData.first_name}! 🙏`);
         }
 
-        // Функция для полного выхода из Telegram
+        // Функция полного выхода (очищает ВСЁ)
         function telegramLogout() {
-            // Очищаем данные на сайте
+            // 1. Очищаем данные пользователя
             currentUser = null;
-            localStorage.removeItem('currentUser');
             orders = [];
+            
+            // 2. Очищаем localStorage ПОЛНОСТЬЮ
+            localStorage.clear();
+            
+            // 3. Очищаем sessionStorage
+            sessionStorage.clear();
+            
+            // 4. Очищаем ВСЕ cookies
+            document.cookie.split(";").forEach(function(c) {
+                document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date(0).toUTCString() + ";path=/");
+            });
+            
+            // 5. Обновляем интерфейс
             updateAuthUI();
             
-            showNotification('Выход из Telegram...');
+            showNotification('Полная очистка данных...');
             
-            // Очищаем все cookies, связанные с Telegram
-            document.cookie.split(";").forEach(function(c) {
-                if (c.includes('tg') || c.includes('telegram') || c.includes('oauth')) {
-                    document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date(0).toUTCString() + ";path=/");
-                }
-            });
-            
-            // Очищаем localStorage от данных Telegram
-            Object.keys(localStorage).forEach(key => {
-                if (key.includes('tg') || key.includes('telegram')) {
-                    localStorage.removeItem(key);
-                }
-            });
-            
-            // Создаем iframe для завершения сессии
+            // 6. Создаем iframe для завершения сессии Telegram
             const iframe = document.createElement('iframe');
             iframe.style.display = 'none';
             iframe.src = 'https://oauth.telegram.org/auth/quit?bot_id=dairy_shop_2026_bot&origin=https://rabotalya22.github.io';
             document.body.appendChild(iframe);
             
             setTimeout(() => {
-                document.querySelectorAll('iframe[src*="telegram"]').forEach(el => el.remove());
+                // 7. Удаляем iframe
+                iframe.remove();
                 
-                // Полностью пересоздаём виджет
+                // 8. Полностью пересоздаём виджет
                 const container = document.getElementById('telegram-login-container');
                 container.innerHTML = '';
                 
-                // Добавляем случайный параметр для предотвращения кэширования
                 const script = document.createElement('script');
                 script.async = true;
-                script.src = 'https://telegram.org/js/telegram-widget.js?22&nocache=' + Date.now();
+                script.src = 'https://telegram.org/js/telegram-widget.js?22&_=' + Date.now() + '&r=' + Math.random();
                 script.setAttribute('data-telegram-login', 'dairy_shop_2026_bot');
                 script.setAttribute('data-size', 'large');
                 script.setAttribute('data-radius', '30');
@@ -697,9 +695,10 @@
                 
                 container.appendChild(script);
                 
+                // 9. Показываем окно входа
                 showAuthModal();
-                showNotification('Сессия очищена. Введите новый номер телефона');
-            }, 1500);
+                showNotification('Все данные очищены. Введите новый номер');
+            }, 1000);
         }
 
         // Показать профиль
