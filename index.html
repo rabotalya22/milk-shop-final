@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-<!-- Запрещаем кэширование страницы -->
+    <!-- Запрещаем кэширование страницы -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -557,7 +557,7 @@
             
             const script = document.createElement('script');
             script.async = true;
-            script.src = 'https://telegram.org/js/telegram-widget.js?22';
+            script.src = 'https://telegram.org/js/telegram-widget.js?22&nocache=' + Date.now();
             script.setAttribute('data-telegram-login', 'dairy_shop_2026_bot');
             script.setAttribute('data-size', 'large');
             script.setAttribute('data-radius', '30');
@@ -648,73 +648,59 @@
             showNotification(`Добро пожаловать, ${userData.first_name}! 🙏`);
         }
 
-        // Функция для принудительного выхода из Telegram (работает в браузере)
-function telegramLogout() {
-    // Очищаем данные на сайте
-    currentUser = null;
-    localStorage.removeItem('currentUser');
-    orders = [];
-    updateAuthUI();
-    
-    showNotification('Выход из Telegram...');
-    
-    // Очищаем все cookies, связанные с Telegram
-    document.cookie.split(";").forEach(function(c) {
-        // Находим все cookies, которые могут быть связаны с Telegram
-        if (c.includes('tg') || c.includes('telegram') || c.includes('oauth')) {
-            document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date(0).toUTCString() + ";path=/");
+        // Функция для полного выхода из Telegram
+        function telegramLogout() {
+            // Очищаем данные на сайте
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            orders = [];
+            updateAuthUI();
+            
+            showNotification('Выход из Telegram...');
+            
+            // Очищаем все cookies, связанные с Telegram
+            document.cookie.split(";").forEach(function(c) {
+                if (c.includes('tg') || c.includes('telegram') || c.includes('oauth')) {
+                    document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date(0).toUTCString() + ";path=/");
+                }
+            });
+            
+            // Очищаем localStorage от данных Telegram
+            Object.keys(localStorage).forEach(key => {
+                if (key.includes('tg') || key.includes('telegram')) {
+                    localStorage.removeItem(key);
+                }
+            });
+            
+            // Создаем iframe для завершения сессии
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = 'https://oauth.telegram.org/auth/quit?bot_id=dairy_shop_2026_bot&origin=https://rabotalya22.github.io';
+            document.body.appendChild(iframe);
+            
+            setTimeout(() => {
+                document.querySelectorAll('iframe[src*="telegram"]').forEach(el => el.remove());
+                
+                // Полностью пересоздаём виджет
+                const container = document.getElementById('telegram-login-container');
+                container.innerHTML = '';
+                
+                // Добавляем случайный параметр для предотвращения кэширования
+                const script = document.createElement('script');
+                script.async = true;
+                script.src = 'https://telegram.org/js/telegram-widget.js?22&nocache=' + Date.now();
+                script.setAttribute('data-telegram-login', 'dairy_shop_2026_bot');
+                script.setAttribute('data-size', 'large');
+                script.setAttribute('data-radius', '30');
+                script.setAttribute('data-onauth', 'onTelegramAuth(user)');
+                script.setAttribute('data-request-access', 'write');
+                
+                container.appendChild(script);
+                
+                showAuthModal();
+                showNotification('Сессия очищена. Введите новый номер телефона');
+            }, 1500);
         }
-    });
-    
-    // Очищаем localStorage от данных Telegram
-    Object.keys(localStorage).forEach(key => {
-        if (key.includes('tg') || key.includes('telegram')) {
-            localStorage.removeItem(key);
-        }
-    });
-    
-    // Создаем iframe для завершения сессии
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = 'https://oauth.telegram.org/auth/quit?bot_id=dairy_shop_2026_bot&origin=https://rabotalya22.github.io';
-    document.body.appendChild(iframe);
-    
-    setTimeout(() => {
-        document.querySelectorAll('iframe[src*="telegram"]').forEach(el => el.remove());
-        
-        // Полностью пересоздаём виджет
-        const container = document.getElementById('telegram-login-container');
-        container.innerHTML = '';
-        
-        // Добавляем случайный параметр для предотвращения кэширования
-        const script = document.createElement('script');
-        script.async = true;
-        script.src = 'https://telegram.org/js/telegram-widget.js?22&nocache=' + Date.now();
-        script.setAttribute('data-telegram-login', 'dairy_shop_2026_bot');
-        script.setAttribute('data-size', 'large');
-        script.setAttribute('data-radius', '30');
-        script.setAttribute('data-onauth', 'onTelegramAuth(user)');
-        script.setAttribute('data-request-access', 'write');
-        script.setAttribute('data-force-reauth', 'true');
-        
-        container.appendChild(script);
-        
-        showAuthModal();
-        showNotification('Сессия очищена. Введите новый номер телефона');
-    }, 1500);
-}
-        
-        // Показываем окно входа
-        showAuthModal();
-        showNotification('Теперь вы можете войти под другим пользователем');
-        
-        // Пробуем также очистить куки и localStorage Telegram
-        document.cookie.split(";").forEach(function(c) { 
-            document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
-        });
-        
-    }, 2000);
-}
 
         // Показать профиль
         function showProfile() {
@@ -730,7 +716,6 @@ function telegramLogout() {
                 <div class="profile-name">${currentUser.name || ''}</div>
                 ${currentUser.username ? `<div class="profile-username">@${currentUser.username}</div>` : ''}
                 <div class="profile-buttons">
-                    <button class="profile-btn secondary" onclick="telegramLogout(); hideProfileModal();">🔄 Сменить пользователя</button>
                     <button class="profile-btn danger" onclick="telegramLogout(); hideProfileModal();">🚪 Выйти</button>
                 </div>
             `;
