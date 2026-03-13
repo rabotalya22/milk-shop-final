@@ -137,6 +137,18 @@
             min-height: 60px;
         }
         
+        /* Кнопка смены пользователя */
+        .switch-user-btn {
+            background: none;
+            border: none;
+            color: #6b4f3c;
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 10px;
+            padding: 0;
+        }
+        
         @media (max-width: 900px) {
             .desktop-container { display: none; }
             .mobile-view { display: block; padding: 8px; }
@@ -201,6 +213,8 @@
         <div class="mobile-menu-item" id="mobileAuthMenuItem" onclick="handleMobileAuth(); toggleMobileMenu()">🔐 Войти</div>
         <!-- Кнопка выйти в мобильном меню -->
         <div class="mobile-menu-item logout" id="mobileLogoutItem" style="display: none;" onclick="mobileLogout()">🚪 Выйти</div>
+        <!-- Кнопка сменить пользователя в мобильном меню -->
+        <div class="mobile-menu-item" id="mobileSwitchUserItem" style="display: none;" onclick="switchUser()">🔄 Сменить пользователя</div>
     </div>
 
     <!-- Десктопная версия -->
@@ -267,7 +281,7 @@
             <button class="close-modal" onclick="hideAuthModal()">×</button>
             <h2 style="color: #6b4f3c; margin-bottom: 20px;">🔐 Вход через Telegram</h2>
             
-            <p style="text-align: center; margin-bottom: 20px; color: #6b4f3c;">
+            <p style="text-align: center; margin-bottom: 20px; color: #6b4f3c;" id="authModalMessage">
                 Нажмите кнопку ниже, чтобы войти с помощью Telegram
             </p>
             
@@ -280,6 +294,11 @@
                     data-auth-url="https://molochko.byethost12.com/auth.php"
                     data-request-access="write">
                 </script>
+            </div>
+            
+            <!-- Кнопка для смены пользователя (будет показана, если есть сохранённый пользователь) -->
+            <div id="switchUserContainer" style="display: none; margin-top: 15px; text-align: center;">
+                <button class="btn btn-secondary" onclick="forceNewLogin()" style="width: 100%;">🔄 Войти как другой пользователь</button>
             </div>
             
             <p style="text-align: center; margin-top: 20px; font-size: 12px; color: #8b6b4f;">
@@ -295,6 +314,7 @@
             <div class="orders-header">
                 <span class="orders-title">📋 Мои заказы</span>
                 <span id="ordersUserInfo" style="font-size: 12px; color: #b87333;"></span>
+                <button class="switch-user-btn" id="switchUserInOrders" onclick="switchUser()" style="display: none;">(сменить)</button>
             </div>
             <div class="orders-container" id="ordersContainer"></div>
         </div>
@@ -561,6 +581,9 @@
             const navButtons = document.getElementById('navButtons');
             const mobileAuthItem = document.getElementById('mobileAuthMenuItem');
             const mobileLogoutItem = document.getElementById('mobileLogoutItem');
+            const mobileSwitchUserItem = document.getElementById('mobileSwitchUserItem');
+            const switchUserContainer = document.getElementById('switchUserContainer');
+            const switchUserInOrders = document.getElementById('switchUserInOrders');
             
             if (currentUser) {
                 const avatarHtml = currentUser.photo_url 
@@ -582,10 +605,13 @@
                 mobileAuthItem.innerHTML = `👤 ${currentUser.name || currentUser.username || 'Профиль'}`;
                 mobileAuthItem.onclick = () => { showOrders(); toggleMobileMenu(); };
                 
-                // Показываем кнопку выйти в мобильном меню
-                if (mobileLogoutItem) {
-                    mobileLogoutItem.style.display = 'block';
-                }
+                // Показываем кнопку выйти и сменить пользователя в мобильном меню
+                if (mobileLogoutItem) mobileLogoutItem.style.display = 'block';
+                if (mobileSwitchUserItem) mobileSwitchUserItem.style.display = 'block';
+                
+                // Показываем кнопку смены пользователя в модалке авторизации
+                if (switchUserContainer) switchUserContainer.style.display = 'block';
+                if (switchUserInOrders) switchUserInOrders.style.display = 'inline';
             } else {
                 navButtons.innerHTML = `
                     <button class="nav-btn auth-btn" onclick="showAuthModal()">🔐 Войти</button>
@@ -596,11 +622,36 @@
                 mobileAuthItem.innerHTML = '🔐 Войти';
                 mobileAuthItem.onclick = () => { showAuthModal(); toggleMobileMenu(); };
                 
-                // Скрываем кнопку выйти в мобильном меню
-                if (mobileLogoutItem) {
-                    mobileLogoutItem.style.display = 'none';
-                }
+                // Скрываем кнопки выйти и сменить пользователя
+                if (mobileLogoutItem) mobileLogoutItem.style.display = 'none';
+                if (mobileSwitchUserItem) mobileSwitchUserItem.style.display = 'none';
+                if (switchUserContainer) switchUserContainer.style.display = 'none';
+                if (switchUserInOrders) switchUserInOrders.style.display = 'none';
             }
+        }
+
+        // Функция для смены пользователя
+        function switchUser() {
+            // Просто выходим и показываем окно авторизации
+            logout(false); // false = не показывать подтверждение
+            showAuthModal();
+        }
+        
+        // Функция для принудительного входа как другой пользователь
+        function forceNewLogin() {
+            // Очищаем все данные авторизации
+            localStorage.removeItem('currentUser');
+            currentUser = null;
+            orders = [];
+            
+            // Обновляем UI
+            updateAuthUI();
+            
+            // Показываем сообщение
+            showNotification('Теперь вы можете войти как другой пользователь');
+            
+            // Перезагружаем страницу? Нет, просто показываем кнопку Telegram
+            // Кнопка уже должна быть видна
         }
 
         // Мобильный выход
@@ -609,7 +660,18 @@
             logout();
         }
 
-        // Отображение товаров
+        // Выход
+        function logout(showConfirm = true) {
+            if (showConfirm && !confirm('Выйти из аккаунта?')) return;
+            
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            orders = [];
+            updateAuthUI();
+            showNotification('Вы вышли из аккаунта');
+        }
+
+        // Отображение товаров (функция полностью сохранена)
         function displayProducts() {
             const filtered = products.filter(p => 
                 (currentCategory === 'all' || p.category === currentCategory) && 
@@ -1020,17 +1082,6 @@
                 showNotification('Не удалось скопировать');
             }
             document.body.removeChild(textarea);
-        }
-
-        // Выход
-        function logout() {
-            if (confirm('Выйти из аккаунта?')) {
-                currentUser = null;
-                localStorage.removeItem('currentUser');
-                orders = [];
-                updateAuthUI();
-                showNotification('Вы вышли из аккаунта');
-            }
         }
 
         // Форма заказа
