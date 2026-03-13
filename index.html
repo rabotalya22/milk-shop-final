@@ -2,35 +2,23 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Закупки молочки — Telegram Mini App</title>
-    <!-- Подключаем Telegram Web App SDK -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Закупки молочки</title>
+    <!-- Подключаем Telegram Web App SDK (для Mini App) -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        /* === ПОЛНЫЕ СТИЛИ === */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
-
-        /* Telegram theme variables */
-        :root {
-            --tg-bg-color: var(--tg-theme-bg-color, #fff9e6);
-            --tg-text-color: var(--tg-theme-text-color, #6b4f3c);
-            --tg-hint-color: var(--tg-theme-hint-color, #8b6b4f);
-            --tg-link-color: var(--tg-theme-link-color, #b87333);
-            --tg-button-color: var(--tg-theme-button-color, #d4a373);
-            --tg-button-text-color: var(--tg-theme-button-text-color, #ffffff);
-            --tg-secondary-bg-color: var(--tg-theme-secondary-bg-color, #fff2d9);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background: var(--tg-bg-color);
-            color: var(--tg-text-color);
-            min-height: 100vh;
-            padding-bottom: env(safe-area-inset-bottom);
+            background: linear-gradient(135deg, #fff9e6 0%, #fff2d9 100%);
             position: relative;
+            min-height: 100vh;
         }
 
         body::before {
@@ -47,10 +35,9 @@
             z-index: -1;
         }
 
-        /* Header */
         .header {
-            background: var(--tg-secondary-bg-color);
-            border-bottom: 3px solid var(--tg-link-color);
+            background: rgba(255, 248, 235, 0.98);
+            border-bottom: 3px solid #d4a373;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             position: sticky;
             top: 0;
@@ -89,7 +76,7 @@
         }
 
         .logo h1 {
-            color: var(--tg-text-color);
+            color: #6b4f3c;
             font-size: 24px;
             font-weight: bold;
         }
@@ -99,7 +86,7 @@
             background: none;
             border: none;
             font-size: 28px;
-            color: var(--tg-text-color);
+            color: #6b4f3c;
             cursor: pointer;
             padding: 5px;
         }
@@ -113,7 +100,7 @@
         .search-box input {
             width: 100%;
             padding: 12px 20px;
-            border: 2px solid var(--tg-link-color);
+            border: 2px solid #d4a373;
             border-radius: 30px;
             font-size: 16px;
             background: white;
@@ -126,11 +113,11 @@
 
         .cart-icon {
             position: relative;
-            background: var(--tg-button-color);
-            border: 2px solid var(--tg-link-color);
+            background: #d4a373;
+            border: 2px solid #b87333;
             border-radius: 30px;
             padding: 10px 20px;
-            color: var(--tg-button-text-color);
+            color: white;
             font-weight: bold;
             cursor: pointer;
             display: flex;
@@ -141,7 +128,7 @@
 
         .cart-count {
             background: white;
-            color: var(--tg-link-color);
+            color: #b87333;
             border-radius: 50%;
             width: 30px;
             height: 30px;
@@ -160,10 +147,10 @@
 
         .nav-btn {
             padding: 10px 20px;
-            background: var(--tg-secondary-bg-color);
-            border: 2px solid var(--tg-link-color);
+            background: #fff2d9;
+            border: 2px solid #d4a373;
             border-radius: 30px;
-            color: var(--tg-text-color);
+            color: #6b4f3c;
             font-weight: bold;
             cursor: pointer;
             font-size: 14px;
@@ -171,12 +158,12 @@
         }
 
         .nav-btn:hover {
-            background: var(--tg-button-color);
-            color: var(--tg-button-text-color);
+            background: #d4a373;
+            color: white;
         }
 
         .auth-btn {
-            background: var(--tg-text-color);
+            background: #6b4f3c;
             border-color: #8b6b4f;
             color: white;
         }
@@ -189,8 +176,8 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            background: var(--tg-secondary-bg-color);
-            border: 2px solid var(--tg-link-color);
+            background: #fff2d9;
+            border: 2px solid #d4a373;
             border-radius: 30px;
             padding: 5px 15px 5px 10px;
             cursor: pointer;
@@ -198,18 +185,18 @@
         }
 
         .user-info:hover {
-            background: var(--tg-button-color);
+            background: #d4a373;
         }
 
         .user-info:hover .user-name {
-            color: var(--tg-button-text-color);
+            color: white;
         }
 
         .user-avatar {
             width: 32px;
             height: 32px;
             border-radius: 50%;
-            background: var(--tg-link-color);
+            background: #d4a373;
             color: white;
             display: flex;
             align-items: center;
@@ -227,7 +214,7 @@
 
         .user-name {
             font-weight: bold;
-            color: var(--tg-text-color);
+            color: #6b4f3c;
             max-width: 120px;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -255,8 +242,8 @@
             left: -300px;
             width: 280px;
             height: 100vh;
-            background: var(--tg-bg-color);
-            border-right: 3px solid var(--tg-link-color);
+            background: #fff9e6;
+            border-right: 3px solid #d4a373;
             z-index: 2000;
             transition: left 0.3s ease;
             padding: 80px 20px 20px;
@@ -283,11 +270,11 @@
 
         .mobile-menu-item {
             padding: 15px;
-            background: var(--tg-secondary-bg-color);
-            border: 2px solid var(--tg-link-color);
+            background: #fff2d9;
+            border: 2px solid #d4a373;
             border-radius: 12px;
             margin-bottom: 10px;
-            color: var(--tg-text-color);
+            color: #6b4f3c;
             font-weight: bold;
             cursor: pointer;
             font-size: 16px;
@@ -299,7 +286,6 @@
             color: #c41e3a;
         }
 
-        /* Desktop container */
         .desktop-container {
             max-width: 1400px;
             margin: 20px auto;
@@ -315,12 +301,12 @@
         }
 
         .price-info {
-            background: var(--tg-secondary-bg-color);
-            border: 2px solid var(--tg-link-color);
+            background: #fff2d9;
+            border: 2px solid #d4a373;
             border-radius: 12px;
             padding: 12px 20px;
             margin-bottom: 20px;
-            color: var(--tg-text-color);
+            color: #6b4f3c;
             font-size: 14px;
         }
 
@@ -333,10 +319,10 @@
 
         .category-tab {
             padding: 8px 16px;
-            background: var(--tg-secondary-bg-color);
-            border: 2px solid var(--tg-link-color);
+            background: #fff2d9;
+            border: 2px solid #d4a373;
             border-radius: 30px;
-            color: var(--tg-text-color);
+            color: #6b4f3c;
             cursor: pointer;
             font-weight: 500;
             font-size: 14px;
@@ -344,9 +330,8 @@
         }
 
         .category-tab.active {
-            background: var(--tg-button-color);
-            color: var(--tg-button-text-color);
-            border-color: var(--tg-link-color);
+            background: #d4a373;
+            color: white;
         }
 
         .products-list {
@@ -361,7 +346,7 @@
             align-items: center;
             padding: 12px 15px;
             background: white;
-            border: 2px solid var(--tg-link-color);
+            border: 2px solid #d4a373;
             border-radius: 12px;
             gap: 10px;
             font-size: 14px;
@@ -380,23 +365,23 @@
 
         .product-name {
             font-weight: bold;
-            color: var(--tg-text-color);
+            color: #6b4f3c;
         }
 
         .product-note {
             font-size: 11px;
-            color: var(--tg-hint-color);
+            color: #8b6b4f;
             margin-top: 2px;
         }
 
         .product-price {
-            color: var(--tg-link-color);
+            color: #b87333;
             font-weight: bold;
             text-align: right;
         }
 
         .product-unit {
-            color: var(--tg-hint-color);
+            color: #8b6b4f;
             font-size: 13px;
             text-align: right;
         }
@@ -411,9 +396,9 @@
         .product-qty-btn {
             width: 30px;
             height: 30px;
-            background: var(--tg-button-color);
-            border: 2px solid var(--tg-link-color);
-            color: var(--tg-button-text-color);
+            background: #d4a373;
+            border: 2px solid #b87333;
+            color: white;
             border-radius: 50%;
             cursor: pointer;
             font-size: 18px;
@@ -423,12 +408,12 @@
         }
 
         .product-qty-btn:hover {
-            background: var(--tg-link-color);
+            background: #b87333;
         }
 
         .product-qty-value {
             font-weight: bold;
-            color: var(--tg-text-color);
+            color: #6b4f3c;
             min-width: 30px;
             text-align: center;
             font-size: 15px;
@@ -443,15 +428,15 @@
         }
 
         .cart-desktop {
-            background: var(--tg-secondary-bg-color);
-            border: 3px solid var(--tg-link-color);
+            background: rgba(255, 248, 235, 0.95);
+            border: 3px solid #d4a373;
             border-radius: 20px;
             padding: 20px;
         }
 
         .cart-desktop h2 {
-            color: var(--tg-text-color);
-            border-bottom: 2px solid var(--tg-link-color);
+            color: #6b4f3c;
+            border-bottom: 2px solid #d4a373;
             padding-bottom: 12px;
             margin-bottom: 15px;
             font-size: 20px;
@@ -468,7 +453,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 10px;
-            border-bottom: 1px dashed var(--tg-link-color);
+            border-bottom: 1px dashed #d4a373;
             font-size: 13px;
         }
 
@@ -478,12 +463,12 @@
 
         .cart-item-name {
             font-weight: bold;
-            color: var(--tg-text-color);
+            color: #6b4f3c;
         }
 
         .cart-item-note {
             font-size: 11px;
-            color: var(--tg-link-color);
+            color: #b87333;
         }
 
         .cart-item-controls {
@@ -494,7 +479,7 @@
 
         .cart-item-quantity {
             font-weight: bold;
-            color: var(--tg-link-color);
+            color: #b87333;
             min-width: 30px;
             text-align: center;
             font-size: 13px;
@@ -502,8 +487,8 @@
 
         .cart-item-btn {
             background: white;
-            border: 1px solid var(--tg-link-color);
-            color: var(--tg-text-color);
+            border: 1px solid #d4a373;
+            color: #6b4f3c;
             width: 24px;
             height: 24px;
             border-radius: 50%;
@@ -526,10 +511,10 @@
         .cart-total {
             font-size: 20px;
             font-weight: bold;
-            color: var(--tg-text-color);
+            color: #6b4f3c;
             text-align: right;
             padding-top: 12px;
-            border-top: 2px solid var(--tg-link-color);
+            border-top: 2px solid #d4a373;
         }
 
         .cart-buttons {
@@ -549,26 +534,26 @@
         }
 
         .btn-primary {
-            background: var(--tg-button-color);
-            color: var(--tg-button-text-color);
-            border: 2px solid var(--tg-link-color);
+            background: #d4a373;
+            color: white;
+            border: 2px solid #b87333;
         }
 
         .btn-secondary {
-            background: var(--tg-secondary-bg-color);
-            color: var(--tg-text-color);
-            border: 2px solid var(--tg-link-color);
+            background: #fff2d9;
+            color: #6b4f3c;
+            border: 2px solid #d4a373;
         }
 
         .calculator-widget {
-            background: var(--tg-secondary-bg-color);
-            border: 3px solid var(--tg-link-color);
+            background: rgba(255, 248, 235, 0.95);
+            border: 3px solid #d4a373;
             border-radius: 20px;
             padding: 20px;
         }
 
         .calculator-widget h3 {
-            color: var(--tg-text-color);
+            color: #6b4f3c;
             font-size: 18px;
             margin-bottom: 15px;
             display: flex;
@@ -581,10 +566,9 @@
             width: 36px;
             height: 36px;
             background: transparent;
-            border: 2px solid var(--tg-text-color);
+            border: 2px solid #6b4f3c;
             border-radius: 6px;
             position: relative;
-            box-sizing: border-box;
         }
 
         .calc-icon-new::before {
@@ -594,7 +578,7 @@
             left: 2px;
             right: 2px;
             height: 2px;
-            background: var(--tg-text-color);
+            background: #6b4f3c;
             transform: translateY(-50%);
         }
 
@@ -605,7 +589,7 @@
             top: 2px;
             bottom: 2px;
             width: 2px;
-            background: var(--tg-text-color);
+            background: #6b4f3c;
             transform: translateX(-50%);
         }
 
@@ -613,8 +597,7 @@
             position: absolute;
             font-size: 12px;
             font-weight: bold;
-            color: var(--tg-text-color);
-            line-height: 1;
+            color: #6b4f3c;
         }
 
         .calc-icon-new span:nth-child(1) { top: 4px; left: 6px; }
@@ -632,20 +615,20 @@
         .calc-row input {
             width: 100px;
             padding: 8px;
-            border: 2px solid var(--tg-link-color);
+            border: 2px solid #d4a373;
             border-radius: 8px;
             font-size: 14px;
         }
 
         .calc-result {
-            background: var(--tg-bg-color);
+            background: #fff2d9;
             padding: 12px;
             border-radius: 10px;
             margin-top: 10px;
             font-size: 14px;
             text-align: center;
             font-weight: bold;
-            color: var(--tg-text-color);
+            color: #6b4f3c;
         }
 
         .mobile-view {
@@ -653,9 +636,9 @@
         }
 
         .mobile-calc-btn {
-            background: var(--tg-button-color);
-            color: var(--tg-button-text-color);
-            border: 2px solid var(--tg-link-color);
+            background: #d4a373;
+            color: white;
+            border: 2px solid #b87333;
             border-radius: 30px;
             padding: 12px;
             margin-bottom: 15px;
@@ -671,8 +654,8 @@
 
         .mobile-calculator {
             display: none;
-            background: var(--tg-secondary-bg-color);
-            border: 3px solid var(--tg-link-color);
+            background: rgba(255, 248, 235, 0.95);
+            border: 3px solid #d4a373;
             border-radius: 20px;
             padding: 20px;
             margin-bottom: 15px;
@@ -682,7 +665,6 @@
             display: block;
         }
 
-        /* Modals */
         .modal {
             display: none;
             position: fixed;
@@ -702,8 +684,8 @@
         }
 
         .modal-content {
-            background: var(--tg-bg-color);
-            border: 3px solid var(--tg-link-color);
+            background: #fff9e6;
+            border: 3px solid #d4a373;
             border-radius: 25px;
             padding: 30px;
             max-width: 600px;
@@ -734,235 +716,15 @@
             background: none;
             border: none;
             font-size: 28px;
-            color: var(--tg-link-color);
+            color: #b87333;
             cursor: pointer;
         }
 
-        .review-form {
-            margin-top: 20px;
-        }
-
-        .review-form input, .review-form textarea {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 2px solid var(--tg-link-color);
-            border-radius: 8px;
-            font-size: 14px;
-        }
-
-        .review-form textarea {
-            height: 100px;
-            resize: vertical;
-        }
-
-        .reviews-list {
-            margin-top: 20px;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .review-item {
-            background: var(--tg-secondary-bg-color);
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-        }
-
-        .review-author {
-            font-weight: bold;
-            color: var(--tg-text-color);
-        }
-
-        .review-date {
-            font-size: 11px;
-            color: var(--tg-link-color);
-            margin-left: 10px;
-        }
-
-        .review-text {
-            margin-top: 5px;
-            color: #4a3729;
-        }
-
-        /* Orders */
-        .orders-header {
-            margin-bottom: 20px;
-            border-bottom: 2px solid var(--tg-link-color);
-            padding-bottom: 10px;
-        }
-
-        .orders-title {
-            color: var(--tg-text-color);
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        .orders-container {
-            max-height: 60vh;
-            overflow-y: auto;
-        }
-
-        .order-card {
-            background: var(--tg-secondary-bg-color);
-            border: 2px solid var(--tg-link-color);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 15px;
-            position: relative;
-        }
-
-        .order-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            padding-bottom: 5px;
-            border-bottom: 1px dashed var(--tg-link-color);
-        }
-
-        .order-id {
-            font-weight: bold;
-            color: #000000;
-            font-size: 12px;
-            border: 1px solid #000000;
-            padding: 3px 8px;
-            border-radius: 15px;
-            background: white;
-            display: inline-block;
-        }
-
-        .order-date {
-            color: var(--tg-text-color);
-            font-size: 12px;
-        }
-
-        .order-body {
-            background: white;
-            border-radius: 8px;
-            padding: 12px;
-            margin: 10px 0;
-            font-size: 13px;
-            color: #2d2d2d;
-            line-height: 1.5;
-            border: 1px solid var(--tg-link-color);
-        }
-
-        .order-field {
-            margin-bottom: 8px;
-            display: flex;
-            flex-wrap: wrap;
-        }
-
-        .order-field .label {
-            font-weight: 700;
-            color: var(--tg-text-color);
-            min-width: 130px;
-        }
-
-        .order-field .value {
-            color: #1e1e1e;
-            font-weight: 500;
-        }
-
-        .order-items-title {
-            font-weight: 700;
-            color: var(--tg-text-color);
-            margin: 12px 0 6px 0;
-            border-bottom: 1px dashed var(--tg-link-color);
-            padding-bottom: 3px;
-        }
-
-        .order-item-line {
-            display: flex;
-            gap: 8px;
-            padding: 3px 0;
-            font-size: 12.5px;
-            border-bottom: 1px dotted #f0dbb8;
-        }
-
-        .order-item-name {
-            flex: 2;
-            color: #4a3729;
-        }
-
-        .order-item-qty {
-            flex: 1;
-            text-align: right;
-            font-weight: 600;
-            color: var(--tg-link-color);
-        }
-
-        .order-total-preview {
-            margin-top: 10px;
-            text-align: right;
-            font-weight: 700;
-            color: var(--tg-text-color);
-            background: var(--tg-secondary-bg-color);
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 14px;
-        }
-
-        .order-actions {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-            margin-top: 10px;
-        }
-
-        .order-copy-btn {
-            background: var(--tg-button-color);
-            color: var(--tg-button-text-color);
-            border: none;
-            border-radius: 30px;
-            padding: 5px 15px;
-            font-size: 12px;
-            cursor: pointer;
-        }
-
-        .order-delete-btn {
-            background: #c41e3a;
-            color: white;
-            border: none;
-            border-radius: 30px;
-            padding: 5px 15px;
-            font-size: 12px;
-            cursor: pointer;
-        }
-
-        .no-orders {
-            text-align: center;
-            color: var(--tg-link-color);
-            padding: 30px;
-            font-style: italic;
-        }
-
-        .notification {
-            position: fixed;
-            top: 100px;
-            right: 20px;
-            background: var(--tg-button-color);
-            color: var(--tg-button-text-color);
-            padding: 15px 25px;
-            border-radius: 50px;
-            border: 2px solid var(--tg-link-color);
-            transform: translateX(400px);
-            transition: transform 0.3s;
-            z-index: 4000;
-            font-weight: bold;
-        }
-
-        .notification.show {
-            transform: translateX(0);
-        }
-
-        /* Profile */
         .profile-avatar-large {
             width: 80px;
             height: 80px;
             border-radius: 50%;
-            background: var(--tg-link-color);
+            background: #d4a373;
             color: white;
             display: flex;
             align-items: center;
@@ -982,12 +744,12 @@
         .profile-name {
             font-size: 20px;
             font-weight: bold;
-            color: var(--tg-text-color);
+            color: #6b4f3c;
             margin-bottom: 5px;
         }
 
         .profile-username {
-            color: var(--tg-link-color);
+            color: #b87333;
             margin-bottom: 20px;
             font-size: 14px;
         }
@@ -1006,20 +768,23 @@
             border: 2px solid #a01830;
         }
 
-        /* Confirm modal */
+        .profile-logout-btn:hover {
+            background: #a01830;
+        }
+
         .confirm-icon {
             font-size: 48px;
             margin-bottom: 15px;
         }
 
         .confirm-title {
-            color: var(--tg-text-color);
+            color: #6b4f3c;
             font-size: 24px;
             margin-bottom: 15px;
         }
 
         .confirm-message {
-            color: var(--tg-hint-color);
+            color: #8b6b4f;
             margin-bottom: 25px;
             line-height: 1.5;
         }
@@ -1037,22 +802,36 @@
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.2s;
         }
 
         .confirm-btn-yes {
-            background: var(--tg-button-color);
-            color: var(--tg-button-text-color);
-            border: 2px solid var(--tg-link-color);
+            background: #d4a373;
+            color: white;
+            border: 2px solid #b87333;
         }
 
         .confirm-btn-no {
-            background: var(--tg-secondary-bg-color);
-            color: var(--tg-text-color);
-            border: 2px solid var(--tg-link-color);
+            background: #fff2d9;
+            color: #6b4f3c;
+            border: 2px solid #d4a373;
         }
 
-        /* Responsive */
+        .telegram-login-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            min-height: 60px;
+        }
+
+        iframe[src*="telegram"] {
+            display: none !important;
+        }
+        
+        .modal.active iframe[src*="telegram"] {
+            display: block !important;
+        }
+
         @media (max-width: 900px) {
             .desktop-container {
                 display: none;
@@ -1108,7 +887,6 @@
                 display: flex;
                 align-items: center;
                 gap: 4px;
-                flex-shrink: 0;
             }
             .product-qty-btn {
                 width: 28px;
@@ -1139,23 +917,6 @@
             .search-box input {
                 padding: 8px 15px;
                 font-size: 13px;
-            }
-            .modal-content {
-                padding: 15px;
-                width: 95%;
-            }
-            .cart-item {
-                font-size: 12px;
-                padding: 6px;
-            }
-            .cart-item-btn {
-                width: 26px;
-                height: 26px;
-                font-size: 14px;
-            }
-            .calc-icon-new {
-                width: 32px;
-                height: 32px;
             }
         }
     </style>
@@ -1209,8 +970,8 @@
             </div>
             <div class="calculator-widget">
                 <h3><span class="calc-icon-new"><span>+</span><span>−</span><span>×</span><span>÷</span></span>Калькулятор</h3>
-                <div class="calc-row"><span>Цена за кг:</span><input type="number" id="widgetPriceKg" value="" placeholder="0" min="0" oninput="updateWidgetCalc()"></div>
-                <div class="calc-row"><span>Нужно грамм:</span><input type="number" id="widgetGram" value="" placeholder="0" min="0" oninput="updateWidgetCalc()"></div>
+                <div class="calc-row"><span>Цена за кг:</span><input type="number" id="widgetPriceKg" placeholder="0" min="0" oninput="updateWidgetCalc()"></div>
+                <div class="calc-row"><span>Нужно грамм:</span><input type="number" id="widgetGram" placeholder="0" min="0" oninput="updateWidgetCalc()"></div>
                 <div class="calc-result" id="widgetResult">Стоимость: 0 ₽</div>
             </div>
         </div>
@@ -1221,25 +982,21 @@
         <div class="price-info">ℹ️ Цены ознакомительные. Доставка 30₽/кг включена.</div>
         <div class="mobile-calc-btn" onclick="toggleMobileCalculator()">
             <span class="calc-icon-new" style="width: 40px; height: 40px; border-color: white;">
-                <span style="color: white;">+</span>
-                <span style="color: white;">−</span>
-                <span style="color: white;">×</span>
-                <span style="color: white;">÷</span>
+                <span style="color: white;">+</span><span style="color: white;">−</span><span style="color: white;">×</span><span style="color: white;">÷</span>
             </span>
             Открыть калькулятор
         </div>
         <div class="mobile-calculator" id="mobileCalculator">
             <h3 style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-                <span class="calc-icon-new" style="width: 32px; height: 32px;"></span>
-                Калькулятор
+                <span class="calc-icon-new" style="width: 32px; height: 32px;"></span>Калькулятор
             </h3>
             <div style="margin-bottom: 10px;">
                 <label style="display: block; margin-bottom: 5px;">Цена за кг (₽):</label>
-                <input type="number" id="mobilePriceKg" value="" placeholder="0" min="0" style="width: 100%; padding: 10px; border: 2px solid #d4a373; border-radius: 8px;">
+                <input type="number" id="mobilePriceKg" placeholder="0" min="0" style="width: 100%; padding: 10px; border: 2px solid #d4a373; border-radius: 8px;">
             </div>
             <div style="margin-bottom: 10px;">
                 <label style="display: block; margin-bottom: 5px;">Нужно грамм:</label>
-                <input type="number" id="mobileGram" value="" placeholder="0" min="0" style="width: 100%; padding: 10px; border: 2px solid #d4a373; border-radius: 8px;">
+                <input type="number" id="mobileGram" placeholder="0" min="0" style="width: 100%; padding: 10px; border: 2px solid #d4a373; border-radius: 8px;">
             </div>
             <div class="calc-result" id="mobileCalcResult">Стоимость: 0 ₽</div>
         </div>
@@ -1272,8 +1029,7 @@
             <div class="confirm-message">
                 ⚠️ <strong>Важно!</strong><br><br>
                 После выхода не забудьте также завершить сессию в Telegram<br>
-                (Настройки → Устройства → Завершить сеанс)<br><br>
-                Это обезопасит ваш аккаунт от несанкционированного доступа.
+                (Настройки → Устройства → Завершить сеанс)
             </div>
             <div class="confirm-buttons">
                 <button class="confirm-btn confirm-btn-no" onclick="hideLogoutConfirm()">Отмена</button>
@@ -1299,18 +1055,22 @@
         <div class="modal-content">
             <button class="close-modal" onclick="hideModal('rules')">×</button>
             <h2 style="color: #6b4f3c; margin-bottom: 20px;">📝 Правила заказа</h2>
-            <p><strong>1.</strong> В первой строчке указываем, как подписать пакет (имя и фамилия или духовное имя)</p>
-            <p><strong>2.</strong> Последней строчкой пишем одним словом условное название точки самовывоза (из списка)</p>
-            <p><strong>3.</strong> Почти все наименования мы заказываем штуками или упаковками (шт./уп.)</p>
-            <p><strong>4.</strong> Панир и Палку пишем в килограммах</p>
-            <p><strong>5.</strong> Сулугуни элитный и Моцарелла упакованы по 1 кг</p>
-            <p><strong>6.</strong> Косичка приходит небольшими упаковками примерно по 250-300 г</p>
-            <p><strong>7.</strong> Остальные сыры нарезают примерно по 0,4-0,7 кг кусками</p>
-            <p><strong>8.</strong> Сгущёнку разливаем по контейнерам (можно приобрести любой вес, кратный 0,5 кг, но лучше всего писать 1,1 кг, что равнозначно 1 л)</p>
-            <p><strong>9.</strong> Варёная сгущёнка приходит в вакуумных пакетах по 1 кг</p>
-            <p><strong>10.</strong> Крем-сыр также в вакуумных упаковках по 1 кг</p>
-            <p><strong>11.</strong> Масло Премиум заказываем коробками по 5 кг</p>
-            <p><strong>12.</strong> Масло Сбойка приходит весом 2,2-2,9 кг в вакуумных упаковках</p>
+            <p><strong>1.</strong> В первой строчке указываем, как подписать пакет</p>
+            <p><strong>2.</strong> Последней строчкой пишем точку самовывоза</p>
+            <p><strong>3.</strong> Панир и Палку пишем в килограммах</p>
+            <p><strong>4.</strong> Сгущёнку - 1.1 кг = 1 л</p>
+        </div>
+    </div>
+
+    <!-- Модальное окно авторизации -->
+    <div class="modal" id="authModal">
+        <div class="modal-content auth-modal">
+            <button class="close-modal" onclick="hideAuthModal()">×</button>
+            <h2 style="color: #6b4f3c; margin-bottom: 20px;">🔐 Вход через Telegram</h2>
+            <div class="telegram-login-wrapper" id="telegram-login-container"></div>
+            <p style="text-align: center; margin-top: 20px; font-size: 12px; color: #8b6b4f;">
+                Мы получаем только ваш ID, имя и фото профиля
+            </p>
         </div>
     </div>
 
@@ -1349,11 +1109,11 @@
                 </div>
                 <div style="margin-bottom: 15px;">
                     <label style="display: block; margin-bottom: 5px; font-weight: bold;">👤 Ваше имя *</label>
-                    <input type="text" id="name" required pattern="[A-Za-zА-Яа-яЁё\s]+" title="Только буквы" oninput="this.value = this.value.replace(/[^A-Za-zА-Яа-яЁё\s]/g, '')" style="width: 100%; padding: 12px; border: 2px solid #d4a373; border-radius: 10px;">
+                    <input type="text" id="name" required style="width: 100%; padding: 12px; border: 2px solid #d4a373; border-radius: 10px;">
                 </div>
                 <div style="margin-bottom: 15px;">
                     <label style="display: block; margin-bottom: 5px; font-weight: bold;">📞 Телефон *</label>
-                    <input type="tel" id="phone" required value="+7" pattern="\+7[0-9]{0,10}" title="Формат: +7 и далее только цифры" oninput="handlePhoneInput(this)" style="width: 100%; padding: 12px; border: 2px solid #d4a373; border-radius: 10px;">
+                    <input type="tel" id="phone" required value="+7" oninput="handlePhoneInput(this)" style="width: 100%; padding: 12px; border: 2px solid #d4a373; border-radius: 10px;">
                 </div>
                 <div style="display: flex; gap: 10px;">
                     <button type="submit" class="btn btn-primary">Отправить заказ</button>
@@ -1380,7 +1140,7 @@
     <!-- Уведомление -->
     <div class="notification" id="notification"></div>
 
-    <!-- Подключаем Firebase SDK -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
@@ -1389,38 +1149,26 @@
         const TELEGRAM_BOT_TOKEN = '8553841090:AAHJx6x0qLY6Ur53cFPtuOCKRUu_JUOWT-A';
         const TELEGRAM_CHAT_ID = '353422630';
         
-        // Firebase настройки (ваши данные)
         const firebaseConfig = {
             apiKey: "AIzaSyDztZkvuz3vp__7uUY9sv34R2G8d06qvZEA",
             authDomain: "moloko-15747.firebaseapp.com",
             projectId: "moloko-15747",
             storageBucket: "moloko-15747.firebasestorage.app",
             messagingSenderId: "533713083066",
-            appId: "1:533713083066:web:5e520a9ce2c78d36314083",
-            measurementId: "G-DDVM2WN2J9"
+            appId: "1:533713083066:web:5e520a9ce2c78d36314083"
         };
 
-        // Google Sheets URL с товарами
         const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGMpTtKvFT6ZeWQI882xR0I1_8f12YWhsFWPzVnf7o3j6i8eE_MpCfA-ZBDYCIxXaufo3ZrdfnS7w4/pub?output=csv';
 
         // Запасные товары
         const fallbackProducts = [
-            { id: 1, name: "🥥 Масло кокосовое нерафинированное", price: 3400, unit: "5 л", category: "maslo", orderUnit: "шт", orderNote: "флакон 5л", step: 1 },
+            { id: 1, name: "🥥 Масло кокосовое", price: 3400, unit: "5 л", category: "maslo", orderUnit: "шт", orderNote: "флакон 5л", step: 1 },
             { id: 2, name: "🧈 Масло Премиум", price: 4600, unit: "5 кг", category: "maslo", orderUnit: "кор", orderNote: "коробка 5 кг", step: 1 },
             { id: 3, name: "🧈 Масло Сбойка", price: 1300, unit: "кг", category: "maslo", orderUnit: "уп", orderNote: "упаковка 2.2-2.9 кг", step: 1 },
             { id: 4, name: "🍯 Гхи из Сбойки", price: 1950, unit: "л", category: "ghee", orderUnit: "шт", orderNote: "бутылка 1л", step: 1 },
             { id: 5, name: "😋 Гхи йогуртовое", price: 2550, unit: "л", category: "ghee", orderUnit: "шт", orderNote: "бутылка 1л", step: 1 },
             { id: 6, name: "🧀 Панир", price: 1400, unit: "кг", category: "cheese", orderUnit: "кг", orderNote: "весовой", step: 1 },
-            { id: 7, name: "🧀 Палка", price: 1400, unit: "кг", category: "cheese", orderUnit: "кг", orderNote: "весовой", step: 1 },
-            { id: 8, name: "🧀 Сулугуни элитный", price: 1800, unit: "кг", category: "cheese", orderUnit: "уп", orderNote: "упаковка 1 кг", step: 1 },
-            { id: 9, name: "🧀 Моцарелла", price: 1900, unit: "кг", category: "cheese", orderUnit: "уп", orderNote: "упаковка 1 кг", step: 1 },
-            { id: 10, name: "🧀 Сыр косичка", price: 1800, unit: "кг", category: "cheese", orderUnit: "уп", orderNote: "упаковка 250-300 г", step: 0.25 },
-            { id: 11, name: "🥛 Творог обезжиренный", price: 800, unit: "кг", category: "lowfat", orderUnit: "кг", orderNote: "весовой", step: 1 },
-            { id: 12, name: "🥛 Мацони", price: 400, unit: "л", category: "lowfat", orderUnit: "л", orderNote: "бутылка", step: 1 },
-            { id: 13, name: "🥛 Кефир", price: 350, unit: "л", category: "lowfat", orderUnit: "л", orderNote: "бутылка", step: 1 },
-            { id: 14, name: "🥛 Сгущёнка", price: 700, unit: "кг", category: "other", orderUnit: "кг", orderNote: "контейнер (1.1 кг = 1 л)", step: 1 },
-            { id: 15, name: "🥛 Варёная сгущёнка", price: 800, unit: "кг", category: "other", orderUnit: "уп", orderNote: "вакуумная упаковка 1 кг", step: 1 },
-            { id: 16, name: "🧀 Крем-сыр", price: 2000, unit: "кг", category: "cheese", orderUnit: "уп", orderNote: "вакуумная упаковка 1 кг", step: 1 }
+            { id: 7, name: "🧀 Палка", price: 1400, unit: "кг", category: "cheese", orderUnit: "кг", orderNote: "весовой", step: 1 }
         ];
 
         // ========== ПЕРЕМЕННЫЕ ==========
@@ -1440,11 +1188,9 @@
         if (tg) {
             tg.ready();
             tg.expand();
-            tg.disableVerticalSwipes?.();
             
-            // Получаем данные пользователя из Telegram
             const tgUser = tg.initDataUnsafe?.user;
-            if (tgUser) {
+            if (tgUser && !currentUser) {
                 handleTelegramAuth({
                     id: tgUser.id,
                     first_name: tgUser.first_name,
@@ -1454,117 +1200,106 @@
                     auth_date: Math.floor(Date.now() / 1000)
                 });
             }
-            
-            // Настраиваем главную кнопку
-            tg.MainButton.setText('ОФОРМИТЬ ЗАКАЗ');
-            tg.MainButton.onClick(() => {
-                if (cart.length > 0) {
-                    showOrderForm();
-                } else {
-                    tg.showAlert('Корзина пуста!');
-                }
-            });
-            tg.MainButton.hide(); // Скрыта по умолчанию
         }
 
-        // ========== ФУНКЦИИ ==========
-        
-        // Форматирование количества
-        function formatQuantity(value) {
-            const rounded = Math.round(value * 100) / 100;
-            return Number.isInteger(rounded) ? rounded.toString() : rounded.toFixed(2);
-        }
-
-        // Тактильная обратная связь
-        function hapticFeedback(type = 'light') {
-            if (tg?.HapticFeedback) {
-                if (type === 'light' || type === 'medium' || type === 'heavy') {
-                    tg.HapticFeedback.impactOccurred(type);
-                } else if (type === 'success' || type === 'error' || type === 'warning') {
-                    tg.HapticFeedback.notificationOccurred(type);
-                }
-            }
-        }
-
-        // Загрузка товаров из Google Sheets
+        // ========== ЗАГРУЗКА ТОВАРОВ ==========
         async function loadProductsFromGoogleSheet() {
             try {
                 const response = await fetch(GOOGLE_SHEET_CSV_URL);
-                if (!response.ok) throw new Error('Ошибка загрузки');
-                
                 const csvText = await response.text();
                 const rows = csvText.split('\n').filter(row => row.trim());
                 
-                if (rows.length < 2) throw new Error('Таблица пуста');
-                
-                const headers = rows[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
-                
-                const loadedProducts = [];
-                for (let i = 1; i < rows.length; i++) {
-                    const values = rows[i].match(/(".*?"|[^,]+)(?=\s*,|\s*$)/g) || [];
-                    
-                    if (values.length >= headers.length) {
-                        const product = {};
-                        headers.forEach((header, index) => {
-                            let value = values[index] ? values[index].replace(/^"|"$/g, '').trim() : '';
-                            
-                            if (['id', 'price', 'step'].includes(header)) {
-                                value = parseFloat(value) || 0;
-                            }
-                            product[header] = value;
-                        });
-                        
-                        if (product.id && product.name) {
-                            loadedProducts.push(product);
+                if (rows.length > 1) {
+                    const loadedProducts = [];
+                    for (let i = 1; i < rows.length; i++) {
+                        const values = rows[i].split(',').map(v => v.replace(/^"|"$/g, '').trim());
+                        if (values.length >= 5) {
+                            loadedProducts.push({
+                                id: i,
+                                name: values[0] || `Товар ${i}`,
+                                price: parseFloat(values[1]) || 1000,
+                                unit: values[2] || 'кг',
+                                category: values[3] || 'other',
+                                orderUnit: values[4] || 'шт',
+                                orderNote: values[5] || '',
+                                step: parseFloat(values[6]) || 1
+                            });
                         }
                     }
+                    if (loadedProducts.length > 0) products = loadedProducts;
                 }
-                
-                if (loadedProducts.length > 0) {
-                    products = loadedProducts;
-                    console.log(`Загружено ${products.length} товаров`);
-                    displayProducts();
-                    return true;
-                } else {
-                    throw new Error('Нет товаров в таблице');
-                }
-                
             } catch (error) {
-                console.error('Ошибка загрузки из Google Таблицы:', error);
+                console.log('Using fallback products');
                 products = fallbackProducts;
-                displayProducts();
-                return false;
             }
+            displayProducts();
         }
 
-        // Обработка авторизации через Telegram
-        async function handleTelegramAuth(userData) {
-            console.log('Telegram auth:', userData);
+        // ========== АВТОРИЗАЦИЯ ==========
+        function createTelegramWidget() {
+            const container = document.getElementById('telegram-login-container');
+            if (!container) return;
+            container.innerHTML = '';
             
+            const script = document.createElement('script');
+            script.async = true;
+            script.src = 'https://telegram.org/js/telegram-widget.js?22';
+            script.setAttribute('data-telegram-login', 'dairy_shop_2026_bot');
+            script.setAttribute('data-size', 'large');
+            script.setAttribute('data-radius', '30');
+            script.setAttribute('data-onauth', 'onTelegramAuth(user)');
+            script.setAttribute('data-request-access', 'write');
+            container.appendChild(script);
+        }
+
+        window.onTelegramAuth = function(user) {
+            handleTelegramAuth(user);
+            hideAuthModal();
+        };
+
+        async function handleTelegramAuth(userData) {
             currentUser = {
                 id: 'tg_' + userData.id,
                 name: userData.first_name + (userData.last_name ? ' ' + userData.last_name : ''),
                 username: userData.username,
                 photo_url: userData.photo_url,
-                authMethod: 'telegram',
                 authDate: new Date().toISOString()
             };
             
             localStorage.setItem('currentUser', JSON.stringify(currentUser));
-            
-            await loadUserOrdersFromFirebase();
+            await loadUserOrders();
             updateAuthUI();
-            
-            if (tg) {
-                tg.showPopup({
-                    title: 'Добро пожаловать!',
-                    message: `🙏 Харе Кришна, ${userData.first_name}!`,
-                    buttons: [{ type: 'ok' }]
-                });
+            showNotification(`Добро пожаловать, ${userData.first_name}! 🙏`);
+        }
+
+        // ========== ЗАКАЗЫ ==========
+        async function loadUserOrders() {
+            if (!currentUser) return;
+            try {
+                const snapshot = await db.collection('orders')
+                    .where('userId', '==', currentUser.id)
+                    .orderBy('date', 'desc')
+                    .get();
+                
+                orders = [];
+                snapshot.forEach(doc => orders.push({ id: doc.id, ...doc.data() }));
+            } catch (error) {
+                console.error('Error loading orders:', error);
             }
         }
 
-        // Обновление UI авторизации
+        async function saveOrderToFirebase(order) {
+            if (!currentUser) return false;
+            try {
+                await db.collection('orders').add(order);
+                return true;
+            } catch (error) {
+                console.error('Error saving order:', error);
+                return false;
+            }
+        }
+
+        // ========== UI ФУНКЦИИ ==========
         function updateAuthUI() {
             const navButtons = document.getElementById('navButtons');
             const mobileAuthItem = document.getElementById('mobileAuthMenuItem');
@@ -1586,12 +1321,10 @@
                     <button class="nav-btn" onclick="showModal('rules')">Правила</button>
                 `;
                 
-                mobileAuthItem.innerHTML = `👤 ${currentUser.name || currentUser.username || 'Профиль'}`;
+                mobileAuthItem.innerHTML = `👤 ${currentUser.name || 'Профиль'}`;
                 mobileAuthItem.onclick = () => { showProfile(); toggleMobileMenu(); };
-                
                 if (mobileOrdersItem) mobileOrdersItem.style.display = 'block';
                 if (mobileLogoutItem) mobileLogoutItem.style.display = 'block';
-                
             } else {
                 navButtons.innerHTML = `
                     <button class="nav-btn auth-btn" onclick="showAuthModal()">🔐 Войти</button>
@@ -1601,68 +1334,62 @@
                 
                 mobileAuthItem.innerHTML = '🔐 Войти';
                 mobileAuthItem.onclick = () => { showAuthModal(); toggleMobileMenu(); };
-                
                 if (mobileOrdersItem) mobileOrdersItem.style.display = 'none';
                 if (mobileLogoutItem) mobileLogoutItem.style.display = 'none';
             }
         }
 
-        // Загрузка заказов из Firebase
-        async function loadUserOrdersFromFirebase() {
+        function showProfile() {
             if (!currentUser) return;
             
-            try {
-                const snapshot = await db.collection('orders')
-                    .where('userId', '==', currentUser.id)
-                    .orderBy('date', 'desc')
-                    .get();
-                
-                orders = [];
-                snapshot.forEach(doc => {
-                    orders.push({ id: doc.id, ...doc.data() });
-                });
-                
-                console.log('Заказы загружены из Firebase:', orders.length);
-            } catch (error) {
-                console.error('Ошибка загрузки заказов:', error);
-            }
-        }
-
-        // Сохранение заказа в Firebase
-        async function saveOrderToFirebase(order) {
-            if (!currentUser) return false;
+            const profileContent = document.getElementById('profileContent');
+            const avatarHtml = currentUser.photo_url 
+                ? `<img src="${currentUser.photo_url}" alt="avatar">` 
+                : (currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U');
             
-            try {
-                const docRef = await db.collection('orders').add({
-                    ...order,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                
-                order.firebaseId = docRef.id;
-                orders.unshift(order);
-                
-                console.log('Заказ сохранён в Firebase');
-                return true;
-            } catch (error) {
-                console.error('Ошибка сохранения заказа:', error);
-                return false;
-            }
+            profileContent.innerHTML = `
+                <div class="profile-avatar-large">${avatarHtml}</div>
+                <div class="profile-name">${currentUser.name || 'Пользователь'}</div>
+                ${currentUser.username ? `<div class="profile-username">@${currentUser.username}</div>` : ''}
+                <button class="profile-logout-btn" onclick="showLogoutConfirm()">🚪 Выйти</button>
+            `;
+            
+            document.getElementById('profileModal').classList.add('active');
         }
 
-        // Удаление заказа из Firebase
-        async function deleteOrderFromFirebase(orderId, firebaseId) {
-            try {
-                await db.collection('orders').doc(firebaseId).delete();
-                orders = orders.filter(o => o.id != orderId);
-                console.log('Заказ удалён из Firebase');
-                return true;
-            } catch (error) {
-                console.error('Ошибка удаления заказа:', error);
-                return false;
-            }
+        function showAuthModal() {
+            document.getElementById('authModal').classList.add('active');
+            createTelegramWidget();
         }
 
-        // Отображение товаров
+        function hideAuthModal() {
+            document.getElementById('authModal').classList.remove('active');
+        }
+
+        function showLogoutConfirm() {
+            document.getElementById('logoutConfirmModal').classList.add('active');
+        }
+
+        function hideLogoutConfirm() {
+            document.getElementById('logoutConfirmModal').classList.remove('active');
+        }
+
+        function confirmLogout() {
+            hideLogoutConfirm();
+            hideProfileModal();
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            orders = [];
+            updateAuthUI();
+            showNotification('Вы вышли из аккаунта');
+        }
+
+        function handleMobileAuth() {
+            if (currentUser) showProfile();
+            else showAuthModal();
+        }
+
+        // ========== ТОВАРЫ И КОРЗИНА ==========
         function displayProducts() {
             const currentProducts = products.length > 0 ? products : fallbackProducts;
             
@@ -1674,9 +1401,8 @@
             const desktopHtml = filtered.map(p => {
                 const cartItem = cart.find(item => item.id === p.id);
                 const qty = cartItem ? formatQuantity(cartItem.count * p.step) : '0';
-                const inCartClass = cartItem ? 'in-cart' : '';
                 return `
-                    <div class="product-item ${inCartClass}" data-id="${p.id}">
+                    <div class="product-item ${cartItem ? 'in-cart' : ''}">
                         <div class="product-info">
                             <div class="product-name">${p.name}</div>
                             <div class="product-note">${p.orderNote}</div>
@@ -1695,9 +1421,8 @@
             const mobileHtml = filtered.map(p => {
                 const cartItem = cart.find(item => item.id === p.id);
                 const qty = cartItem ? formatQuantity(cartItem.count * p.step) : '0';
-                const inCartClass = cartItem ? 'in-cart' : '';
                 return `
-                    <div class="product-item ${inCartClass}" data-id="${p.id}">
+                    <div class="product-item ${cartItem ? 'in-cart' : ''}">
                         <div class="product-name">${p.name}</div>
                         <div class="product-note">${p.orderNote}</div>
                         <div class="product-details-row">
@@ -1715,23 +1440,21 @@
                 `;
             }).join('');
             
-            if (document.getElementById('productsList')) {
-                document.getElementById('productsList').innerHTML = desktopHtml;
-            }
-            if (document.getElementById('mobileProductsList')) {
-                document.getElementById('mobileProductsList').innerHTML = mobileHtml;
-            }
+            document.getElementById('productsList').innerHTML = desktopHtml;
+            document.getElementById('mobileProductsList').innerHTML = mobileHtml;
         }
 
-        // Обновление количества товара
+        function formatQuantity(value) {
+            return Number.isInteger(value) ? value.toString() : value.toFixed(2);
+        }
+
         function updateProductQuantity(productId, delta) {
             const currentProducts = products.length > 0 ? products : fallbackProducts;
             const product = currentProducts.find(p => p.id === productId);
             const existingItem = cart.find(item => item.id === productId);
             
             if (existingItem) {
-                const deltaCount = delta > 0 ? 1 : -1;
-                const newCount = existingItem.count + deltaCount;
+                const newCount = existingItem.count + (delta > 0 ? 1 : -1);
                 if (newCount <= 0) {
                     cart = cart.filter(item => item.id !== productId);
                 } else {
@@ -1741,99 +1464,22 @@
                 cart.push({ ...product, count: 1 });
             }
             
-            hapticFeedback('light');
             saveCart();
             displayProducts();
             updateAllCarts();
         }
 
-        // Поиск
-        function searchProducts() {
-            searchQuery = document.getElementById('searchInput').value;
-            displayProducts();
-        }
-
-        // Фильтр по категориям
-        function filterProducts(category) {
-            currentCategory = category;
-            document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-            displayProducts();
-        }
-
-        // Обновление корзин
-        function updateAllCarts() {
-            const totalUnits = cart.reduce((sum, item) => sum + item.count, 0);
-            document.getElementById('cartCount').textContent = totalUnits > 99 ? '99+' : totalUnits;
-            
-            // Показываем/скрываем кнопку Telegram
-            if (tg) {
-                if (cart.length > 0) {
-                    tg.MainButton.show();
-                } else {
-                    tg.MainButton.hide();
-                }
-            }
-            
-            const createCartHtml = () => {
-                if (cart.length === 0) {
-                    return { html: '<p style="color: #b87333; text-align: center; padding: 10px;">🛒 Корзина пуста</p>', total: 0 };
-                }
-                
-                let totalSum = 0;
-                const itemsHtml = cart.map(item => {
-                    const quantity = item.count * item.step;
-                    const itemTotal = item.price * quantity;
-                    totalSum += itemTotal;
-                    return `
-                        <div class="cart-item">
-                            <div class="cart-item-info">
-                                <div class="cart-item-name">${item.name}</div>
-                                <div class="cart-item-note">${item.orderNote}</div>
-                            </div>
-                            <div class="cart-item-controls">
-                                <button class="cart-item-btn" onclick="updateProductQuantity(${item.id}, -${item.step})">−</button>
-                                <span class="cart-item-quantity">${formatQuantity(quantity)}</span>
-                                <button class="cart-item-btn" onclick="updateProductQuantity(${item.id}, ${item.step})">+</button>
-                                <button class="cart-item-remove" onclick="removeFromCart(${item.id})">×</button>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-                
-                return { html: itemsHtml, total: totalSum };
-            };
-            
-            const { html, total } = createCartHtml();
-            
-            const desktopCart = document.getElementById('desktopCartItems');
-            const desktopTotal = document.getElementById('desktopCartTotal')?.querySelector('span');
-            if (desktopCart) desktopCart.innerHTML = html;
-            if (desktopTotal) desktopTotal.textContent = `${total.toFixed(2)} ₽`;
-            
-            const mobileCart = document.getElementById('mobileCartItems');
-            const mobileTotal = document.getElementById('mobileCartTotal')?.querySelector('span');
-            if (mobileCart && document.getElementById('mobileCartModal').classList.contains('active')) {
-                mobileCart.innerHTML = html;
-            }
-            if (mobileTotal) mobileTotal.textContent = `${total.toFixed(2)} ₽`;
-        }
-
-        // Удаление из корзины
         function removeFromCart(productId) {
             cart = cart.filter(item => item.id !== productId);
-            hapticFeedback('light');
             saveCart();
             displayProducts();
             updateAllCarts();
         }
 
-        // Сохранение корзины
         function saveCart() {
             localStorage.setItem('cart', JSON.stringify(cart));
         }
 
-        // Загрузка корзины
         function loadCart() {
             const saved = localStorage.getItem('cart');
             if (saved) {
@@ -1845,36 +1491,71 @@
             }
         }
 
-        // Очистка корзины
+        function updateAllCarts() {
+            const totalUnits = cart.reduce((sum, item) => sum + item.count, 0);
+            document.getElementById('cartCount').textContent = totalUnits > 99 ? '99+' : totalUnits;
+            
+            if (cart.length === 0) {
+                document.getElementById('desktopCartItems').innerHTML = '<p style="color: #b87333; text-align: center; padding: 10px;">🛒 Корзина пуста</p>';
+                document.getElementById('desktopCartTotal').querySelector('span').textContent = '0 ₽';
+                return;
+            }
+            
+            let totalSum = 0;
+            const itemsHtml = cart.map(item => {
+                const quantity = item.count * item.step;
+                const itemTotal = item.price * quantity;
+                totalSum += itemTotal;
+                return `
+                    <div class="cart-item">
+                        <div class="cart-item-info">
+                            <div class="cart-item-name">${item.name}</div>
+                            <div class="cart-item-note">${item.orderNote}</div>
+                        </div>
+                        <div class="cart-item-controls">
+                            <button class="cart-item-btn" onclick="updateProductQuantity(${item.id}, -${item.step})">−</button>
+                            <span class="cart-item-quantity">${formatQuantity(quantity)}</span>
+                            <button class="cart-item-btn" onclick="updateProductQuantity(${item.id}, ${item.step})">+</button>
+                            <button class="cart-item-remove" onclick="removeFromCart(${item.id})">×</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('desktopCartItems').innerHTML = itemsHtml;
+            document.getElementById('desktopCartTotal').querySelector('span').textContent = totalSum.toFixed(2) + ' ₽';
+            
+            if (document.getElementById('mobileCartModal').classList.contains('active')) {
+                document.getElementById('mobileCartItems').innerHTML = itemsHtml;
+                document.getElementById('mobileCartTotal').querySelector('span').textContent = totalSum.toFixed(2) + ' ₽';
+            }
+        }
+
         function clearCart() {
             if (cart.length === 0) return;
-            
-            const doClear = () => {
+            if (confirm('Очистить корзину?')) {
                 cart = [];
                 saveCart();
                 displayProducts();
                 updateAllCarts();
-                hapticFeedback('success');
-                if (!tg) showNotification('Корзина очищена');
-            };
-            
-            if (tg) {
-                tg.showPopup({
-                    title: 'Очистить корзину?',
-                    message: 'Вы уверены, что хотите очистить корзину?',
-                    buttons: [
-                        { type: 'cancel' },
-                        { type: 'ok', text: 'Очистить' }
-                    ]
-                }, (buttonId) => {
-                    if (buttonId === 'ok') doClear();
-                });
-            } else {
-                if (confirm('Очистить корзину?')) doClear();
+                showNotification('Корзина очищена');
             }
         }
 
-        // Калькуляторы
+        // ========== ПОИСК И ФИЛЬТРЫ ==========
+        function searchProducts() {
+            searchQuery = document.getElementById('searchInput').value;
+            displayProducts();
+        }
+
+        function filterProducts(category) {
+            currentCategory = category;
+            document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            displayProducts();
+        }
+
+        // ========== КАЛЬКУЛЯТОР ==========
         function updateWidgetCalc() {
             const price = parseFloat(document.getElementById('widgetPriceKg').value) || 0;
             const gram = parseFloat(document.getElementById('widgetGram').value) || 0;
@@ -1887,7 +1568,7 @@
             document.getElementById('mobileCalcResult').textContent = `Стоимость: ${((gram/1000)*price).toFixed(2)} ₽`;
         }
 
-        // Мобильное меню
+        // ========== МОБИЛЬНОЕ МЕНЮ ==========
         function toggleMobileMenu() {
             document.getElementById('mobileMenu').classList.toggle('active');
             document.getElementById('menuOverlay').classList.toggle('active');
@@ -1906,7 +1587,7 @@
             document.getElementById('mobileCartModal').classList.remove('active');
         }
 
-        // Модальные окна
+        // ========== МОДАЛЬНЫЕ ОКНА ==========
         function showModal(type) {
             document.getElementById(type + 'Modal').classList.add('active');
         }
@@ -1915,100 +1596,19 @@
             document.getElementById(type + 'Modal').classList.remove('active');
         }
 
-        // Профиль
-        function showProfile() {
-            if (!currentUser) {
-                showAuthModal();
-                return;
-            }
-            
-            const profileContent = document.getElementById('profileContent');
-            
-            const avatarHtml = currentUser.photo_url 
-                ? `<img src="${currentUser.photo_url}" alt="avatar">` 
-                : (currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U');
-            
-            profileContent.innerHTML = `
-                <div class="profile-avatar-large">${avatarHtml}</div>
-                <div class="profile-name">${currentUser.name || 'Пользователь'}</div>
-                ${currentUser.username ? `<div class="profile-username">@${currentUser.username}</div>` : ''}
-                <div style="background: #fff2d9; padding: 15px; border-radius: 10px; margin: 20px 0; text-align: left;">
-                    <p style="margin: 5px 0;"><strong>ID:</strong> ${currentUser.id}</p>
-                    <p style="margin: 5px 0;"><strong>Вход через:</strong> Telegram</p>
-                    <p style="margin: 5px 0;"><strong>Дата входа:</strong> ${new Date(currentUser.authDate).toLocaleString()}</p>
-                </div>
-                <button class="profile-logout-btn" onclick="showLogoutConfirm()">🚪 Выйти из аккаунта</button>
-            `;
-            
-            document.getElementById('profileModal').classList.add('active');
-        }
-
         function hideProfileModal() {
             document.getElementById('profileModal').classList.remove('active');
         }
 
-        // Выход
-        function showLogoutConfirm() {
-            document.getElementById('logoutConfirmModal').classList.add('active');
-        }
-
-        function hideLogoutConfirm() {
-            document.getElementById('logoutConfirmModal').classList.remove('active');
-        }
-
-        function confirmLogout() {
-            hideLogoutConfirm();
-            hideProfileModal();
-            
-            currentUser = null;
-            localStorage.removeItem('currentUser');
-            orders = [];
-            updateAuthUI();
-            
-            if (tg) {
-                tg.showPopup({
-                    message: 'Вы вышли из аккаунта',
-                    buttons: [{ type: 'ok' }]
-                });
-            } else {
-                showNotification('Вы вышли из аккаунта');
-            }
-        }
-
-        // Авторизация (для браузера)
-        function showAuthModal() {
-            if (tg) {
-                tg.showAlert('Вы уже авторизованы через Telegram!');
-                return;
-            }
-            document.getElementById('authModal').classList.add('active');
-        }
-
-        function hideAuthModal() {
-            document.getElementById('authModal').classList.remove('active');
-        }
-
-        function handleMobileAuth() {
-            if (currentUser) {
-                showProfile();
-            } else {
-                showAuthModal();
-            }
-        }
-
-        // Заказы
+        // ========== ЗАКАЗЫ ==========
         async function showOrders() {
             if (!currentUser) {
-                if (tg) {
-                    tg.showAlert('Сначала войдите в аккаунт');
-                } else {
-                    showNotification('Сначала войдите в аккаунт');
-                    showAuthModal();
-                }
+                showNotification('Сначала войдите в аккаунт');
+                showAuthModal();
                 return;
             }
             
-            await loadUserOrdersFromFirebase();
+            await loadUserOrders();
             displayOrders();
             document.getElementById('ordersModal').classList.add('active');
         }
@@ -2047,101 +1647,21 @@
                             ${itemsHtml}
                             <div class="order-total-preview">💰 Предварительно: ${total.toFixed(2)} ₽</div>
                         </div>
-                        <div class="order-actions">
-                            <button class="order-copy-btn" onclick="copyOrder('${order.id}')">📋 Копировать</button>
-                            <button class="order-delete-btn" onclick="deleteOrder('${order.id}', '${order.firebaseId || ''}')">🗑 Удалить</button>
-                        </div>
                     </div>
                 `;
             }).join('');
         }
 
-        async function deleteOrder(orderId, firebaseId) {
-            if (!confirm('Удалить заказ?')) return;
-            
-            if (firebaseId) {
-                const success = await deleteOrderFromFirebase(orderId, firebaseId);
-                if (success) {
-                    displayOrders();
-                    if (tg) {
-                        hapticFeedback('success');
-                    } else {
-                        showNotification('Заказ удалён');
-                    }
-                }
-            } else {
-                orders = orders.filter(o => o.id != orderId);
-                displayOrders();
-                if (!tg) showNotification('Заказ удалён');
-            }
-        }
-
-        function copyOrder(orderId) {
-            const order = orders.find(o => o.id == orderId);
-            if (order) {
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(order.orderText).then(() => {
-                        if (tg) {
-                            hapticFeedback('success');
-                            tg.showPopup({
-                                message: 'Заказ скопирован',
-                                buttons: [{ type: 'ok' }]
-                            });
-                        } else {
-                            showNotification('Заказ скопирован 📋');
-                        }
-                    });
-                } else {
-                    fallbackCopy(order.orderText);
-                }
-            }
-        }
-
-        function fallbackCopy(text) {
-            const textarea = document.createElement('textarea');
-            textarea.value = text;
-            textarea.style.position = 'fixed';
-            textarea.style.top = '-9999px';
-            textarea.style.left = '-9999px';
-            document.body.appendChild(textarea);
-            textarea.focus();
-            textarea.select();
-            try {
-                document.execCommand('copy');
-                if (tg) {
-                    hapticFeedback('success');
-                    tg.showPopup({ message: 'Заказ скопирован', buttons: [{ type: 'ok' }] });
-                } else {
-                    showNotification('Заказ скопирован 📋');
-                }
-            } catch (err) {
-                if (tg) {
-                    tg.showPopup({ message: 'Не удалось скопировать', buttons: [{ type: 'ok' }] });
-                } else {
-                    showNotification('Не удалось скопировать');
-                }
-            }
-            document.body.removeChild(textarea);
-        }
-
-        // Форма заказа
+        // ========== ФОРМА ЗАКАЗА ==========
         function showOrderForm() {
             if (!currentUser) {
-                if (tg) {
-                    tg.showAlert('Сначала войдите в аккаунт');
-                } else {
-                    showNotification('Сначала войдите в аккаунт');
-                    showAuthModal();
-                }
+                showNotification('Сначала войдите в аккаунт');
+                showAuthModal();
                 return;
             }
             
             if (cart.length === 0) {
-                if (tg) {
-                    tg.showAlert('Добавьте товары в корзину');
-                } else {
-                    showNotification('Добавьте товары в корзину');
-                }
+                showNotification('Добавьте товары в корзину');
                 return;
             }
 
@@ -2149,17 +1669,7 @@
             summary.innerHTML = '<h3 style="margin-bottom: 10px;">Ваш заказ:</h3>' + 
                 cart.map(item => {
                     const quantity = item.count * item.step;
-                    let itemText = `${item.name} — ${formatQuantity(quantity)} `;
-                    if (item.orderUnit === 'кг') {
-                        itemText += 'кг';
-                    } else if (item.name.includes('Сгущёнка') && !item.name.includes('варёная')) {
-                        itemText += `кг (рекомендуется ${(quantity * 1.1).toFixed(2)} кг = ${quantity} л)`;
-                    } else if (item.name.includes('Масло Премиум')) {
-                        itemText += `коробок (5 кг)`;
-                    } else {
-                        itemText += item.orderUnit;
-                    }
-                    return `<p>• ${itemText}</p>`;
+                    return `<p>• ${item.name} — ${formatQuantity(quantity)} ${item.orderUnit}</p>`;
                 }).join('');
             
             document.getElementById('phone').value = '+7';
@@ -2170,7 +1680,6 @@
             document.getElementById('orderForm').classList.remove('active');
         }
 
-        // Обработка телефона
         function handlePhoneInput(input) {
             let value = input.value;
             if (!value.startsWith('+7')) {
@@ -2182,16 +1691,11 @@
             input.value = '+7' + numbers;
         }
 
-        // Отправка заказа
         async function submitOrder(event) {
             event.preventDefault();
             
             if (!currentUser) {
-                if (tg) {
-                    tg.showAlert('Ошибка авторизации');
-                } else {
-                    showNotification('Сначала войдите в аккаунт');
-                }
+                showNotification('Сначала войдите в аккаунт');
                 return;
             }
             
@@ -2202,33 +1706,15 @@
             
             const phoneDigits = phone.substring(2).replace(/\D/g, '');
             if (phoneDigits.length < 10) {
-                if (tg) {
-                    tg.showAlert('Введите полный номер телефона (10 цифр)');
-                    hapticFeedback('error');
-                } else {
-                    showNotification('Введите полный номер телефона (10 цифр)');
-                }
+                showNotification('Введите полный номер телефона (10 цифр)');
                 return;
             }
             
-            // Формируем текст заказа
             let orderText = `${packageName}\n\n`;
-            
             cart.forEach(item => {
                 const quantity = item.count * item.step;
-                if (item.name.includes('Панир') || item.name.includes('Палка')) {
-                    orderText += `${item.name} — ${formatQuantity(quantity)} кг\n`;
-                } else if (item.name.includes('Сгущёнка') && !item.name.includes('варёная')) {
-                    orderText += `${item.name} — ${(quantity * 1.1).toFixed(2)} кг (рекомендуется 1.1 кг = 1 л)\n`;
-                } else if (item.name.includes('Масло Премиум')) {
-                    orderText += `${item.name} — ${item.count} коробок по 5 кг\n`;
-                } else if (item.name.includes('Масло Сбойка')) {
-                    orderText += `${item.name} — ${item.count} упаковок (2.2-2.9 кг)\n`;
-                } else {
-                    orderText += `${item.name} — ${item.count} ${item.orderUnit} (${item.orderNote})\n`;
-                }
+                orderText += `${item.name} — ${formatQuantity(quantity)} ${item.orderUnit}\n`;
             });
-            
             orderText += `\n${pickupPoint}`;
 
             const orderId = Date.now();
@@ -2244,55 +1730,32 @@
                 userId: currentUser.id
             };
 
-            const saved = await saveOrderToFirebase(order);
+            await saveOrderToFirebase(order);
             
-            if (!saved && !tg) {
-                orders.unshift(order);
-                showNotification('Заказ сохранён локально');
-            }
-
-            // Отправка в Telegram бот
             const totalSum = cart.reduce((sum, item) => sum + (item.price * item.count * item.step), 0);
             const telegramMessage = `
 <b>🛍 НОВЫЙ ЗАКАЗ #${orderId.toString().slice(-6)}</b>
 <b>👤 Пользователь:</b> ${currentUser.name || currentUser.username || 'Неизвестно'}
 
-<b>📦 Подпись на пакете:</b> ${packageName}
+<b>📦 Подпись:</b> ${packageName}
 <b>👤 Имя:</b> ${customerName}
 <b>📞 Телефон:</b> ${phone}
-<b>📍 Точка самовывоза:</b> ${pickupPoint}
-<b>📅 Дата:</b> ${new Date().toLocaleString()}
+<b>📍 Точка:</b> ${pickupPoint}
 
-<b>🛒 Состав заказа:</b>
+<b>🛒 Состав:</b>
 ${orderText.replace(/\n/g, '\n')}
 
-<b>💰 Предварительная сумма:</b> ${totalSum.toFixed(2)} ₽
+<b>💰 Сумма:</b> ${totalSum.toFixed(2)} ₽
             `;
 
             fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    chat_id: TELEGRAM_CHAT_ID, 
-                    text: telegramMessage, 
-                    parse_mode: 'HTML' 
-                })
-            }).catch(e => console.error('Ошибка отправки в Telegram:', e));
+                body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: telegramMessage, parse_mode: 'HTML' })
+            }).catch(e => console.error);
             
-            // Уведомление пользователя
-            if (tg) {
-                hapticFeedback('success');
-                tg.MainButton.hide();
-                tg.showPopup({
-                    title: 'Заказ принят!',
-                    message: '🙏 Харе Кришна! Ваш заказ успешно отправлен.',
-                    buttons: [{ type: 'ok' }]
-                });
-            } else {
-                showNotification('Заказ принят! Харе Кришна! 🙏');
-            }
+            showNotification('Заказ принят! Харе Кришна! 🙏');
             
-            // Очищаем корзину
             cart = [];
             saveCart();
             displayProducts();
@@ -2303,7 +1766,7 @@ ${orderText.replace(/\n/g, '\n')}
             document.getElementById('phone').value = '+7';
         }
 
-        // Уведомления (для браузера)
+        // ========== УВЕДОМЛЕНИЯ ==========
         function showNotification(message) {
             const n = document.getElementById('notification');
             n.textContent = message;
@@ -2311,27 +1774,25 @@ ${orderText.replace(/\n/g, '\n')}
             setTimeout(() => n.classList.remove('show'), 3000);
         }
 
-        // Скролл шапки
-        window.addEventListener('scroll', function() {
-            document.getElementById('header').classList.toggle('compact', window.scrollY > 50);
-        });
-
-        // Закрытие модалок по клику на фон
-        window.onclick = (event) => {
-            if (event.target.classList.contains('modal')) {
-                event.target.classList.remove('active');
-            }
-        };
-
-        // Инициализация при загрузке
+        // ========== ИНИЦИАЛИЗАЦИЯ ==========
         document.addEventListener('DOMContentLoaded', () => {
+            // Проверяем URL на наличие данных авторизации (для браузера)
+            const urlParams = new URLSearchParams(window.location.search);
+            const tgUser = urlParams.get('tg_user');
+            if (tgUser) {
+                try {
+                    const userData = JSON.parse(decodeURIComponent(tgUser));
+                    handleTelegramAuth(userData);
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                } catch (e) {}
+            }
+            
             loadProductsFromGoogleSheet();
             loadCart();
             displayProducts();
             updateAllCarts();
             updateAuthUI();
             
-            // Калькуляторы
             document.getElementById('widgetPriceKg').addEventListener('input', updateWidgetCalc);
             document.getElementById('widgetGram').addEventListener('input', updateWidgetCalc);
             document.getElementById('mobilePriceKg').addEventListener('input', updateMobileCalc);
@@ -2340,9 +1801,19 @@ ${orderText.replace(/\n/g, '\n')}
             updateMobileCalc();
             
             if (currentUser) {
-                loadUserOrdersFromFirebase();
+                loadUserOrders();
             }
         });
+
+        window.addEventListener('scroll', function() {
+            document.getElementById('header').classList.toggle('compact', window.scrollY > 50);
+        });
+
+        window.onclick = (event) => {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active');
+            }
+        };
     </script>
 </body>
 </html>
