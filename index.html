@@ -214,7 +214,7 @@
         <!-- Кнопка выйти в мобильном меню -->
         <div class="mobile-menu-item logout" id="mobileLogoutItem" style="display: none;" onclick="mobileLogout()">🚪 Выйти</div>
         <!-- Кнопка сменить пользователя в мобильном меню -->
-        <div class="mobile-menu-item" id="mobileSwitchUserItem" style="display: none;" onclick="switchUser()">🔄 Сменить пользователя</div>
+        <div class="mobile-menu-item" id="mobileSwitchUserItem" style="display: none;" onclick="forceNewLogin()">🔄 Войти как другой</div>
     </div>
 
     <!-- Десктопная версия -->
@@ -286,21 +286,7 @@
             </p>
             
             <!-- Контейнер для Telegram кнопки -->
-            <div class="telegram-login-wrapper" id="telegram-login-container">
-                <script async src="https://telegram.org/js/telegram-widget.js?22"
-                    data-telegram-login="dairy_shop_2026_bot"
-                    data-size="large"
-                    data-radius="30"
-                    data-auth-url="https://molochko.byethost12.com/auth.php"
-                    data-request-access="write">
-                </script>
-            </div>
-            
-            <!-- Информация о текущем пользователе (если есть) -->
-            <div id="currentUserInfo" style="display: none; margin: 15px 0; padding: 10px; background: #fff2d9; border-radius: 10px; text-align: center;">
-                <p style="margin-bottom: 5px;">Сейчас выполнен вход как:</p>
-                <p style="font-weight: bold;" id="currentUserName"></p>
-            </div>
+            <div class="telegram-login-wrapper" id="telegram-login-container"></div>
             
             <!-- Кнопка для смены пользователя -->
             <div id="switchUserContainer" style="display: none; margin-top: 15px; text-align: center;">
@@ -320,7 +306,7 @@
             <div class="orders-header">
                 <span class="orders-title">📋 Мои заказы</span>
                 <span id="ordersUserInfo" style="font-size: 12px; color: #b87333;"></span>
-                <button class="switch-user-btn" id="switchUserInOrders" onclick="switchUser()" style="display: none;">(сменить)</button>
+                <button class="switch-user-btn" id="switchUserInOrders" onclick="forceNewLogin()" style="display: none;">(сменить)</button>
             </div>
             <div class="orders-container" id="ordersContainer"></div>
         </div>
@@ -465,7 +451,7 @@
 
         // Загрузка
         document.addEventListener('DOMContentLoaded', () => {
-            // Проверяем URL на наличие данных от Telegram (при редиректе с auth.php)
+            // Проверяем URL на наличие данных от Telegram (при редиректе с auth.php) - оставляем для совместимости
             const urlParams = new URLSearchParams(window.location.search);
             const tgUser = urlParams.get('tg_user');
             
@@ -473,7 +459,6 @@
                 try {
                     const userData = JSON.parse(decodeURIComponent(tgUser));
                     handleTelegramAuth(userData);
-                    // Очищаем URL от параметров
                     window.history.replaceState({}, document.title, window.location.pathname);
                 } catch (e) {
                     console.error('Ошибка парсинга данных Telegram:', e);
@@ -493,11 +478,38 @@
             updateWidgetCalc();
             updateMobileCalc();
             
-            // Загружаем заказы пользователя из Firebase
             if (currentUser) {
                 loadUserOrdersFromFirebase();
             }
+            
+            // Создаём Telegram виджет с JS-колбэком
+            createTelegramWidget();
         });
+
+        // Создание Telegram виджета с JS-колбэком
+        function createTelegramWidget() {
+            const container = document.getElementById('telegram-login-container');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            const script = document.createElement('script');
+            script.async = true;
+            script.src = 'https://telegram.org/js/telegram-widget.js?22';
+            script.setAttribute('data-telegram-login', 'dairy_shop_2026_bot');
+            script.setAttribute('data-size', 'large');
+            script.setAttribute('data-radius', '30');
+            script.setAttribute('data-onauth', 'onTelegramAuth(user)');
+            script.setAttribute('data-request-access', 'write');
+            
+            container.appendChild(script);
+        }
+
+        // Глобальная функция для обработки авторизации
+        window.onTelegramAuth = function(user) {
+            console.log('Telegram auth success:', user);
+            handleTelegramAuth(user);
+        };
 
         // Загрузка заказов из Firebase
         async function loadUserOrdersFromFirebase() {
@@ -526,13 +538,11 @@
             if (!currentUser) return;
             
             try {
-                // Добавляем заказ в Firestore
                 const docRef = await db.collection('orders').add({
                     ...order,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 
-                // Обновляем локальный массив
                 order.firebaseId = docRef.id;
                 orders.unshift(order);
                 
@@ -559,7 +569,7 @@
             }
         }
 
-        // Обработка данных от Telegram (вызывается из auth.php через редирект)
+        // Обработка данных от Telegram
         async function handleTelegramAuth(userData) {
             console.log('Telegram auth success:', userData);
             
@@ -574,7 +584,6 @@
             
             localStorage.setItem('currentUser', JSON.stringify(currentUser));
             
-            // Загружаем заказы из Firebase
             await loadUserOrdersFromFirebase();
             
             updateAuthUI();
@@ -590,8 +599,6 @@
             const mobileSwitchUserItem = document.getElementById('mobileSwitchUserItem');
             const switchUserContainer = document.getElementById('switchUserContainer');
             const switchUserInOrders = document.getElementById('switchUserInOrders');
-            const currentUserInfo = document.getElementById('currentUserInfo');
-            const currentUserName = document.getElementById('currentUserName');
             
             if (currentUser) {
                 const avatarHtml = currentUser.photo_url 
@@ -613,17 +620,8 @@
                 mobileAuthItem.innerHTML = `👤 ${currentUser.name || currentUser.username || 'Профиль'}`;
                 mobileAuthItem.onclick = () => { showOrders(); toggleMobileMenu(); };
                 
-                // Показываем кнопку выйти и сменить пользователя в мобильном меню
                 if (mobileLogoutItem) mobileLogoutItem.style.display = 'block';
                 if (mobileSwitchUserItem) mobileSwitchUserItem.style.display = 'block';
-                
-                // Показываем информацию о текущем пользователе в модалке авторизации
-                if (currentUserInfo) {
-                    currentUserInfo.style.display = 'block';
-                    if (currentUserName) currentUserName.textContent = currentUser.name || currentUser.username || 'Пользователь';
-                }
-                
-                // Показываем кнопку смены пользователя
                 if (switchUserContainer) switchUserContainer.style.display = 'block';
                 if (switchUserInOrders) switchUserInOrders.style.display = 'inline';
             } else {
@@ -636,65 +634,28 @@
                 mobileAuthItem.innerHTML = '🔐 Войти';
                 mobileAuthItem.onclick = () => { showAuthModal(); toggleMobileMenu(); };
                 
-                // Скрываем кнопки выйти и сменить пользователя
                 if (mobileLogoutItem) mobileLogoutItem.style.display = 'none';
                 if (mobileSwitchUserItem) mobileSwitchUserItem.style.display = 'none';
-                if (currentUserInfo) currentUserInfo.style.display = 'none';
                 if (switchUserContainer) switchUserContainer.style.display = 'none';
                 if (switchUserInOrders) switchUserInOrders.style.display = 'none';
             }
         }
 
-        // Функция для смены пользователя
-        function switchUser() {
-            // Принудительный выход с очисткой сессии Telegram
-            forceNewLogin();
-        }
-        
-        // Функция для принудительного входа как другой пользователь
+        // Принудительный вход как новый пользователь
         function forceNewLogin() {
-            // Очищаем все данные авторизации на сайте
-            localStorage.removeItem('currentUser');
+            // Очищаем все данные
             currentUser = null;
+            localStorage.removeItem('currentUser');
             orders = [];
             
-            // Обновляем UI
             updateAuthUI();
-            
-            // Показываем сообщение
             showNotification('Сессия очищена. Теперь вы можете войти как другой пользователь.');
             
-            // Пытаемся очистить кэш Telegram, пересоздавая виджет
-            refreshTelegramWidget();
-        }
-
-        // Функция для обновления виджета Telegram (принудительный сброс)
-        function refreshTelegramWidget() {
-            const container = document.getElementById('telegram-login-container');
-            if (!container) return;
+            // Показываем модальное окно входа
+            showAuthModal();
             
-            // Сохраняем текущее содержимое
-            const currentHTML = container.innerHTML;
-            
-            // Очищаем контейнер
-            container.innerHTML = '';
-            
-            // Небольшая задержка и восстановление
-            setTimeout(() => {
-                container.innerHTML = currentHTML;
-                
-                // Перезагружаем скрипт, добавив его заново
-                const script = document.createElement('script');
-                script.async = true;
-                script.src = 'https://telegram.org/js/telegram-widget.js?22';
-                script.setAttribute('data-telegram-login', 'dairy_shop_2026_bot');
-                script.setAttribute('data-size', 'large');
-                script.setAttribute('data-radius', '30');
-                script.setAttribute('data-auth-url', 'https://molochko.byethost12.com/auth.php');
-                script.setAttribute('data-request-access', 'write');
-                
-                container.appendChild(script);
-            }, 100);
+            // Пересоздаём виджет Telegram (это сбросит кэш)
+            createTelegramWidget();
         }
 
         // Мобильный выход
@@ -712,19 +673,15 @@
             orders = [];
             updateAuthUI();
             showNotification('Вы вышли из аккаунта');
-            
-            // Обновляем виджет Telegram
-            refreshTelegramWidget();
         }
 
-        // Отображение товаров (функция полностью сохранена)
+        // Отображение товаров
         function displayProducts() {
             const filtered = products.filter(p => 
                 (currentCategory === 'all' || p.category === currentCategory) && 
                 p.name.toLowerCase().includes(searchQuery.toLowerCase())
             );
             
-            // Десктоп
             const desktopHtml = filtered.map(p => {
                 const cartItem = cart.find(item => item.id === p.id);
                 const qty = cartItem ? formatQuantity(cartItem.count * p.step) : '0';
@@ -746,7 +703,6 @@
                 `;
             }).join('');
             
-            // Мобильная
             const mobileHtml = filtered.map(p => {
                 const cartItem = cart.find(item => item.id === p.id);
                 const qty = cartItem ? formatQuantity(cartItem.count * p.step) : '0';
@@ -1003,12 +959,9 @@
             input.value = '+7' + numbers;
         }
 
-        // === АВТОРИЗАЦИЯ ЧЕРЕЗ TELEGRAM ===
+        // === АВТОРИЗАЦИЯ ===
         function showAuthModal() {
             document.getElementById('authModal').classList.add('active');
-            
-            // При открытии модалки обновляем информацию о текущем пользователе
-            updateAuthUI();
         }
 
         function hideAuthModal() {
@@ -1040,7 +993,6 @@
                 return;
             }
             
-            // Обновляем заказы из Firebase перед показом
             await loadUserOrdersFromFirebase();
             displayOrders();
             document.getElementById('ordersModal').classList.add('active');
@@ -1097,7 +1049,6 @@
                     showNotification('Заказ удалён');
                 }
             } else {
-                // Если нет firebaseId, просто удаляем локально
                 orders = orders.filter(o => o.id != orderId);
                 displayOrders();
                 showNotification('Заказ удалён');
@@ -1223,11 +1174,9 @@
                 userId: currentUser.id
             };
 
-            // Сохраняем в Firebase
             const saved = await saveOrderToFirebase(order);
             
             if (!saved) {
-                // Если не удалось сохранить в Firebase, сохраняем локально
                 orders.unshift(order);
                 showNotification('Заказ сохранён локально');
             }
