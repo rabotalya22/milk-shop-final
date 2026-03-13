@@ -576,6 +576,8 @@
             script.setAttribute('data-radius', '30');
             script.setAttribute('data-onauth', 'onTelegramAuth(user)');
             script.setAttribute('data-request-access', 'write');
+            // Добавляем force-reauth, чтобы всегда запрашивать номер
+            script.setAttribute('data-force-reauth', 'true');
             
             container.appendChild(script);
         }
