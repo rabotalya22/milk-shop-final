@@ -644,18 +644,32 @@
             showNotification(`Добро пожаловать, ${userData.first_name}! 🙏`);
         }
 
-        // Полная очистка сессии Telegram
-        function terminateTelegramSession() {
-            // Создаем iframe для выхода из Telegram
+        // Функция для выхода из Telegram
+        function telegramLogout() {
+            // Очищаем данные на сайте
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            orders = [];
+            updateAuthUI();
+            
+            // Открываем страницу выхода Telegram в iframe
             const iframe = document.createElement('iframe');
             iframe.style.display = 'none';
-            iframe.src = 'https://oauth.telegram.org/auth/quit';
+            iframe.src = 'https://oauth.telegram.org/auth/quit?bot_id=dairy_shop_2026_bot&origin=https://rabotalya22.github.io';
             document.body.appendChild(iframe);
             
-            // Удаляем через секунду
+            // Показываем уведомление
+            showNotification('Выход из Telegram...');
+            
+            // Удаляем iframe и показываем окно входа через секунду
             setTimeout(() => {
                 document.body.removeChild(iframe);
-            }, 1000);
+                showAuthModal();
+                // Пересоздаём виджет
+                setTimeout(() => {
+                    createTelegramWidget();
+                }, 200);
+            }, 1500);
         }
 
         // Показать профиль
@@ -672,8 +686,8 @@
                 <div class="profile-name">${currentUser.name || ''}</div>
                 ${currentUser.username ? `<div class="profile-username">@${currentUser.username}</div>` : ''}
                 <div class="profile-buttons">
-                    <button class="profile-btn secondary" onclick="switchUser(); hideProfileModal();">🔄 Сменить пользователя</button>
-                    <button class="profile-btn danger" onclick="logout(); hideProfileModal();">🚪 Выйти</button>
+                    <button class="profile-btn secondary" onclick="telegramLogout(); hideProfileModal();">🔄 Сменить пользователя</button>
+                    <button class="profile-btn danger" onclick="telegramLogout(); hideProfileModal();">🚪 Выйти</button>
                 </div>
             `;
             
@@ -718,46 +732,6 @@
                 mobileAuthItem.innerHTML = '🔐 Войти';
                 mobileAuthItem.onclick = () => { showAuthModal(); toggleMobileMenu(); };
             }
-        }
-
-        function switchUser() {
-            // Полная очистка
-            currentUser = null;
-            localStorage.removeItem('currentUser');
-            orders = [];
-            
-            // Принудительно завершаем сессию Telegram
-            terminateTelegramSession();
-            
-            updateAuthUI();
-            showNotification('Сессия очищена. Теперь вы можете войти как другой пользователь.');
-            
-            // Показываем окно входа
-            showAuthModal();
-            
-            // Пересоздаём виджет Telegram
-            setTimeout(() => {
-                createTelegramWidget();
-            }, 500);
-        }
-
-        function logout() {
-            if (!confirm('Выйти из аккаунта?')) return;
-            
-            currentUser = null;
-            localStorage.removeItem('currentUser');
-            orders = [];
-            
-            // Принудительно завершаем сессию Telegram
-            terminateTelegramSession();
-            
-            updateAuthUI();
-            showNotification('Вы вышли из аккаунта');
-            
-            // Показываем окно входа
-            setTimeout(() => {
-                showAuthModal();
-            }, 500);
         }
 
         function toggleMobileMenu() {
