@@ -581,12 +581,6 @@
             container.appendChild(script);
         }
 
-        // Функция обратного вызова (оставлена для совместимости)
-        window.onTelegramAuth = function(user) {
-            console.log('Telegram auth success:', user);
-            handleTelegramAuth(user);
-        };
-
         async function loadUserOrdersFromFirebase() {
             if (!currentUser) return;
             
