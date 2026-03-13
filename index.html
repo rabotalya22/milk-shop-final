@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Закупки молочки — вход через Telegram</title>
     <style>
-        /* === СТИЛИ (полностью сохранены, добавляю кнопку выйти в мобильное меню) === */
+        /* === СТИЛИ (полностью сохранены) === */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background: linear-gradient(135deg, #fff9e6 0%, #fff2d9 100%); position: relative; min-height: 100vh; }
         body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100" opacity="0.1"><path d="M40,50 Q50,30 70,50 T100,50" stroke="%23b87333" fill="none" stroke-width="3"/><circle cx="45" cy="40" r="8" fill="%23b87333" opacity="0.2"/><circle cx="85" cy="40" r="8" fill="%23b87333" opacity="0.2"/><path d="M60,65 L70,75 L80,65" stroke="%23b87333" fill="none" stroke-width="3"/></svg>'), url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100" opacity="0.1"><path d="M140,60 Q150,40 170,60 T200,60" stroke="%238b4513" fill="none" stroke-width="3"/><circle cx="145" cy="50" r="8" fill="%238b4513" opacity="0.2"/><circle cx="185" cy="50" r="8" fill="%238b4513" opacity="0.2"/><path d="M160,75 L170,85 L180,75" stroke="%238b4513" fill="none" stroke-width="3"/></svg>'); background-repeat: repeat; background-position: 0 0, 100px 50px; pointer-events: none; z-index: -1; }
@@ -199,7 +199,7 @@
         <div class="mobile-menu-item" onclick="showModal('reviews'); toggleMobileMenu()">⭐ Отзывы покупателей</div>
         <div class="mobile-menu-item" onclick="handleMobileOrders(); toggleMobileMenu()">📋 Мои заказы</div>
         <div class="mobile-menu-item" id="mobileAuthMenuItem" onclick="handleMobileAuth(); toggleMobileMenu()">🔐 Войти</div>
-        <!-- Добавляем кнопку выйти в мобильное меню (будет показываться только когда пользователь авторизован) -->
+        <!-- Кнопка выйти в мобильном меню -->
         <div class="mobile-menu-item logout" id="mobileLogoutItem" style="display: none;" onclick="mobileLogout()">🚪 Выйти</div>
     </div>
 
@@ -309,7 +309,26 @@
     <!-- Уведомление -->
     <div class="notification" id="notification"></div>
 
+    <!-- Подключаем Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <script>
+        // 🔥 ВАЖНО: ЗАМЕНИТЕ ЭТИ ДАННЫЕ НА СВОИ ИЗ КОНСОЛИ FIREBASE!
+        const firebaseConfig = {
+    apiKey: "AIzaSyDztZkvuz3vp__7uUY9sv34R2G8d06qvZEA",
+    authDomain: "moloko-15747.firebaseapp.com",
+    projectId: "moloko-15747",
+    storageBucket: "moloko-15747.firebasestorage.app",
+    messagingSenderId: "533713083066",
+    appId: "1:533713083066:web:5e520a9ce2c78d36314083",
+    measurementId: "G-DDVM2WN2J9"
+};
+
+        // Инициализация Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
         // Токен и ID чата для Telegram бота (для отправки уведомлений)
         const TELEGRAM_BOT_TOKEN = '8553841090:AAHJx6x0qLY6Ur53cFPtuOCKRUu_JUOWT-A';
         const TELEGRAM_CHAT_ID = '353422630';
@@ -405,7 +424,7 @@
         
         // Данные пользователя и заказы
         let currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
-        let orders = JSON.parse(localStorage.getItem('orders') || '[]');
+        let orders = [];
 
         // Форматирование количества
         function formatQuantity(value) {
@@ -448,14 +467,74 @@
             updateWidgetCalc();
             updateMobileCalc();
             
-            // Загружаем заказы пользователя
+            // Загружаем заказы пользователя из Firebase
             if (currentUser) {
-                loadUserOrders();
+                loadUserOrdersFromFirebase();
             }
         });
 
+        // Загрузка заказов из Firebase
+        async function loadUserOrdersFromFirebase() {
+            if (!currentUser) return;
+            
+            try {
+                const snapshot = await db.collection('orders')
+                    .where('userId', '==', currentUser.id)
+                    .orderBy('date', 'desc')
+                    .get();
+                
+                orders = [];
+                snapshot.forEach(doc => {
+                    orders.push({ id: doc.id, ...doc.data() });
+                });
+                
+                console.log('Заказы загружены из Firebase:', orders.length);
+            } catch (error) {
+                console.error('Ошибка загрузки заказов:', error);
+                showNotification('Ошибка загрузки заказов');
+            }
+        }
+
+        // Сохранение заказа в Firebase
+        async function saveOrderToFirebase(order) {
+            if (!currentUser) return;
+            
+            try {
+                // Добавляем заказ в Firestore
+                const docRef = await db.collection('orders').add({
+                    ...order,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                // Обновляем локальный массив
+                order.firebaseId = docRef.id;
+                orders.unshift(order);
+                
+                console.log('Заказ сохранён в Firebase');
+                return true;
+            } catch (error) {
+                console.error('Ошибка сохранения заказа:', error);
+                showNotification('Ошибка сохранения заказа');
+                return false;
+            }
+        }
+
+        // Удаление заказа из Firebase
+        async function deleteOrderFromFirebase(orderId, firebaseId) {
+            try {
+                await db.collection('orders').doc(firebaseId).delete();
+                orders = orders.filter(o => o.id != orderId);
+                console.log('Заказ удалён из Firebase');
+                return true;
+            } catch (error) {
+                console.error('Ошибка удаления заказа:', error);
+                showNotification('Ошибка удаления заказа');
+                return false;
+            }
+        }
+
         // Обработка данных от Telegram (вызывается из auth.php через редирект)
-        function handleTelegramAuth(userData) {
+        async function handleTelegramAuth(userData) {
             console.log('Telegram auth success:', userData);
             
             currentUser = {
@@ -469,7 +548,9 @@
             
             localStorage.setItem('currentUser', JSON.stringify(currentUser));
             
-            loadUserOrders();
+            // Загружаем заказы из Firebase
+            await loadUserOrdersFromFirebase();
+            
             updateAuthUI();
             hideAuthModal();
             showNotification(`Добро пожаловать, ${userData.first_name}! 🙏`);
@@ -528,26 +609,7 @@
             logout();
         }
 
-        // Загрузка заказов пользователя
-        function loadUserOrders() {
-            if (!currentUser) return;
-            const key = `orders_${currentUser.id}`;
-            const userOrders = localStorage.getItem(key);
-            if (userOrders) {
-                orders = JSON.parse(userOrders);
-            } else {
-                orders = [];
-            }
-        }
-
-        // Сохранение заказов пользователя
-        function saveUserOrders() {
-            if (!currentUser) return;
-            const key = `orders_${currentUser.id}`;
-            localStorage.setItem(key, JSON.stringify(orders));
-        }
-
-        // Отображение товаров
+        // Отображение товаров (функция полностью сохранена)
         function displayProducts() {
             const filtered = products.filter(p => 
                 (currentCategory === 'all' || p.category === currentCategory) && 
@@ -860,13 +922,15 @@
         }
 
         // === ЗАКАЗЫ ===
-        function showOrders() {
+        async function showOrders() {
             if (!currentUser) {
                 showNotification('Сначала войдите в аккаунт');
                 showAuthModal();
                 return;
             }
             
+            // Обновляем заказы из Firebase перед показом
+            await loadUserOrdersFromFirebase();
             displayOrders();
             document.getElementById('ordersModal').classList.add('active');
             document.getElementById('ordersUserInfo').textContent = `Пользователь: ${currentUser.name || currentUser.username || ''}`;
@@ -882,8 +946,7 @@
                 container.innerHTML = '<div class="no-orders">📭 У вас пока нет заказов</div>';
                 return;
             }
-            const sorted = [...orders].sort((a,b) => new Date(b.date) - new Date(a.date));
-            container.innerHTML = sorted.map(order => {
+            container.innerHTML = orders.map(order => {
                 const total = order.items.reduce((sum, item) => sum + (item.price * item.count * item.step), 0);
                 let itemsHtml = '';
                 order.items.forEach(item => {
@@ -907,16 +970,24 @@
                     </div>
                     <div class="order-actions">
                         <button class="order-copy-btn" onclick="copyOrder('${order.id}')">📋 Копировать</button>
-                        <button class="order-delete-btn" onclick="deleteOrder('${order.id}')">🗑 Удалить</button>
+                        <button class="order-delete-btn" onclick="deleteOrder('${order.id}', '${order.firebaseId || ''}')">🗑 Удалить</button>
                     </div>
                 </div>`;
             }).join('');
         }
 
-        function deleteOrder(orderId) {
-            if (confirm('Удалить заказ?')) {
+        async function deleteOrder(orderId, firebaseId) {
+            if (!confirm('Удалить заказ?')) return;
+            
+            if (firebaseId) {
+                const success = await deleteOrderFromFirebase(orderId, firebaseId);
+                if (success) {
+                    displayOrders();
+                    showNotification('Заказ удалён');
+                }
+            } else {
+                // Если нет firebaseId, просто удаляем локально
                 orders = orders.filter(o => o.id != orderId);
-                saveUserOrders();
                 displayOrders();
                 showNotification('Заказ удалён');
             }
@@ -999,7 +1070,7 @@
         }
 
         // Отправка заказа
-        function submitOrder(event) {
+        async function submitOrder(event) {
             event.preventDefault();
             
             if (!currentUser) {
@@ -1052,8 +1123,14 @@
                 userId: currentUser.id
             };
 
-            orders.unshift(order);
-            saveUserOrders();
+            // Сохраняем в Firebase
+            const saved = await saveOrderToFirebase(order);
+            
+            if (!saved) {
+                // Если не удалось сохранить в Firebase, сохраняем локально
+                orders.unshift(order);
+                showNotification('Заказ сохранён локально');
+            }
 
             const telegramMessage = `
 <b>🛍 НОВЫЙ ЗАКАЗ #${orderId.toString().slice(-6)}</b>
