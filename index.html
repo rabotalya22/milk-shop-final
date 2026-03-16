@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Закупки молочки — вход по email</title>
     <style>
-        /* === ВСЕ ВАШИ СТИЛИ (полностью) === */
+        /* === ВСЕ СТИЛИ (полностью) === */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background: linear-gradient(135deg, #fff9e6 0%, #fff2d9 100%); position: relative; min-height: 100vh; }
         body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100" opacity="0.1"><path d="M40,50 Q50,30 70,50 T100,50" stroke="%23b87333" fill="none" stroke-width="3"/><circle cx="45" cy="40" r="8" fill="%23b87333" opacity="0.2"/><circle cx="85" cy="40" r="8" fill="%23b87333" opacity="0.2"/><path d="M60,65 L70,75 L80,65" stroke="%23b87333" fill="none" stroke-width="3"/></svg>'), url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100" opacity="0.1"><path d="M140,60 Q150,40 170,60 T200,60" stroke="%238b4513" fill="none" stroke-width="3"/><circle cx="145" cy="50" r="8" fill="%238b4513" opacity="0.2"/><circle cx="185" cy="50" r="8" fill="%238b4513" opacity="0.2"/><path d="M160,75 L170,85 L180,65" stroke="%238b4513" fill="none" stroke-width="3"/></svg>'); background-repeat: repeat; background-position: 0 0, 100px 50px; pointer-events: none; z-index: -1; }
@@ -135,7 +135,7 @@
         .confirm-btn-yes { background: #d4a373; color: white; border: 2px solid #b87333; }
         .confirm-btn-no { background: #fff2d9; color: #6b4f3c; border: 2px solid #d4a373; }
 
-        /* НОВЫЕ СТИЛИ ДЛЯ EMAIL АВТОРИЗАЦИИ */
+        /* СТИЛИ ДЛЯ EMAIL АВТОРИЗАЦИИ */
         .email-login-wrapper { text-align: center; margin: 20px 0; }
         .email-input { width: 100%; padding: 12px; border: 2px solid #d4a373; border-radius: 30px; font-size: 16px; margin-bottom: 15px; }
         .email-input:focus { outline: none; border-color: #b87333; }
@@ -284,7 +284,7 @@
         </div>
     </div>
 
-    <!-- НОВОЕ: Модальное окно авторизации через Email -->
+    <!-- Модальное окно авторизации через Email -->
     <div class="modal" id="authModal">
         <div class="modal-content auth-modal">
             <button class="close-modal" onclick="hideAuthModal()">×</button>
@@ -401,11 +401,11 @@
             appId: "1:533713083066:web:5e520a9ce2c78d36314083"
         };
 
-        // ========== ВАШИ ДАННЫЕ EMAILJS (ЗАМЕНИТЕ НА СВОИ) ==========
+        // ВАШИ ДАННЫЕ EMAILJS
         const EMAILJS_CONFIG = {
             publicKey: '8QhBouJ3A8nOKhaoQ',     // User ID из Account → API Keys
-            serviceId: 'service_vsmyhsn',     // Service ID из Email Services
-            templateId: 'template_zzplf7z'    // Template ID из Email Templates
+            serviceId: 'service_vsmyhsn',       // Service ID из Email Services
+            templateId: 'template_zzplf7z'      // Template ID из Email Templates
         };
 
         firebase.initializeApp(firebaseConfig);
@@ -458,90 +458,116 @@
             }
         });
 
-        // ========== ФУНКЦИЯ ОТПРАВКИ ПИСЬМА ЧЕРЕЗ EMAILJS ==========
+        // ========== ФУНКЦИЯ ОТПРАВКИ ПИСЬМА ==========
         function sendLoginLink() {
-    const email = document.getElementById('loginEmail').value;
-    if (!email || !email.includes('@')) {
-        showNotification('Введите корректный email');
-        return;
-    }
-    
-    // Блокируем кнопку
-    const btn = document.getElementById('sendLinkBtn');
-    btn.disabled = true;
-    
-    // Таймер на 60 секунд
-    let seconds = 60;
-    const timerDiv = document.getElementById('timer');
-    
-    // Очищаем предыдущий таймер если был
-    if (window.loginTimer) {
-        clearInterval(window.loginTimer);
-    }
-    
-    // Запускаем новый таймер
-    window.loginTimer = setInterval(() => {
-        seconds--;
-        timerDiv.textContent = `Отправить повторно через ${seconds} сек`;
-        
-        if (seconds <= 0) {
-            clearInterval(window.loginTimer);
-            btn.disabled = false;
-            timerDiv.textContent = '';
+            const email = document.getElementById('loginEmail').value;
+            if (!email || !email.includes('@')) {
+                showNotification('Введите корректный email');
+                return;
+            }
+            
+            // Блокируем кнопку
+            const btn = document.getElementById('sendLinkBtn');
+            btn.disabled = true;
+            
+            // Таймер на 60 секунд
+            let seconds = 60;
+            const timerDiv = document.getElementById('timer');
+            
+            // Очищаем предыдущий таймер если был
+            if (window.loginTimer) {
+                clearInterval(window.loginTimer);
+            }
+            
+            // Запускаем новый таймер
+            window.loginTimer = setInterval(() => {
+                seconds--;
+                timerDiv.textContent = `Отправить повторно через ${seconds} сек`;
+                
+                if (seconds <= 0) {
+                    clearInterval(window.loginTimer);
+                    btn.disabled = false;
+                    timerDiv.textContent = '';
+                }
+            }, 1000);
+            
+            // Генерируем токен
+            const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+            
+            // Сохраняем токен
+            let pendingLogins = JSON.parse(localStorage.getItem('pendingLogins') || '{}');
+            pendingLogins[token] = { email: email, expires: Date.now() + 3600000 };
+            localStorage.setItem('pendingLogins', JSON.stringify(pendingLogins));
+            
+            // Ссылка для входа
+            const loginLink = `${window.location.origin}${window.location.pathname}?token=${token}&email=${encodeURIComponent(email)}`;
+            
+            // Отправляем через EmailJS
+            emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, {
+                email: email,
+                link: loginLink
+            })
+            .then(function() {
+                // Успешно отправлено - показываем step2
+                document.getElementById('step1').style.display = 'none';
+                document.getElementById('step2').style.display = 'block';
+                showNotification('✉️ Письмо отправлено! Проверьте почту');
+                
+                // Таймер продолжает идти, кнопка остаётся заблокированной
+            })
+            .catch(function(error) {
+                // Ошибка отправки
+                console.error('Ошибка EmailJS:', error);
+                showNotification('Ошибка отправки. Попробуйте еще раз');
+                
+                // При ошибке - разблокируем кнопку и очищаем таймер
+                clearInterval(window.loginTimer);
+                btn.disabled = false;
+                timerDiv.textContent = '';
+            });
         }
-    }, 1000);
-    
-    // Генерируем токен
-    const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-    
-    // Сохраняем токен
-    let pendingLogins = JSON.parse(localStorage.getItem('pendingLogins') || '{}');
-    pendingLogins[token] = { email: email, expires: Date.now() + 3600000 };
-    localStorage.setItem('pendingLogins', JSON.stringify(pendingLogins));
-    
-    // Ссылка для входа
-    const loginLink = `${window.location.origin}${window.location.pathname}?token=${token}&email=${encodeURIComponent(email)}`;
-    
-    // Отправляем через EmailJS
-    emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, {
-        email: email,
-        link: loginLink
-    })
-    .then(function() {
-        // Успешно отправлено
-        document.getElementById('step1').style.display = 'none';
-        document.getElementById('step2').style.display = 'block';
-        showNotification('Письмо отправлено! Проверьте почту');
         
-        // НЕ очищаем таймер - он должен дойти до 0
-        // Только если пользователь нажмет "Назад", тогда сбросим
-    })
-    .catch(function(error) {
-        // Ошибка отправки
-        console.error('Ошибка EmailJS:', error);
-        showNotification('Ошибка отправки. Попробуйте еще раз');
+        function loginWithToken(token, email) {
+            let pendingLogins = JSON.parse(localStorage.getItem('pendingLogins') || '{}');
+            const loginData = pendingLogins[token];
+            
+            if (loginData && loginData.email === email && loginData.expires > Date.now()) {
+                // Токен действителен - входим
+                currentUser = {
+                    id: 'email_' + email.replace(/[^a-zA-Z0-9]/g, '_'),
+                    name: email.split('@')[0],
+                    email: email,
+                    authMethod: 'email',
+                    authDate: new Date().toISOString()
+                };
+                
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                
+                // Удаляем использованный токен
+                delete pendingLogins[token];
+                localStorage.setItem('pendingLogins', JSON.stringify(pendingLogins));
+                
+                updateAuthUI();
+                loadUserOrdersFromFirebase();
+                showNotification('Добро пожаловать! 🙏');
+            } else {
+                showNotification('Ссылка устарела или недействительна');
+            }
+        }
         
-        // При ошибке - разблокируем кнопку и очищаем таймер
-        clearInterval(window.loginTimer);
-        btn.disabled = false;
-        timerDiv.textContent = '';
-    });
-}
-
-// Добавьте эту функцию для сброса таймера при нажатии "Назад"
-function resetAuthModal() {
-    document.getElementById('step1').style.display = 'block';
-    document.getElementById('step2').style.display = 'none';
-    document.getElementById('loginEmail').value = '';
-    
-    // Очищаем таймер и разблокируем кнопку
-    if (window.loginTimer) {
-        clearInterval(window.loginTimer);
-    }
-    const btn = document.getElementById('sendLinkBtn');
-    btn.disabled = false;
-    document.getElementById('timer').textContent = '';
-}
+        function resetAuthModal() {
+            document.getElementById('step1').style.display = 'block';
+            document.getElementById('step2').style.display = 'none';
+            document.getElementById('loginEmail').value = '';
+            
+            // Очищаем таймер и разблокируем кнопку
+            if (window.loginTimer) {
+                clearInterval(window.loginTimer);
+            }
+            const btn = document.getElementById('sendLinkBtn');
+            btn.disabled = false;
+            document.getElementById('timer').textContent = '';
+        }
 
         // Загрузка товаров
         async function loadProductsFromGoogleSheet() {
