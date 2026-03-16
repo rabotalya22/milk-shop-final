@@ -386,6 +386,9 @@
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    
+    <!-- EmailJS -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
     <script>
         // ================ НАСТРОЙКИ ================
@@ -398,11 +401,18 @@
             appId: "1:533713083066:web:5e520a9ce2c78d36314083"
         };
 
-        // ВАШ EMAIL ДЛЯ ПОЛУЧЕНИЯ ПИСЕМ (ЗАМЕНИТЕ НА СВОЙ!)
-        const YOUR_EMAIL = 'moloko.shop@atomicmail.io'; // ← ИЗМЕНИТЕ ЭТО
+        // ========== ВАШИ ДАННЫЕ EMAILJS (ЗАМЕНИТЕ НА СВОИ) ==========
+        const EMAILJS_CONFIG = {
+            publicKey: '8QhBouJ3A8nOKhaoQ',     // User ID из Account → API Keys
+            serviceId: 'service_vsmyhsn',     // Service ID из Email Services
+            templateId: 'template_zzplf7z'    // Template ID из Email Templates
+        };
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+
+        // Инициализируем EmailJS
+        emailjs.init(EMAILJS_CONFIG.publicKey);
 
         const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGMpTtKvFT6ZeWQI882xR0I1_8f12YWhsFWPzVnf7o3j6i8eE_MpCfA-ZBDYCIxXaufo3ZrdfnS7w4/pub?output=csv';
 
@@ -448,7 +458,7 @@
             }
         });
 
-        // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ ОТПРАВКИ ПИСЬМА ==========
+        // ========== ФУНКЦИЯ ОТПРАВКИ ПИСЬМА ЧЕРЕЗ EMAILJS ==========
         function sendLoginLink() {
             const email = document.getElementById('loginEmail').value;
             if (!email || !email.includes('@')) {
@@ -484,43 +494,26 @@
             // Ссылка для входа
             const loginLink = `${window.location.origin}${window.location.pathname}?token=${token}&email=${encodeURIComponent(email)}`;
             
-            // === ИСПРАВЛЕННАЯ ОТПРАВКА ЧЕРЕЗ FORMSUBMIT ===
-            // Создаем скрытую форму для отправки
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = `https://formsubmit.co/${YOUR_EMAIL}`;
-            form.style.display = 'none';
-            
-            // Добавляем поля
-            const fields = {
-                '_subject': 'Ссылка для входа на сайт',
-                '_template': 'table',
-                'email': email,
-                'message': `Для входа на сайт перейдите по ссылке:\n${loginLink}\n\nСсылка действительна 1 час.`,
-                '_autoresponse': `Вы получили это письмо, потому что запросили вход на сайт. Если это не вы, просто проигнорируйте.`
-            };
-            
-            for (let key in fields) {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = key;
-                input.value = fields[key];
-                form.appendChild(input);
-            }
-            
-            document.body.appendChild(form);
-            
-            // Отправляем форму
-            form.submit();
-            
-            // Показываем следующий шаг
-            document.getElementById('step1').style.display = 'none';
-            document.getElementById('step2').style.display = 'block';
-            
-            // Удаляем форму через секунду
-            setTimeout(() => {
-                document.body.removeChild(form);
-            }, 1000);
+            // Отправляем через EmailJS
+            emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, {
+                to_email: email,
+                link: loginLink,
+                subject: 'Ссылка для входа на сайт'
+            })
+            .then(function() {
+                // Успешно отправлено
+                document.getElementById('step1').style.display = 'none';
+                document.getElementById('step2').style.display = 'block';
+                showNotification('Письмо отправлено! Проверьте почту');
+            })
+            .catch(function(error) {
+                // Ошибка отправки
+                console.error('Ошибка EmailJS:', error);
+                showNotification('Ошибка отправки. Попробуйте еще раз');
+                btn.disabled = false;
+                clearInterval(timer);
+                timerDiv.textContent = '';
+            });
         }
         
         function loginWithToken(token, email) {
