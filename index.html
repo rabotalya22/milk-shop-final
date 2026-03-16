@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>Закупки молочки — вход через ВКонтакте</title>
+    <title>Закупки молочки — вход по email</title>
     <style>
-        /* === ПОЛНЫЕ СТИЛИ (как в оригинале) === */
+        /* === ВСЕ ВАШИ СТИЛИ (полностью) === */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background: linear-gradient(135deg, #fff9e6 0%, #fff2d9 100%); position: relative; min-height: 100vh; }
         body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100" opacity="0.1"><path d="M40,50 Q50,30 70,50 T100,50" stroke="%23b87333" fill="none" stroke-width="3"/><circle cx="45" cy="40" r="8" fill="%23b87333" opacity="0.2"/><circle cx="85" cy="40" r="8" fill="%23b87333" opacity="0.2"/><path d="M60,65 L70,75 L80,65" stroke="%23b87333" fill="none" stroke-width="3"/></svg>'), url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100" opacity="0.1"><path d="M140,60 Q150,40 170,60 T200,60" stroke="%238b4513" fill="none" stroke-width="3"/><circle cx="145" cy="50" r="8" fill="%238b4513" opacity="0.2"/><circle cx="185" cy="50" r="8" fill="%238b4513" opacity="0.2"/><path d="M160,75 L170,85 L180,65" stroke="%238b4513" fill="none" stroke-width="3"/></svg>'); background-repeat: repeat; background-position: 0 0, 100px 50px; pointer-events: none; z-index: -1; }
@@ -135,25 +135,14 @@
         .confirm-btn-yes { background: #d4a373; color: white; border: 2px solid #b87333; }
         .confirm-btn-no { background: #fff2d9; color: #6b4f3c; border: 2px solid #d4a373; }
 
-        /* Стили для VK кнопки */
-        .vk-login-wrapper { display: flex; justify-content: center; align-items: center; margin: 20px 0; }
-        .vk-login-btn { 
-            background: #0077ff; 
-            color: white; 
-            border: none; 
-            border-radius: 30px; 
-            padding: 12px 30px; 
-            font-size: 16px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            display: inline-flex;
-            align-items: center; 
-            gap: 10px; 
-            border: 2px solid #005bb5;
-            text-decoration: none;
-        }
-        .vk-login-btn:hover { background: #0066dd; }
-        .vk-login-btn:before { content: "ВК"; font-weight: bold; font-size: 18px; margin-right: 5px; }
+        /* НОВЫЕ СТИЛИ ДЛЯ EMAIL АВТОРИЗАЦИИ */
+        .email-login-wrapper { text-align: center; margin: 20px 0; }
+        .email-input { width: 100%; padding: 12px; border: 2px solid #d4a373; border-radius: 30px; font-size: 16px; margin-bottom: 15px; }
+        .email-input:focus { outline: none; border-color: #b87333; }
+        .email-btn { background: #6b4f3c; color: white; border: none; border-radius: 30px; padding: 12px 30px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%; border: 2px solid #8b6b4f; }
+        .email-btn:hover { background: #8b6b4f; }
+        .email-btn:disabled { background: #cccccc; border-color: #999999; cursor: not-allowed; }
+        .timer-text { color: #b87333; margin-top: 10px; font-size: 14px; }
         
         @media (max-width: 900px) {
             .desktop-container { display: none; }
@@ -295,27 +284,35 @@
         </div>
     </div>
 
-    <!-- Модальное окно авторизации через ВКонтакте -->
+    <!-- НОВОЕ: Модальное окно авторизации через Email -->
     <div class="modal" id="authModal">
         <div class="modal-content auth-modal">
             <button class="close-modal" onclick="hideAuthModal()">×</button>
-            <h2 style="color: #6b4f3c; margin-bottom: 20px;">🔐 Вход через ВКонтакте</h2>
+            <h2 style="color: #6b4f3c; margin-bottom: 20px;">📧 Вход по email</h2>
             
-            <div style="text-align: center; margin: 20px 0;">
-                <p style="margin-bottom: 20px; color: #6b4f3c;">
-                    Нажмите кнопку ниже, чтобы войти
+            <div id="step1" style="display: block;">
+                <p style="text-align: center; margin-bottom: 20px; color: #6b4f3c;">
+                    Введите ваш email, мы отправим ссылку для входа
                 </p>
                 
-                <!-- КНОПКА ВХОДА ЧЕРЕЗ ВК -->
-                <a href="https://oauth.vk.com/authorize?client_id=54487652&display=page&redirect_uri=https://rabotalya22.github.io/milk-shop-final/&scope=email&response_type=token&v=5.131" 
-                   class="vk-login-btn" 
-                   style="display: inline-block; text-decoration: none;">
-                    Войти через ВКонтакте
-                </a>
+                <div class="email-login-wrapper">
+                    <input type="email" id="loginEmail" class="email-input" placeholder="Ваш email" required>
+                    <button class="email-btn" onclick="sendLoginLink()" id="sendLinkBtn">Отправить ссылку</button>
+                    <div id="timer" class="timer-text"></div>
+                </div>
+            </div>
+            
+            <div id="step2" style="display: none;">
+                <p style="text-align: center; margin-bottom: 20px; color: #6b4f3c;">
+                    ✉️ Письмо отправлено!<br><br>
+                    Проверьте почту и перейдите по ссылке<br>
+                    <small>(если не видите письмо, проверьте папку Спам)</small>
+                </p>
+                <button class="email-btn" onclick="resetAuthModal()">Назад</button>
             </div>
             
             <p style="text-align: center; margin-top: 20px; font-size: 12px; color: #8b6b4f;">
-                Мы получим только ваше имя и фото профиля
+                Мы запоминаем ваш email, чтобы показывать ваши заказы
             </p>
         </div>
     </div>
@@ -391,7 +388,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <script>
-        // ================ ВАШИ ДАННЫЕ ================
+        // ================ НАСТРОЙКИ ================
         const firebaseConfig = {
             apiKey: "AIzaSyDztZkvuz3vp__7uUY9sv34R2G8d06qvZEA",
             authDomain: "moloko-15747.firebaseapp.com",
@@ -401,11 +398,10 @@
             appId: "1:533713083066:web:5e520a9ce2c78d36314083"
         };
 
-        // ДАННЫЕ ВКОНТАКТЕ
-        const VK_CONFIG = {
-            appId: '54487652',
-            groupId: '236729336',
-            groupToken: 'vk1.a.kADYCfymLVoVesaQSTx8tBpgw3u9QgM6o9lC0Xz55ThPhKAeYC0Zr3pDsZK3f1SDK4wwjqEF3H-iv44xJUkvter9aJ93s-7RdGjXkMBsfJi_ZltSzRghHNJyiqqUiddV6eiXAPXd8y9PIlW0EALBMfJpaLSg0o-qTyCBGnR7r85Eqo_n2Q0EUhVFk74VtU5BcZpK8gsijyydecQ4Ik8d1w'
+        // Email для отправки (вам нужно будет заменить на свои данные)
+        const EMAIL_CONFIG = {
+            // Используем бесплатный сервис FormSubmit.co
+            formUrl: 'https://formsubmit.co/ajax/moloko.shop@atomicmail.io' // ЗАМЕНИТЕ НА ВАШ EMAIL
         };
 
         firebase.initializeApp(firebaseConfig);
@@ -426,37 +422,18 @@
         let currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
         let orders = [];
 
-        // Загрузка страницы
+        // ========== ПРОВЕРЯЕМ URL ПРИ ЗАГРУЗКЕ ==========
         document.addEventListener('DOMContentLoaded', function() {
-            // Проверяем URL на токен от ВК
-            if (window.location.hash) {
-                const hashParams = new URLSearchParams(window.location.hash.substring(1));
-                const accessToken = hashParams.get('access_token');
-                const userId = hashParams.get('user_id');
-                
-                if (accessToken && userId) {
-                    fetch(`https://api.vk.com/method/users.get?user_ids=${userId}&fields=photo_200&access_token=${accessToken}&v=5.131`)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.response && data.response[0]) {
-                                const user = data.response[0];
-                                
-                                currentUser = {
-                                    id: 'vk_' + user.id,
-                                    name: user.first_name + ' ' + user.last_name,
-                                    photo_url: user.photo_200,
-                                    authDate: new Date().toISOString()
-                                };
-                                
-                                localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                                window.location.hash = '';
-                                updateAuthUI();
-                                hideAuthModal();
-                                showNotification(`Добро пожаловать, ${user.first_name}! 🙏`);
-                                loadUserOrdersFromFirebase();
-                            }
-                        });
-                }
+            // Проверяем, есть ли в URL токен для входа
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+            const email = urlParams.get('email');
+            
+            if (token && email) {
+                // Входим по ссылке из письма
+                loginWithToken(token, email);
+                // Очищаем URL
+                window.history.replaceState({}, document.title, window.location.pathname);
             }
             
             loadCart();
@@ -474,29 +451,100 @@
             }
         });
 
-        // Функции ВК
-        function loginWithVK() {
-            window.location.href = 'https://oauth.vk.com/authorize?client_id=54487652&display=page&redirect_uri=https://rabotalya22.github.io/milk-shop-final/&scope=email&response_type=token&v=5.131';
-        }
-
-        async function sendVKMessage(message) {
-            try {
-                const formData = new URLSearchParams();
-                formData.append('access_token', VK_CONFIG.groupToken);
-                formData.append('user_id', VK_CONFIG.groupId);
-                formData.append('random_id', Math.floor(Math.random() * 1000000));
-                formData.append('message', message);
-                formData.append('v', '5.131');
-
-                await fetch('https://api.vk.com/method/messages.send', {
-                    method: 'POST',
-                    body: formData
-                });
-                return true;
-            } catch (error) {
-                console.error('Ошибка отправки в ВК:', error);
-                return false;
+        // ========== ФУНКЦИИ ДЛЯ EMAIL АВТОРИЗАЦИИ ==========
+        function sendLoginLink() {
+            const email = document.getElementById('loginEmail').value;
+            if (!email || !email.includes('@')) {
+                showNotification('Введите корректный email');
+                return;
             }
+            
+            // Блокируем кнопку на 60 секунд
+            const btn = document.getElementById('sendLinkBtn');
+            btn.disabled = true;
+            
+            // Таймер обратного отсчета
+            let seconds = 60;
+            const timerDiv = document.getElementById('timer');
+            const timer = setInterval(() => {
+                seconds--;
+                timerDiv.textContent = `Отправить повторно через ${seconds} сек`;
+                if (seconds <= 0) {
+                    clearInterval(timer);
+                    btn.disabled = false;
+                    timerDiv.textContent = '';
+                }
+            }, 1000);
+            
+            // Генерируем токен
+            const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+            
+            // Сохраняем токен в localStorage (для проверки при переходе по ссылке)
+            let pendingLogins = JSON.parse(localStorage.getItem('pendingLogins') || '{}');
+            pendingLogins[token] = { email: email, expires: Date.now() + 3600000 }; // час на вход
+            localStorage.setItem('pendingLogins', JSON.stringify(pendingLogins));
+            
+            // Ссылка для входа
+            const loginLink = `${window.location.origin}${window.location.pathname}?token=${token}&email=${encodeURIComponent(email)}`;
+            
+            // Отправляем письмо через formsubmit.co (бесплатно)
+            fetch('https://formsubmit.co/ajax/' + email, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    _subject: 'Вход на сайт Закупки молочки',
+                    _template: 'table',
+                    message: `Для входа на сайт перейдите по ссылке: ${loginLink}\n\nСсылка действительна 1 час.`,
+                    _autoresponse: 'Вы получили это письмо, потому что запросили вход на сайт. Если это не вы, просто проигнорируйте.'
+                })
+            })
+            .then(() => {
+                document.getElementById('step1').style.display = 'none';
+                document.getElementById('step2').style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Ошибка отправки:', error);
+                showNotification('Ошибка отправки письма. Попробуйте еще раз.');
+                btn.disabled = false;
+                clearInterval(timer);
+                timerDiv.textContent = '';
+            });
+        }
+        
+        function loginWithToken(token, email) {
+            let pendingLogins = JSON.parse(localStorage.getItem('pendingLogins') || '{}');
+            const loginData = pendingLogins[token];
+            
+            if (loginData && loginData.email === email && loginData.expires > Date.now()) {
+                // Токен действителен - входим
+                currentUser = {
+                    id: 'email_' + email.replace(/[^a-zA-Z0-9]/g, '_'),
+                    name: email.split('@')[0],
+                    email: email,
+                    authMethod: 'email',
+                    authDate: new Date().toISOString()
+                };
+                
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                
+                // Удаляем использованный токен
+                delete pendingLogins[token];
+                localStorage.setItem('pendingLogins', JSON.stringify(pendingLogins));
+                
+                updateAuthUI();
+                loadUserOrdersFromFirebase();
+                showNotification('Добро пожаловать! 🙏');
+            } else {
+                showNotification('Ссылка устарела или недействительна');
+            }
+        }
+        
+        function resetAuthModal() {
+            document.getElementById('step1').style.display = 'block';
+            document.getElementById('step2').style.display = 'none';
+            document.getElementById('loginEmail').value = '';
+            document.getElementById('sendLinkBtn').disabled = false;
+            document.getElementById('timer').textContent = '';
         }
 
         // Загрузка товаров
@@ -541,7 +589,6 @@
             }
         }
 
-        // Остальные функции (сокращено для экономии места, но все рабочие)
         function formatQuantity(value) {
             const rounded = Math.round(value * 100) / 100;
             return Number.isInteger(rounded) ? rounded.toString() : rounded.toFixed(2);
@@ -618,7 +665,7 @@
                 <div class="profile-avatar-large">${avatarHtml}</div>
                 <div class="profile-name">${currentUser.name || 'Пользователь'}</div>
                 <div style="background: #fff2d9; padding: 15px; border-radius: 10px; margin: 20px 0;">
-                    <p><strong>Вход через:</strong> ВКонтакте</p>
+                    <p><strong>Email:</strong> ${currentUser.email || 'не указан'}</p>
                     <p><strong>Дата входа:</strong> ${new Date(currentUser.authDate).toLocaleString()}</p>
                 </div>
                 <button class="profile-logout-btn" onclick="showLogoutConfirm()">🚪 Выйти</button>
@@ -783,7 +830,10 @@
             input.value = '+7' + numbers;
         }
 
-        function showAuthModal() { document.getElementById('authModal').classList.add('active'); }
+        function showAuthModal() { 
+            resetAuthModal();
+            document.getElementById('authModal').classList.add('active'); 
+        }
         function hideAuthModal() { document.getElementById('authModal').classList.remove('active'); }
 
         function handleMobileAuth() {
@@ -809,6 +859,13 @@
         function showOrderForm() {
             if (!currentUser) { showNotification('Сначала войдите'); showAuthModal(); return; }
             if (cart.length === 0) { showNotification('Корзина пуста'); return; }
+            
+            const summary = document.getElementById('orderSummary');
+            summary.innerHTML = '<h3>Ваш заказ:</h3>' + cart.map(item => {
+                const quantity = item.count * item.step;
+                return `<p>• ${item.name} — ${formatQuantity(quantity)} ${item.orderUnit}</p>`;
+            }).join('');
+            
             document.getElementById('orderForm').classList.add('active');
         }
         function hideOrderForm() { document.getElementById('orderForm').classList.remove('active'); }
@@ -827,14 +884,11 @@
                 date: new Date().toLocaleString(),
                 items: [...cart],
                 customerName, phone, pickupPoint, packageName,
-                userId: currentUser.id
+                userId: currentUser.id,
+                userEmail: currentUser.email || ''
             };
             
             await saveOrderToFirebase(order);
-            
-            const vkMessage = `🛍 НОВЫЙ ЗАКАЗ #${orderId.toString().slice(-6)}\n👤 ${currentUser.name}\n\n📦 ${packageName}\n👤 ${customerName}\n📞 ${phone}\n📍 ${pickupPoint}\n\n🛒 Состав:\n${cart.map(item => `• ${item.name} — ${item.count * item.step} ${item.orderUnit}`).join('\n')}\n\n💰 Сумма: ${cart.reduce((sum, item) => sum + (item.price * item.count * item.step), 0).toFixed(2)} ₽`;
-            
-            await sendVKMessage(vkMessage);
             
             showNotification('Заказ принят! 🙏');
             cart = [];
