@@ -495,20 +495,19 @@
     const loginLink = `${window.location.origin}${window.location.pathname}?token=${token}&email=${encodeURIComponent(email)}`;
     
     // ===== ИСПРАВЛЕННАЯ ОТПРАВКА =====
-    // Отправляем ТОЛЬКО переменную link, которую ожидает шаблон
+    // Отправляем И email И link
     emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, {
-        link: loginLink
+        email: email,      // для поля To Email
+        link: loginLink    // для текста письма
     })
     .then(function() {
-        // Успешно отправлено
         document.getElementById('step1').style.display = 'none';
         document.getElementById('step2').style.display = 'block';
         showNotification('Письмо отправлено! Проверьте почту');
     })
     .catch(function(error) {
-        // Ошибка отправки
         console.error('Ошибка EmailJS:', error);
-        showNotification('Ошибка отправки. Проверьте консоль (F12)');
+        showNotification('Ошибка отправки. Проверьте настройки EmailJS');
         btn.disabled = false;
         clearInterval(timer);
         timerDiv.textContent = '';
