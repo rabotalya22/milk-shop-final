@@ -398,11 +398,8 @@
             appId: "1:533713083066:web:5e520a9ce2c78d36314083"
         };
 
-        // Email для отправки (вам нужно будет заменить на свои данные)
-        const EMAIL_CONFIG = {
-            // Используем бесплатный сервис FormSubmit.co
-            formUrl: 'https://formsubmit.co/ajax/moloko.shop@atomicmail.io' // ЗАМЕНИТЕ НА ВАШ EMAIL
-        };
+        // ВАШ EMAIL ДЛЯ ПОЛУЧЕНИЯ ПИСЕМ (ЗАМЕНИТЕ НА СВОЙ!)
+        const YOUR_EMAIL = 'moloko.shop@atomicmail.io'; // ← ИЗМЕНИТЕ ЭТО
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
@@ -451,7 +448,7 @@
             }
         });
 
-        // ========== ФУНКЦИИ ДЛЯ EMAIL АВТОРИЗАЦИИ ==========
+        // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ ОТПРАВКИ ПИСЬМА ==========
         function sendLoginLink() {
             const email = document.getElementById('loginEmail').value;
             if (!email || !email.includes('@')) {
@@ -459,11 +456,11 @@
                 return;
             }
             
-            // Блокируем кнопку на 60 секунд
+            // Блокируем кнопку
             const btn = document.getElementById('sendLinkBtn');
             btn.disabled = true;
             
-            // Таймер обратного отсчета
+            // Таймер
             let seconds = 60;
             const timerDiv = document.getElementById('timer');
             const timer = setInterval(() => {
@@ -479,36 +476,51 @@
             // Генерируем токен
             const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
             
-            // Сохраняем токен в localStorage (для проверки при переходе по ссылке)
+            // Сохраняем токен
             let pendingLogins = JSON.parse(localStorage.getItem('pendingLogins') || '{}');
-            pendingLogins[token] = { email: email, expires: Date.now() + 3600000 }; // час на вход
+            pendingLogins[token] = { email: email, expires: Date.now() + 3600000 };
             localStorage.setItem('pendingLogins', JSON.stringify(pendingLogins));
             
             // Ссылка для входа
             const loginLink = `${window.location.origin}${window.location.pathname}?token=${token}&email=${encodeURIComponent(email)}`;
             
-            // Отправляем письмо через formsubmit.co (бесплатно)
-            fetch('https://formsubmit.co/ajax/' + email, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    _subject: 'Вход на сайт Закупки молочки',
-                    _template: 'table',
-                    message: `Для входа на сайт перейдите по ссылке: ${loginLink}\n\nСсылка действительна 1 час.`,
-                    _autoresponse: 'Вы получили это письмо, потому что запросили вход на сайт. Если это не вы, просто проигнорируйте.'
-                })
-            })
-            .then(() => {
-                document.getElementById('step1').style.display = 'none';
-                document.getElementById('step2').style.display = 'block';
-            })
-            .catch(error => {
-                console.error('Ошибка отправки:', error);
-                showNotification('Ошибка отправки письма. Попробуйте еще раз.');
-                btn.disabled = false;
-                clearInterval(timer);
-                timerDiv.textContent = '';
-            });
+            // === ИСПРАВЛЕННАЯ ОТПРАВКА ЧЕРЕЗ FORMSUBMIT ===
+            // Создаем скрытую форму для отправки
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `https://formsubmit.co/${YOUR_EMAIL}`;
+            form.style.display = 'none';
+            
+            // Добавляем поля
+            const fields = {
+                '_subject': 'Ссылка для входа на сайт',
+                '_template': 'table',
+                'email': email,
+                'message': `Для входа на сайт перейдите по ссылке:\n${loginLink}\n\nСсылка действительна 1 час.`,
+                '_autoresponse': `Вы получили это письмо, потому что запросили вход на сайт. Если это не вы, просто проигнорируйте.`
+            };
+            
+            for (let key in fields) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = key;
+                input.value = fields[key];
+                form.appendChild(input);
+            }
+            
+            document.body.appendChild(form);
+            
+            // Отправляем форму
+            form.submit();
+            
+            // Показываем следующий шаг
+            document.getElementById('step1').style.display = 'none';
+            document.getElementById('step2').style.display = 'block';
+            
+            // Удаляем форму через секунду
+            setTimeout(() => {
+                document.body.removeChild(form);
+            }, 1000);
         }
         
         function loginWithToken(token, email) {
