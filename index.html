@@ -460,61 +460,60 @@
 
         // ========== ФУНКЦИЯ ОТПРАВКИ ПИСЬМА ЧЕРЕЗ EMAILJS ==========
         function sendLoginLink() {
-            const email = document.getElementById('loginEmail').value;
-            if (!email || !email.includes('@')) {
-                showNotification('Введите корректный email');
-                return;
-            }
-            
-            // Блокируем кнопку
-            const btn = document.getElementById('sendLinkBtn');
-            btn.disabled = true;
-            
-            // Таймер
-            let seconds = 60;
-            const timerDiv = document.getElementById('timer');
-            const timer = setInterval(() => {
-                seconds--;
-                timerDiv.textContent = `Отправить повторно через ${seconds} сек`;
-                if (seconds <= 0) {
-                    clearInterval(timer);
-                    btn.disabled = false;
-                    timerDiv.textContent = '';
-                }
-            }, 1000);
-            
-            // Генерируем токен
-            const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-            
-            // Сохраняем токен
-            let pendingLogins = JSON.parse(localStorage.getItem('pendingLogins') || '{}');
-            pendingLogins[token] = { email: email, expires: Date.now() + 3600000 };
-            localStorage.setItem('pendingLogins', JSON.stringify(pendingLogins));
-            
-            // Ссылка для входа
-            const loginLink = `${window.location.origin}${window.location.pathname}?token=${token}&email=${encodeURIComponent(email)}`;
-            
-            // Отправляем через EmailJS
-            emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, {
-                to_email: email,
-                link: loginLink,
-                subject: 'Ссылка для входа на сайт'
-            })
-            .then(function() {
-                // Успешно отправлено
-                document.getElementById('step1').style.display = 'none';
-                document.getElementById('step2').style.display = 'block';
-                showNotification('Письмо отправлено! Проверьте почту');
-            })
-            .catch(function(error) {
-                // Ошибка отправки
-                console.error('Ошибка EmailJS:', error);
-                showNotification('Ошибка отправки. Попробуйте еще раз');
-                btn.disabled = false;
-                clearInterval(timer);
-                timerDiv.textContent = '';
-            });
+    const email = document.getElementById('loginEmail').value;
+    if (!email || !email.includes('@')) {
+        showNotification('Введите корректный email');
+        return;
+    }
+    
+    // Блокируем кнопку
+    const btn = document.getElementById('sendLinkBtn');
+    btn.disabled = true;
+    
+    // Таймер
+    let seconds = 60;
+    const timerDiv = document.getElementById('timer');
+    const timer = setInterval(() => {
+        seconds--;
+        timerDiv.textContent = `Отправить повторно через ${seconds} сек`;
+        if (seconds <= 0) {
+            clearInterval(timer);
+            btn.disabled = false;
+            timerDiv.textContent = '';
         }
+    }, 1000);
+    
+    // Генерируем токен
+    const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    
+    // Сохраняем токен
+    let pendingLogins = JSON.parse(localStorage.getItem('pendingLogins') || '{}');
+    pendingLogins[token] = { email: email, expires: Date.now() + 3600000 };
+    localStorage.setItem('pendingLogins', JSON.stringify(pendingLogins));
+    
+    // Ссылка для входа
+    const loginLink = `${window.location.origin}${window.location.pathname}?token=${token}&email=${encodeURIComponent(email)}`;
+    
+    // ===== ИСПРАВЛЕННАЯ ОТПРАВКА =====
+    // Отправляем ТОЛЬКО переменную link, которую ожидает шаблон
+    emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, {
+        link: loginLink
+    })
+    .then(function() {
+        // Успешно отправлено
+        document.getElementById('step1').style.display = 'none';
+        document.getElementById('step2').style.display = 'block';
+        showNotification('Письмо отправлено! Проверьте почту');
+    })
+    .catch(function(error) {
+        // Ошибка отправки
+        console.error('Ошибка EmailJS:', error);
+        showNotification('Ошибка отправки. Проверьте консоль (F12)');
+        btn.disabled = false;
+        clearInterval(timer);
+        timerDiv.textContent = '';
+    });
+}
         
         function loginWithToken(token, email) {
             let pendingLogins = JSON.parse(localStorage.getItem('pendingLogins') || '{}');
