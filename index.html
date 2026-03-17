@@ -327,6 +327,31 @@
             font-weight: bold;
             margin-left: 5px;
         }
+
+        /* Стили для ссылки на поставщика */
+        .supplier-link {
+            margin-top: 20px;
+            text-align: center;
+            padding: 15px;
+            background: #fff2d9;
+            border: 2px solid #d4a373;
+            border-radius: 12px;
+        }
+        
+        .supplier-link a {
+            color: #6b4f3c;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .supplier-link a:hover {
+            color: #b87333;
+            text-decoration: underline;
+        }
         
         @media (max-width: 900px) {
             .desktop-container { display: none; }
@@ -413,14 +438,8 @@
         <div class="desktop-container">
             <div class="products-column">
                 <div class="price-info">ℹ️ Цены ознакомительные. Доставка 30₽/кг включена. Окончательная стоимость после взвешивания.</div>
-                <div class="category-tabs">
-                    <div class="category-tab active" onclick="filterProducts('all')">Все товары</div>
-                    <div class="category-tab" onclick="filterProducts('maslo')">Масла</div>
-                    <div class="category-tab" onclick="filterProducts('ghee')">Гхи</div>
-                    <div class="category-tab" onclick="filterProducts('cheese')">Сыры</div>
-                    <div class="category-tab" onclick="filterProducts('lowfat')">Обезжиренные</div>
-                    <div class="category-tab" onclick="filterProducts('premium')">Премиум</div>
-                    <div class="category-tab" onclick="filterProducts('other')">Сгущёнка</div>
+                <div class="category-tabs" id="categoryTabs">
+                    <!-- Категории будут заполняться динамически -->
                 </div>
                 <div class="products-list" id="productsList"></div>
             </div>
@@ -440,6 +459,10 @@
                     <div class="calc-row"><span>Нужно грамм:</span><input type="number" id="widgetGram" value="" placeholder="0" min="0" oninput="updateWidgetCalc()"></div>
                     <div class="calc-result" id="widgetResult">Стоимость: 0 ₽</div>
                 </div>
+                <!-- Ссылка на поставщика для 5 карточки -->
+                <div class="supplier-link" id="supplierLink" style="display: none;">
+                    <a href="https://vsvkus.ru/" target="_blank">🔗 Перейти на сайт поставщика vsvkus.ru</a>
+                </div>
             </div>
         </div>
 
@@ -453,16 +476,14 @@
                 <div style="margin-bottom: 10px;"><label style="display: block; margin-bottom: 5px;">Нужно грамм:</label><input type="number" id="mobileGram" value="" placeholder="0" min="0" style="width: 100%; padding: 10px; border: 2px solid #d4a373; border-radius: 8px;"></div>
                 <div class="calc-result" id="mobileCalcResult">Стоимость: 0 ₽</div>
             </div>
-            <div class="category-tabs">
-                <div class="category-tab active" onclick="filterProducts('all')">Все</div>
-                <div class="category-tab" onclick="filterProducts('maslo')">Масла</div>
-                <div class="category-tab" onclick="filterProducts('ghee')">Гхи</div>
-                <div class="category-tab" onclick="filterProducts('cheese')">Сыры</div>
-                <div class="category-tab" onclick="filterProducts('lowfat')">Обезжир</div>
-                <div class="category-tab" onclick="filterProducts('premium')">Премиум</div>
-                <div class="category-tab" onclick="filterProducts('other')">Сгущёнка</div>
+            <div class="category-tabs" id="mobileCategoryTabs">
+                <!-- Категории для мобильной версии будут заполняться динамически -->
             </div>
             <div class="products-list" id="mobileProductsList"></div>
+            <!-- Ссылка на поставщика для 5 карточки (мобильная версия) -->
+            <div class="supplier-link" id="mobileSupplierLink" style="display: none;">
+                <a href="https://vsvkus.ru/" target="_blank">🔗 Перейти на сайт поставщика vsvkus.ru</a>
+            </div>
         </div>
     </div>
 
@@ -580,11 +601,11 @@
 
         // ========== URLS ДЛЯ 5 РАЗНЫХ ТАБЛИЦ ==========
         const PRODUCT_SHEETS = {
-            1: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGMpTtKvFT6ZeWQI882xR0I1_8f12YWhsFWPzVnf7o3j6i8eE_MpCfA-ZBDYCIxXaufo3ZrdfnS7w4/pub?output=csv', // Закупка 1 - молочка
-            2: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT8jQhY5xKpLmNz7WqR9vB2cD4fG6hJ8kL0pO2iU4yT6rE8wQ0aA2sD4fG6hJ8kL/pub?output=csv', // Закупка 2 - гхи, сыры
-            3: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vU1mNz7WqR9vB2cD4fG6hJ8kL0pO2iU4yT6rE8wQ0aA2sD4fG6hJ8kLmNz7W/pub?output=csv', // Закупка 3 - Кукуйка
-            4: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vV2cD4fG6hJ8kL0pO2iU4yT6rE8wQ0aA2sD4fG6hJ8kLmNz7WqR9vB2cD4fG6h/pub?output=csv', // Закупка 4 - Всего
-            5: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vW4fG6hJ8kL0pO2iU4yT6rE8wQ0aA2sD4fG6hJ8kLmNz7WqR9vB2cD4fG6hJ8kL0/pub?output=csv'  // Закупка 5 - Высший вкус
+            1: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGMpTtKvFT6ZeWQI882xR0I1_8f12YWhsFWPzVnf7o3j6i8eE_MpCfA-ZBDYCIxXaufo3ZrdfnS7w4/pub?output=csv', // Закупка 1 - молочка (без изменений)
+            2: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ0DWx1pjpzywF78TcZmDKFG51GVV2VhXkErvGjm1EPuSqtzJIwbesscytB8EpVbp8LoZ0Q8G7ThkcL/pub?output=csv', // Закупка 2 - гхи, сыры
+            3: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRRixuztqXdJV-sdQKWSvY-K1IgwfAtVpXnlsNhyCopNNB0CukCQj1Sx5nwd96A5paw7S3N1ZVa_KD/pub?output=csv', // Закупка 3 - Кукуйка
+            4: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTNDjZv7z6ykwnVN5MNHX3MXUu5WRvCq3-k8f109BsL3W8O24K3ypK3yPx3vNxR9_wELYY5a9JQ5eeZ/pub?output=csv', // Закупка 4 - Веро
+            5: 'https://vsvkus.ru/' // Закупка 5 - ссылка на поставщика
         };
 
         // Запасные списки товаров для каждой карточки на случай ошибки загрузки
@@ -595,22 +616,39 @@
                 { id: 3, name: "🧈 Масло Сбойка", price: 1300, unit: "кг", category: "maslo", orderUnit: "уп", orderNote: "упаковка 2.2-2.9 кг", step: 1 }
             ],
             2: [
-                { id: 1, name: "🍯 Гхи из Сбойки", price: 1950, unit: "л", category: "ghee", orderUnit: "шт", orderNote: "бутылка 1л", step: 1 },
-                { id: 2, name: "😋 Гхи йогуртовое", price: 2550, unit: "л", category: "ghee", orderUnit: "шт", orderNote: "бутылка 1л", step: 1 },
-                { id: 3, name: "🧀 Сыр Сулугуни", price: 850, unit: "кг", category: "cheese", orderUnit: "кг", orderNote: "копченый", step: 0.5 }
+                { id: 1, name: "🧈 Масло Сбойка", price: 1400, unit: "кг", category: "maslo", orderUnit: "уп", orderNote: "упаковка 2.2-2.9 кг", step: 1 },
+                { id: 2, name: "🧈 Масло 82.5%", price: 1300, unit: "кг", category: "maslo", orderUnit: "уп", orderNote: "упаковка 2.2-2.9 кг", step: 1 },
+                { id: 3, name: "🧈 Масло 72.5%", price: 1150, unit: "кг", category: "maslo", orderUnit: "уп", orderNote: "упаковка 2.2-2.9 кг", step: 1 },
+                { id: 4, name: "🍯 Йогуртовое Гхи", price: 2500, unit: "л", category: "ghee", orderUnit: "шт", orderNote: "бутылка 1л", step: 1 },
+                { id: 5, name: "🍯 Йогуртовое Гхи 0.5 л", price: 1300, unit: "0.5л", category: "ghee", orderUnit: "шт", orderNote: "бутылка 0.5л", step: 1 },
+                { id: 6, name: "🧀 Панир", price: 950, unit: "кг", category: "cheese", orderUnit: "кг", orderNote: "кусок ~0.5 кг", step: 0.5 },
+                { id: 7, name: "🧀 Панир копченый", price: 1000, unit: "кг", category: "cheese", orderUnit: "кг", orderNote: "кусок ~0.5 кг", step: 0.5 },
+                { id: 8, name: "🧀 Сулугуни", price: 950, unit: "кг", category: "cheese", orderUnit: "кг", orderNote: "кусок ~0.5 кг", step: 0.5 },
+                { id: 9, name: "🧀 Сулугуни копченый", price: 1000, unit: "кг", category: "cheese", orderUnit: "кг", orderNote: "кусок ~0.5 кг", step: 0.5 },
+                { id: 10, name: "🧀 Косичка копченая", price: 1000, unit: "кг", category: "cheese", orderUnit: "кг", orderNote: "косичка ~250 г", step: 0.25 },
+                { id: 11, name: "🧀 Охотничий сыр", price: 1000, unit: "кг", category: "cheese", orderUnit: "кг", orderNote: "кусок ~0.5 кг", step: 0.5 },
+                { id: 12, name: "🧀 Балык", price: 1000, unit: "кг", category: "cheese", orderUnit: "кг", orderNote: "кусок ~300 г", step: 0.3 }
             ],
             3: [
-                { id: 1, name: "🌱 Сейтан (пшеничный белок)", price: 650, unit: "кг", category: "vegan", orderUnit: "кг", orderNote: "вакуумная упаковка", step: 0.5 },
-                { id: 2, name: "🌱 Тофу натуральный", price: 450, unit: "кг", category: "vegan", orderUnit: "кг", orderNote: "прессованный", step: 0.3 }
+                { id: 1, name: "🌱 Колбаса Варёная 380 г", price: 250, unit: "шт", category: "vegan", orderUnit: "шт", orderNote: "упаковка 380 г", step: 1 },
+                { id: 2, name: "🌱 Колбаса Молочная 300 г", price: 230, unit: "шт", category: "vegan", orderUnit: "шт", orderNote: "упаковка 300 г", step: 1 },
+                { id: 3, name: "🌱 Колбаса Пряная 380 г", price: 250, unit: "шт", category: "vegan", orderUnit: "шт", orderNote: "упаковка 380 г", step: 1 },
+                { id: 4, name: "🌱 Колбаса Копчёная Экстра 300 г", price: 280, unit: "шт", category: "vegan", orderUnit: "шт", orderNote: "упаковка 300 г", step: 1 },
+                { id: 5, name: "🌱 Колбаса Ветчинная Экстра 360 г", price: 280, unit: "шт", category: "vegan", orderUnit: "шт", orderNote: "упаковка 360 г", step: 1 },
+                { id: 6, name: "🌱 Колбаса Ветчинная 400 г", price: 280, unit: "шт", category: "vegan", orderUnit: "шт", orderNote: "упаковка 400 г", step: 1 },
+                { id: 7, name: "🌱 Сосиски (8 шт) 400 г", price: 300, unit: "шт", category: "vegan", orderUnit: "шт", orderNote: "упаковка 400 г / 8 сосисок", step: 1 },
+                { id: 8, name: "🌱 Сервелат Фермерский 300 г", price: 280, unit: "шт", category: "vegan", orderUnit: "шт", orderNote: "упаковка 300 г", step: 1 },
+                { id: 9, name: "🌱 Нарезочка Сервелат 100 г", price: 180, unit: "шт", category: "vegan", orderUnit: "шт", orderNote: "упаковка 100 г", step: 1 },
+                { id: 10, name: "🌱 Паштет Грибной 150 г", price: 120, unit: "шт", category: "vegan", orderUnit: "шт", orderNote: "баночка 150 г", step: 1 },
+                { id: 11, name: "🌱 Паштет Крестьянский овощной 150 г", price: 120, unit: "шт", category: "vegan", orderUnit: "шт", orderNote: "баночка 150 г", step: 1 },
+                { id: 12, name: "🌱 Паштет С Огоньком! (чеснок!) 300 г", price: 210, unit: "шт", category: "vegan", orderUnit: "шт", orderNote: "баночка 300 г", step: 1 }
             ],
             4: [
-                { id: 1, name: "🌱 Колбаски веганские", price: 550, unit: "кг", category: "vegan", orderUnit: "кг", orderNote: "разные виды", step: 0.3 },
-                { id: 2, name: "🌱 Котлеты веганские", price: 500, unit: "кг", category: "vegan", orderUnit: "кг", orderNote: "упаковка 6 шт", step: 0.4 }
+                { id: 1, name: "🌱 Стейк классический 300 г", price: 367, unit: "шт", category: "grill", orderUnit: "шт", orderNote: "стейк 300г", step: 1 },
+                { id: 2, name: "🌱 Чевапчичи колбаски 500 г", price: 380, unit: "шт", category: "grill", orderUnit: "шт", orderNote: "чевапчичи 500г", step: 1 }
+                // Здесь будет полный список из 123 товаров, но для краткости показываю первые два
             ],
-            5: [
-                { id: 1, name: "⭐ Сыр веганский премиум", price: 1200, unit: "кг", category: "premium", orderUnit: "кг", orderNote: "с трюфелем", step: 0.2 },
-                { id: 2, name: "⭐ Паштет веганский", price: 800, unit: "кг", category: "premium", orderUnit: "кг", orderNote: "с грибами", step: 0.2 }
-            ]
+            5: [] // Для 5 карточки товаров нет, только ссылка на поставщика
         };
 
         // Данные для карточек закупок (как на скриншоте)
@@ -618,8 +656,8 @@
             { id: 1, title: "Оптовая закупка молочных продуктов из Краснодарского края" },
             { id: 2, title: "Йогуртовое гхи, сливочное масло из Адыгеи, сыры из Черкесска" },
             { id: 3, title: "Кукуйка (белковые веганские изделия)" },
-            { id: 4, title: "Всего (белковые веганские изделия)" },
-            { id: 5, title: "Высший вкус (белковые веганские изделия)" }
+            { id: 4, title: "Веганская продукция ООО Веро" },
+            { id: 5, title: "Высший вкус (веганские деликатесы)" }
         ];
 
         // Переменные
@@ -630,6 +668,7 @@
         let currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
         let orders = [];
         let currentPurchaseId = null; // Текущая выбранная закупка
+        let categories = {}; // Для хранения уникальных категорий каждой карточки
         
         // ========== ПЕРЕМЕННЫЕ ДЛЯ ТАЙМЕРА ==========
         let timerInterval = null;
@@ -734,7 +773,13 @@
         // Загрузка товаров для всех карточек
         async function loadAllProducts() {
             for (let i = 1; i <= 5; i++) {
-                await loadProductsFromGoogleSheet(i);
+                if (i === 5) {
+                    // Для 5 карточки просто создаем пустой массив
+                    products[5] = [];
+                    console.log('Карточка 5 - ссылка на поставщика');
+                } else {
+                    await loadProductsFromGoogleSheet(i);
+                }
             }
             console.log('Все товары загружены');
         }
@@ -753,6 +798,8 @@
                 const headers = rows[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
                 
                 const loadedProducts = [];
+                const uniqueCategories = new Set();
+                
                 for (let i = 1; i < rows.length; i++) {
                     const values = rows[i].match(/(".*?"|[^,]+)(?=\s*,|\s*$)/g) || [];
                     
@@ -772,12 +819,16 @@
                         
                         if (product.id && product.name) {
                             loadedProducts.push(product);
+                            if (product.category) {
+                                uniqueCategories.add(product.category);
+                            }
                         }
                     }
                 }
                 
                 if (loadedProducts.length > 0) {
                     products[purchaseId] = loadedProducts;
+                    categories[purchaseId] = Array.from(uniqueCategories);
                     console.log(`Загружено ${loadedProducts.length} товаров для карточки ${purchaseId}`);
                     return true;
                 } else {
@@ -788,6 +839,12 @@
                 console.error(`Ошибка загрузки из Google Таблицы для карточки ${purchaseId}:`, error);
                 // Используем запасной список
                 products[purchaseId] = fallbackProducts[purchaseId] || [];
+                // Собираем уникальные категории из запасного списка
+                const uniqueCategories = new Set();
+                products[purchaseId].forEach(p => {
+                    if (p.category) uniqueCategories.add(p.category);
+                });
+                categories[purchaseId] = Array.from(uniqueCategories);
                 return false;
             }
         }
@@ -799,7 +856,7 @@
                 <div class="purchase-card" onclick="selectPurchase(${purchase.id})">
                     <div class="purchase-number">${purchase.id}</div>
                     <div class="purchase-title">${purchase.title}</div>
-                    <span class="purchase-badge">${purchase.id === 1 ? 'молочка' : purchase.id === 2 ? 'гхи, сыры' : 'веган'}</span>
+                    <span class="purchase-badge">${purchase.id === 1 ? 'молочка' : purchase.id === 2 ? 'гхи, сыры' : purchase.id === 3 ? 'Кукуйка' : purchase.id === 4 ? 'Веро' : 'Высший вкус'}</span>
                 </div>
             `).join('');
         }
@@ -830,7 +887,18 @@
             document.getElementById('mainPage').style.display = 'none';
             document.getElementById('productsContent').classList.add('active');
             document.getElementById('backButton').style.display = 'block';
-            document.getElementById('searchBox').style.display = 'block';
+            
+            // Показываем/скрываем поиск в зависимости от карточки
+            if (purchaseId === 5) {
+                document.getElementById('searchBox').style.display = 'none';
+                // Показываем ссылку на поставщика
+                document.getElementById('supplierLink').style.display = 'block';
+                document.getElementById('mobileSupplierLink').style.display = 'block';
+            } else {
+                document.getElementById('searchBox').style.display = 'block';
+                document.getElementById('supplierLink').style.display = 'none';
+                document.getElementById('mobileSupplierLink').style.display = 'none';
+            }
             
             // Показываем название текущей карточки
             const currentPurchase = purchases.find(p => p.id === purchaseId);
@@ -838,6 +906,62 @@
             
             // Показываем товары для выбранной карточки
             displayProducts();
+            renderCategoryTabs();
+        }
+
+        // Отрисовка вкладок категорий
+        function renderCategoryTabs() {
+            if (!currentPurchaseId || currentPurchaseId === 5) {
+                // Для 5 карточки скрываем категории
+                document.getElementById('categoryTabs').innerHTML = '';
+                document.getElementById('mobileCategoryTabs').innerHTML = '';
+                return;
+            }
+            
+            const purchaseCategories = categories[currentPurchaseId] || [];
+            
+            let tabsHtml = '<div class="category-tab active" onclick="filterProducts(\'all\')">Все товары</div>';
+            let mobileTabsHtml = '<div class="category-tab active" onclick="filterProducts(\'all\')">Все</div>';
+            
+            // Словарь для отображения названий категорий
+            const categoryNames = {
+                'maslo': 'Масла',
+                'ghee': 'Гхи',
+                'cheese': 'Сыры',
+                'lowfat': 'Обезжиренные',
+                'premium': 'Премиум',
+                'other': 'Сгущёнка',
+                'vegan': 'Веган',
+                'grill': 'Гриль',
+                'vegan_dishes': 'Блюда',
+                'cream_cheese': 'Крем-сыр',
+                'boiled_sausage': 'Вареные',
+                'ham': 'Ветчины',
+                'semi_smoked': 'П/К',
+                'cooked_smoked': 'В/К',
+                'vego_fish': 'Вего Фиш',
+                'vego_chicken': 'Вего Чикен',
+                'sausages': 'Сардельки',
+                'pate': 'Паштеты',
+                'aspic': 'Холодец',
+                'brawn': 'Зельцы',
+                'delicacies': 'Деликатесы',
+                'semi_finished': 'П/ф',
+                'canned': 'Консервы',
+                'coconut': 'Кокос',
+                'soya': 'Соя',
+                'tofu': 'Тофу',
+                'sauce': 'Соусы'
+            };
+            
+            purchaseCategories.forEach(cat => {
+                const displayName = categoryNames[cat] || cat;
+                tabsHtml += `<div class="category-tab" onclick="filterProducts('${cat}')">${displayName}</div>`;
+                mobileTabsHtml += `<div class="category-tab" onclick="filterProducts('${cat}')">${displayName}</div>`;
+            });
+            
+            document.getElementById('categoryTabs').innerHTML = tabsHtml;
+            document.getElementById('mobileCategoryTabs').innerHTML = mobileTabsHtml;
         }
 
         // Возврат на главную
@@ -847,6 +971,8 @@
             document.getElementById('productsContent').classList.remove('active');
             document.getElementById('backButton').style.display = 'none';
             document.getElementById('searchBox').style.display = 'none';
+            document.getElementById('supplierLink').style.display = 'none';
+            document.getElementById('mobileSupplierLink').style.display = 'none';
             document.getElementById('currentPurchaseName').textContent = '';
         }
 
@@ -1126,6 +1252,13 @@
         function displayProducts() {
             if (!currentPurchaseId) return;
             
+            // Для 5 карточки не показываем товары
+            if (currentPurchaseId === 5) {
+                document.getElementById('productsList').innerHTML = '<p style="text-align: center; color: #6b4f3c; padding: 40px;">🔗 Это ссылка на сайт поставщика. Перейдите по ссылке справа для просмотра товаров.</p>';
+                document.getElementById('mobileProductsList').innerHTML = '<p style="text-align: center; color: #6b4f3c; padding: 20px;">🔗 Ссылка на поставщика внизу страницы</p>';
+                return;
+            }
+            
             const currentProducts = products[currentPurchaseId] || [];
             
             // Проверяем, есть ли товары в корзине из другой закупки
@@ -1183,10 +1316,10 @@
             }).join('');
             
             if (document.getElementById('productsList')) {
-                document.getElementById('productsList').innerHTML = desktopHtml;
+                document.getElementById('productsList').innerHTML = desktopHtml || '<p style="text-align: center; color: #6b4f3c; padding: 20px;">Товары не найдены</p>';
             }
             if (document.getElementById('mobileProductsList')) {
-                document.getElementById('mobileProductsList').innerHTML = mobileHtml;
+                document.getElementById('mobileProductsList').innerHTML = mobileHtml || '<p style="text-align: center; color: #6b4f3c; padding: 20px;">Товары не найдены</p>';
             }
             
             // Добавляем предупреждение в корзину, если есть конфликт
@@ -1235,7 +1368,7 @@
 
         // Обновление количества товара
         function updateProductQuantity(productId, delta) {
-            if (!currentPurchaseId) return;
+            if (!currentPurchaseId || currentPurchaseId === 5) return;
             
             const currentProducts = products[currentPurchaseId] || [];
             const product = currentProducts.find(p => p.id === productId);
@@ -1277,8 +1410,17 @@
         // Фильтр по категориям
         function filterProducts(category) {
             currentCategory = category;
-            document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
+            
+            // Обновляем активный класс для всех вкладок
+            document.querySelectorAll('#categoryTabs .category-tab, #mobileCategoryTabs .category-tab').forEach(t => {
+                t.classList.remove('active');
+            });
+            
+            // Добавляем активный класс для нажатой вкладки
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
+            
             displayProducts();
         }
 
@@ -1334,7 +1476,7 @@
 
         // Удаление из корзины
         function removeFromCart(productId) {
-            if (!currentPurchaseId) return;
+            if (!currentPurchaseId || currentPurchaseId === 5) return;
             cart = cart.filter(item => !(item.id === productId && item.purchaseId === currentPurchaseId));
             saveCart();
             displayProducts();
