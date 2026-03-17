@@ -156,30 +156,6 @@
         
         .back-btn span { font-size: 20px; }
         
-        /* НОВЫЙ СТИЛЬ - заголовок текущей закупки */
-        .current-purchase-header {
-            max-width: 1400px;
-            margin: 10px auto 0;
-            padding: 0 20px;
-        }
-        
-        .current-purchase-title {
-            background: #fff2d9;
-            border: 2px solid #d4a373;
-            border-radius: 30px;
-            padding: 12px 20px;
-            color: #6b4f3c;
-            font-weight: bold;
-            font-size: 16px;
-            display: inline-block;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        
-        .current-purchase-title span {
-            color: #b87333;
-            margin-right: 8px;
-        }
-        
         .desktop-container { max-width: 1400px; margin: 20px auto; padding: 0 20px; display: grid; grid-template-columns: 1fr 350px; gap: 20px; align-items: start; }
         .products-column { width: 100%; }
         .price-info { background: #fff2d9; border: 2px solid #d4a373; border-radius: 12px; padding: 12px 20px; margin-bottom: 20px; color: #6b4f3c; font-size: 14px; }
@@ -295,10 +271,10 @@
         .email-login-wrapper { text-align: center; margin: 20px 0; }
         .email-input { width: 100%; padding: 12px; border: 2px solid #d4a373; border-radius: 30px; font-size: 16px; margin-bottom: 15px; }
         .email-input:focus { outline: none; border-color: #b87333; }
-        .email-btn { background: #6b4f3c; color: white; border: none; border-radius: 30px; padding: 12px 30px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%; border: 2px solid #8b6b4f; }
-        .email-btn:hover { background: #8b6b4f; }
-        .email-btn:disabled { background: #cccccc; border-color: #999999; cursor: not-allowed; }
-        .timer-text { color: #b87333; margin-top: 10px; font-size: 14px; }
+        .email-btn { background: #6b4f3c; color: white; border: none; border-radius: 30px; padding: 12px 30px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%; border: 2px solid #8b6b4f; transition: all 0.3s; }
+        .email-btn:hover:not(:disabled) { background: #8b6b4f; }
+        .email-btn:disabled { background: #cccccc; border-color: #999999; cursor: not-allowed; opacity: 0.7; }
+        .timer-text { color: #b87333; margin-top: 10px; font-size: 14px; min-height: 24px; font-weight: 500; }
         
         @media (max-width: 900px) {
             .desktop-container { display: none; }
@@ -309,7 +285,6 @@
             .purchases-grid { grid-template-columns: 1fr; padding: 8px; gap: 12px; }
             .purchase-card { padding: 15px; }
             .purchase-title { font-size: 16px; min-height: auto; }
-            .current-purchase-title { font-size: 14px; padding: 10px 15px; }
             .product-item { display: block; padding: 8px 10px; border-width: 1px; border-radius: 8px; margin-bottom: 5px; }
             .product-name { font-size: 13px; font-weight: 600; margin-bottom: 2px; line-height: 1.2; }
             .product-note { font-size: 10px; margin-bottom: 4px; }
@@ -361,11 +336,6 @@
         <div class="back-btn" onclick="goToMainPage()">
             <span>←</span> К списку закупок
         </div>
-    </div>
-
-    <!-- НОВЫЙ БЛОК - заголовок текущей закупки -->
-    <div class="current-purchase-header" id="currentPurchaseHeader" style="display: none;">
-        <div class="current-purchase-title" id="currentPurchaseTitle"></div>
     </div>
 
     <!-- Главная страница с карточками закупок -->
@@ -478,7 +448,7 @@
                     Проверьте почту и перейдите по ссылке<br>
                     <small>(если не видите письмо, проверьте папку Спам)</small>
                 </p>
-                <button class="email-btn" onclick="resetAuthModal()" id="backFromStep2Btn">← Назад</button>
+                <button class="email-btn" onclick="resetAuthModal()">Назад</button>
             </div>
             
             <p style="text-align: center; margin-top: 20px; font-size: 12px; color: #8b6b4f;">
@@ -569,10 +539,6 @@
         let currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
         let orders = [];
         let currentPurchaseId = null; // Текущая выбранная закупка
-        
-        // Переменные для таймера отправки email
-        let emailTimerInterval = null;
-        let emailSecondsLeft = 0;
 
         // ========== ПРОВЕРЯЕМ URL ПРИ ЗАГРУЗКЕ ==========
         document.addEventListener('DOMContentLoaded', function() {
@@ -624,12 +590,6 @@
         // Выбор закупки
         function selectPurchase(purchaseId) {
             currentPurchaseId = purchaseId;
-            const purchase = purchases.find(p => p.id === purchaseId);
-            
-            // Показываем заголовок с названием закупки
-            document.getElementById('currentPurchaseTitle').innerHTML = `<span>📋</span> ${purchase.title}`;
-            document.getElementById('currentPurchaseHeader').style.display = 'block';
-            
             document.getElementById('mainPage').style.display = 'none';
             document.getElementById('productsContent').classList.add('active');
             document.getElementById('backButton').style.display = 'block';
@@ -637,6 +597,8 @@
             
             // Показываем товары
             displayProducts();
+            
+            showNotification(`Выбрана закупка: ${purchases.find(p => p.id === purchaseId).title}`);
         }
 
         // Возврат на главную
@@ -646,7 +608,6 @@
             document.getElementById('productsContent').classList.remove('active');
             document.getElementById('backButton').style.display = 'none';
             document.getElementById('searchBox').style.display = 'none';
-            document.getElementById('currentPurchaseHeader').style.display = 'none';
         }
 
         // Функция загрузки из Google Таблицы
@@ -718,22 +679,17 @@
             const btn = document.getElementById('sendLinkBtn');
             btn.disabled = true;
             
-            // Останавливаем предыдущий таймер если был
-            if (emailTimerInterval) {
-                clearInterval(emailTimerInterval);
-            }
-            
             // Таймер на 60 секунд
-            emailSecondsLeft = 60;
+            let seconds = 60;
             const timerDiv = document.getElementById('timer');
+            timerDiv.textContent = `Повторная отправка через ${seconds} сек`;
             
-            emailTimerInterval = setInterval(() => {
-                emailSecondsLeft--;
-                timerDiv.textContent = `Отправить повторно через ${emailSecondsLeft} сек`;
+            const timer = setInterval(() => {
+                seconds--;
+                timerDiv.textContent = `Повторная отправка через ${seconds} сек`;
                 
-                if (emailSecondsLeft <= 0) {
-                    clearInterval(emailTimerInterval);
-                    emailTimerInterval = null;
+                if (seconds <= 0) {
+                    clearInterval(timer);
                     btn.disabled = false;
                     timerDiv.textContent = '';
                 }
@@ -765,8 +721,7 @@
                 showNotification('Ошибка отправки. Проверьте настройки EmailJS');
                 
                 // Разблокируем кнопку при ошибке
-                clearInterval(emailTimerInterval);
-                emailTimerInterval = null;
+                clearInterval(timer);
                 btn.disabled = false;
                 timerDiv.textContent = '';
             });
@@ -805,13 +760,7 @@
             document.getElementById('step2').style.display = 'none';
             document.getElementById('loginEmail').value = '';
             
-            // Останавливаем таймер
-            if (emailTimerInterval) {
-                clearInterval(emailTimerInterval);
-                emailTimerInterval = null;
-            }
-            
-            // Сбрасываем состояние кнопки
+            // Сбрасываем состояние кнопки и таймера
             const btn = document.getElementById('sendLinkBtn');
             btn.disabled = false;
             document.getElementById('timer').textContent = '';
@@ -1234,11 +1183,6 @@
 
         function hideAuthModal() {
             document.getElementById('authModal').classList.remove('active');
-            // Останавливаем таймер при закрытии модалки
-            if (emailTimerInterval) {
-                clearInterval(emailTimerInterval);
-                emailTimerInterval = null;
-            }
         }
 
         function handleMobileAuth() {
@@ -1469,11 +1413,6 @@
         window.onclick = (event) => {
             if (event.target.classList.contains('modal')) {
                 event.target.classList.remove('active');
-                // Останавливаем таймер если закрыли модалку авторизации
-                if (event.target.id === 'authModal' && emailTimerInterval) {
-                    clearInterval(emailTimerInterval);
-                    emailTimerInterval = null;
-                }
             }
         };
     </script>
