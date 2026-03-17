@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>Закупки молочки — вход по email</title>
+    <title>Закупки молочки</title>
     <style>
-        /* === ВСЕ СТИЛИ (полностью) === */
+        /* === ВСЕ ВАШИ СТИЛИ (полностью) === */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background: linear-gradient(135deg, #fff9e6 0%, #fff2d9 100%); position: relative; min-height: 100vh; }
         body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100" opacity="0.1"><path d="M40,50 Q50,30 70,50 T100,50" stroke="%23b87333" fill="none" stroke-width="3"/><circle cx="45" cy="40" r="8" fill="%23b87333" opacity="0.2"/><circle cx="85" cy="40" r="8" fill="%23b87333" opacity="0.2"/><path d="M60,65 L70,75 L80,65" stroke="%23b87333" fill="none" stroke-width="3"/></svg>'), url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100" opacity="0.1"><path d="M140,60 Q150,40 170,60 T200,60" stroke="%238b4513" fill="none" stroke-width="3"/><circle cx="145" cy="50" r="8" fill="%238b4513" opacity="0.2"/><circle cx="185" cy="50" r="8" fill="%238b4513" opacity="0.2"/><path d="M160,75 L170,85 L180,65" stroke="%238b4513" fill="none" stroke-width="3"/></svg>'); background-repeat: repeat; background-position: 0 0, 100px 50px; pointer-events: none; z-index: -1; }
@@ -13,7 +13,7 @@
         .header.compact { padding: 5px 0; }
         .header-top { max-width: 1400px; margin: 0 auto; padding: 15px 20px; display: flex; align-items: center; gap: 15px; transition: all 0.3s ease; }
         .header.compact .header-top { padding: 8px 20px; }
-        .logo { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+        .logo { display: flex; align-items: center; gap: 8px; white-space: nowrap; cursor: pointer; }
         .logo span { font-size: 32px; }
         .logo h1 { color: #6b4f3c; font-size: 24px; font-weight: bold; }
         .menu-toggle { display: none; background: none; border: none; font-size: 28px; color: #6b4f3c; cursor: pointer; padding: 5px; }
@@ -41,6 +41,120 @@
         .mobile-menu-overlay.active { display: block; }
         .mobile-menu-item { padding: 15px; background: #fff2d9; border: 2px solid #d4a373; border-radius: 12px; margin-bottom: 10px; color: #6b4f3c; font-weight: bold; cursor: pointer; font-size: 16px; }
         .mobile-menu-item.logout { background: #ffe4e0; border-color: #c41e3a; color: #c41e3a; }
+        
+        /* НОВЫЙ СТИЛЬ ДЛЯ КАРТОЧЕК ЗАКУПОК */
+        .purchases-grid {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        
+        .purchase-card {
+            background: white;
+            border: 3px solid #d4a373;
+            border-radius: 20px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .purchase-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            border-color: #b87333;
+        }
+        
+        .purchase-card::before {
+            content: "🥛";
+            position: absolute;
+            right: -10px;
+            bottom: -10px;
+            font-size: 80px;
+            opacity: 0.1;
+            transform: rotate(-15deg);
+        }
+        
+        .purchase-card:nth-child(2)::before { content: "🧈"; }
+        .purchase-card:nth-child(3)::before { content: "🌱"; }
+        .purchase-card:nth-child(4)::before { content: "🌱"; }
+        .purchase-card:nth-child(5)::before { content: "⭐"; }
+        
+        .purchase-number {
+            display: inline-block;
+            background: #d4a373;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .purchase-title {
+            color: #6b4f3c;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            line-height: 1.4;
+            min-height: 50px;
+        }
+        
+        .purchase-badge {
+            display: inline-block;
+            background: #fff2d9;
+            color: #b87333;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            border: 1px solid #d4a373;
+        }
+        
+        /* Основной контент с товарами (скрыт по умолчанию) */
+        .main-content {
+            display: none;
+        }
+        
+        .main-content.active {
+            display: block;
+        }
+        
+        /* Кнопка "Назад к закупкам" */
+        .back-button {
+            max-width: 1400px;
+            margin: 20px auto 0;
+            padding: 0 20px;
+        }
+        
+        .back-btn {
+            background: #fff2d9;
+            border: 2px solid #d4a373;
+            border-radius: 30px;
+            padding: 10px 20px;
+            color: #6b4f3c;
+            font-weight: bold;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        
+        .back-btn:hover {
+            background: #d4a373;
+            color: white;
+        }
+        
+        .back-btn span { font-size: 20px; }
+        
         .desktop-container { max-width: 1400px; margin: 20px auto; padding: 0 20px; display: grid; grid-template-columns: 1fr 350px; gap: 20px; align-items: start; }
         .products-column { width: 100%; }
         .price-info { background: #fff2d9; border: 2px solid #d4a373; border-radius: 12px; padding: 12px 20px; margin-bottom: 20px; color: #6b4f3c; font-size: 14px; }
@@ -135,7 +249,7 @@
         .confirm-btn-yes { background: #d4a373; color: white; border: 2px solid #b87333; }
         .confirm-btn-no { background: #fff2d9; color: #6b4f3c; border: 2px solid #d4a373; }
 
-        /* СТИЛИ ДЛЯ EMAIL АВТОРИЗАЦИИ */
+        /* НОВЫЕ СТИЛИ ДЛЯ EMAIL АВТОРИЗАЦИИ */
         .email-login-wrapper { text-align: center; margin: 20px 0; }
         .email-input { width: 100%; padding: 12px; border: 2px solid #d4a373; border-radius: 30px; font-size: 16px; margin-bottom: 15px; }
         .email-input:focus { outline: none; border-color: #b87333; }
@@ -150,6 +264,9 @@
             .menu-toggle { display: block; }
             .logo h1 { display: none; }
             .nav-buttons { display: none; }
+            .purchases-grid { grid-template-columns: 1fr; padding: 8px; gap: 12px; }
+            .purchase-card { padding: 15px; }
+            .purchase-title { font-size: 16px; min-height: auto; }
             .product-item { display: block; padding: 8px 10px; border-width: 1px; border-radius: 8px; margin-bottom: 5px; }
             .product-name { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
             .product-note { font-size: 10px; margin-bottom: 4px; }
@@ -174,8 +291,8 @@
     <div class="header" id="header">
         <div class="header-top">
             <button class="menu-toggle" onclick="toggleMobileMenu()">☰</button>
-            <div class="logo"><span>🐄</span><h1>Закупки молочки</h1></div>
-            <div class="search-box"><input type="text" id="searchInput" placeholder="🔍 Поиск товаров..." oninput="searchProducts()"></div>
+            <div class="logo" onclick="goToMainPage()"><span>🐄</span><h1>Закупки молочки</h1></div>
+            <div class="search-box" id="searchBox" style="display: none;"><input type="text" id="searchInput" placeholder="🔍 Поиск товаров..." oninput="searchProducts()"></div>
             <div class="nav-buttons" id="navButtons"></div>
             <div class="cart-icon" onclick="toggleMobileCart()"><span>🛒</span><span class="cart-count" id="cartCount">0</span></div>
         </div>
@@ -191,57 +308,71 @@
         <div class="mobile-menu-item logout" id="mobileLogoutItem" style="display: none;" onclick="showLogoutConfirm()">🚪 Выйти</div>
     </div>
 
-    <!-- Десктопная версия -->
-    <div class="desktop-container">
-        <div class="products-column">
-            <div class="price-info">ℹ️ Цены ознакомительные. Доставка 30₽/кг включена. Окончательная стоимость после взвешивания.</div>
-            <div class="category-tabs">
-                <div class="category-tab active" onclick="filterProducts('all')">Все товары</div>
-                <div class="category-tab" onclick="filterProducts('maslo')">Масла</div>
-                <div class="category-tab" onclick="filterProducts('ghee')">Гхи</div>
-                <div class="category-tab" onclick="filterProducts('cheese')">Сыры</div>
-                <div class="category-tab" onclick="filterProducts('lowfat')">Обезжиренные</div>
-                <div class="category-tab" onclick="filterProducts('premium')">Премиум</div>
-                <div class="category-tab" onclick="filterProducts('other')">Сгущёнка</div>
-            </div>
-            <div class="products-list" id="productsList"></div>
-        </div>
-        <div class="right-column">
-            <div class="cart-desktop">
-                <h2>🛒 Моя корзина</h2>
-                <div class="cart-items" id="desktopCartItems"></div>
-                <div class="cart-total" id="desktopCartTotal">Предварительно: <span>0 ₽</span></div>
-                <div class="cart-buttons"><button class="btn btn-primary" onclick="showOrderForm()">Оформить</button><button class="btn btn-secondary" onclick="clearCart()">Очистить</button></div>
-            </div>
-            <div class="calculator-widget">
-                <h3><span class="calc-icon-new"><span>+</span><span>−</span><span>×</span><span>÷</span></span>Калькулятор</h3>
-                <div class="calc-row"><span>Цена за кг:</span><input type="number" id="widgetPriceKg" value="" placeholder="0" min="0" oninput="updateWidgetCalc()"></div>
-                <div class="calc-row"><span>Нужно грамм:</span><input type="number" id="widgetGram" value="" placeholder="0" min="0" oninput="updateWidgetCalc()"></div>
-                <div class="calc-result" id="widgetResult">Стоимость: 0 ₽</div>
-            </div>
+    <!-- Кнопка "Назад к закупкам" (появляется внутри закупки) -->
+    <div class="back-button" id="backButton" style="display: none;">
+        <div class="back-btn" onclick="goToMainPage()">
+            <span>←</span> К списку закупок
         </div>
     </div>
 
-    <!-- Мобильная версия -->
-    <div class="mobile-view">
-        <div class="price-info">ℹ️ Цены ознакомительные. Доставка 30₽/кг включена.</div>
-        <div class="mobile-calc-btn" onclick="toggleMobileCalculator()"><span class="calc-icon-new" style="width: 40px; height: 40px; border-color: white;"><span style="color: white;">+</span><span style="color: white;">−</span><span style="color: white;">×</span><span style="color: white;">÷</span></span>Открыть калькулятор</div>
-        <div class="mobile-calculator" id="mobileCalculator">
-            <h3 style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;"><span class="calc-icon-new" style="width: 32px; height: 32px;"></span>Калькулятор</h3>
-            <div style="margin-bottom: 10px;"><label style="display: block; margin-bottom: 5px;">Цена за кг (₽):</label><input type="number" id="mobilePriceKg" value="" placeholder="0" min="0" style="width: 100%; padding: 10px; border: 2px solid #d4a373; border-radius: 8px;"></div>
-            <div style="margin-bottom: 10px;"><label style="display: block; margin-bottom: 5px;">Нужно грамм:</label><input type="number" id="mobileGram" value="" placeholder="0" min="0" style="width: 100%; padding: 10px; border: 2px solid #d4a373; border-radius: 8px;"></div>
-            <div class="calc-result" id="mobileCalcResult">Стоимость: 0 ₽</div>
+    <!-- Главная страница с карточками закупок -->
+    <div id="mainPage" class="purchases-grid">
+        <!-- Карточки будут вставлены через JavaScript -->
+    </div>
+
+    <!-- Основной контент с товарами (скрыт по умолчанию) -->
+    <div id="productsContent" class="main-content">
+        <div class="desktop-container">
+            <div class="products-column">
+                <div class="price-info">ℹ️ Цены ознакомительные. Доставка 30₽/кг включена. Окончательная стоимость после взвешивания.</div>
+                <div class="category-tabs">
+                    <div class="category-tab active" onclick="filterProducts('all')">Все товары</div>
+                    <div class="category-tab" onclick="filterProducts('maslo')">Масла</div>
+                    <div class="category-tab" onclick="filterProducts('ghee')">Гхи</div>
+                    <div class="category-tab" onclick="filterProducts('cheese')">Сыры</div>
+                    <div class="category-tab" onclick="filterProducts('lowfat')">Обезжиренные</div>
+                    <div class="category-tab" onclick="filterProducts('premium')">Премиум</div>
+                    <div class="category-tab" onclick="filterProducts('other')">Сгущёнка</div>
+                </div>
+                <div class="products-list" id="productsList"></div>
+            </div>
+            <div class="right-column">
+                <div class="cart-desktop">
+                    <h2>🛒 Моя корзина</h2>
+                    <div class="cart-items" id="desktopCartItems"></div>
+                    <div class="cart-total" id="desktopCartTotal">Предварительно: <span>0 ₽</span></div>
+                    <div class="cart-buttons"><button class="btn btn-primary" onclick="showOrderForm()">Оформить</button><button class="btn btn-secondary" onclick="clearCart()">Очистить</button></div>
+                </div>
+                <div class="calculator-widget">
+                    <h3><span class="calc-icon-new"><span>+</span><span>−</span><span>×</span><span>÷</span></span>Калькулятор</h3>
+                    <div class="calc-row"><span>Цена за кг:</span><input type="number" id="widgetPriceKg" value="" placeholder="0" min="0" oninput="updateWidgetCalc()"></div>
+                    <div class="calc-row"><span>Нужно грамм:</span><input type="number" id="widgetGram" value="" placeholder="0" min="0" oninput="updateWidgetCalc()"></div>
+                    <div class="calc-result" id="widgetResult">Стоимость: 0 ₽</div>
+                </div>
+            </div>
         </div>
-        <div class="category-tabs">
-            <div class="category-tab active" onclick="filterProducts('all')">Все</div>
-            <div class="category-tab" onclick="filterProducts('maslo')">Масла</div>
-            <div class="category-tab" onclick="filterProducts('ghee')">Гхи</div>
-            <div class="category-tab" onclick="filterProducts('cheese')">Сыры</div>
-            <div class="category-tab" onclick="filterProducts('lowfat')">Обезжир</div>
-            <div class="category-tab" onclick="filterProducts('premium')">Премиум</div>
-            <div class="category-tab" onclick="filterProducts('other')">Сгущёнка</div>
+
+        <!-- Мобильная версия -->
+        <div class="mobile-view">
+            <div class="price-info">ℹ️ Цены ознакомительные. Доставка 30₽/кг включена.</div>
+            <div class="mobile-calc-btn" onclick="toggleMobileCalculator()"><span class="calc-icon-new" style="width: 40px; height: 40px; border-color: white;"><span style="color: white;">+</span><span style="color: white;">−</span><span style="color: white;">×</span><span style="color: white;">÷</span></span>Открыть калькулятор</div>
+            <div class="mobile-calculator" id="mobileCalculator">
+                <h3 style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;"><span class="calc-icon-new" style="width: 32px; height: 32px;"></span>Калькулятор</h3>
+                <div style="margin-bottom: 10px;"><label style="display: block; margin-bottom: 5px;">Цена за кг (₽):</label><input type="number" id="mobilePriceKg" value="" placeholder="0" min="0" style="width: 100%; padding: 10px; border: 2px solid #d4a373; border-radius: 8px;"></div>
+                <div style="margin-bottom: 10px;"><label style="display: block; margin-bottom: 5px;">Нужно грамм:</label><input type="number" id="mobileGram" value="" placeholder="0" min="0" style="width: 100%; padding: 10px; border: 2px solid #d4a373; border-radius: 8px;"></div>
+                <div class="calc-result" id="mobileCalcResult">Стоимость: 0 ₽</div>
+            </div>
+            <div class="category-tabs">
+                <div class="category-tab active" onclick="filterProducts('all')">Все</div>
+                <div class="category-tab" onclick="filterProducts('maslo')">Масла</div>
+                <div class="category-tab" onclick="filterProducts('ghee')">Гхи</div>
+                <div class="category-tab" onclick="filterProducts('cheese')">Сыры</div>
+                <div class="category-tab" onclick="filterProducts('lowfat')">Обезжир</div>
+                <div class="category-tab" onclick="filterProducts('premium')">Премиум</div>
+                <div class="category-tab" onclick="filterProducts('other')">Сгущёнка</div>
+            </div>
+            <div class="products-list" id="mobileProductsList"></div>
         </div>
-        <div class="products-list" id="mobileProductsList"></div>
     </div>
 
     <!-- Модальное окно профиля -->
@@ -284,7 +415,7 @@
         </div>
     </div>
 
-    <!-- Модальное окно авторизации через Email -->
+    <!-- НОВОЕ: Модальное окно авторизации через Email -->
     <div class="modal" id="authModal">
         <div class="modal-content auth-modal">
             <button class="close-modal" onclick="hideAuthModal()">×</button>
@@ -401,11 +532,11 @@
             appId: "1:533713083066:web:5e520a9ce2c78d36314083"
         };
 
-        // ВАШИ ДАННЫЕ EMAILJS
+        // ========== ВАШИ ДАННЫЕ EMAILJS (ЗАМЕНИТЕ НА СВОИ) ==========
         const EMAILJS_CONFIG = {
             publicKey: '8QhBouJ3A8nOKhaoQ',     // User ID из Account → API Keys
-            serviceId: 'service_vsmyhsn',       // Service ID из Email Services
-            templateId: 'template_zzplf7z'      // Template ID из Email Templates
+            serviceId: 'service_vsmyhsn',     // Service ID из Email Services
+            templateId: 'template_zzplf7z'    // Template ID из Email Templates
         };
 
         firebase.initializeApp(firebaseConfig);
@@ -422,12 +553,22 @@
             { id: 3, name: "🧈 Масло Сбойка", price: 1300, unit: "кг", category: "maslo", orderUnit: "уп", orderNote: "упаковка 2.2-2.9 кг", step: 1 }
         ];
 
+        // Данные для карточек закупок (как на скриншоте)
+        const purchases = [
+            { id: 1, title: "Оптовая закупка молочных продуктов из Краснодарского края" },
+            { id: 2, title: "Йогуртовое гхи, сливочное масло из Адыгеи, сыры из Черкесска" },
+            { id: 3, title: "Кукуйка (белковые веганские изделия)" },
+            { id: 4, title: "Всего (белковые веганские изделия)" },
+            { id: 5, title: "Высший вкус (белковые веганские изделия)" }
+        ];
+
         let products = [];
         let cart = [];
         let currentCategory = 'all';
         let searchQuery = '';
         let currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
         let orders = [];
+        let currentPurchaseId = null; // Текущая выбранная закупка
 
         // ========== ПРОВЕРЯЕМ URL ПРИ ЗАГРУЗКЕ ==========
         document.addEventListener('DOMContentLoaded', function() {
@@ -447,6 +588,7 @@
             loadProductsFromGoogleSheet();
             updateAllCarts();
             updateAuthUI();
+            renderPurchases(); // Отрисовываем карточки закупок
             
             document.getElementById('widgetPriceKg').addEventListener('input', updateWidgetCalc);
             document.getElementById('widgetGram').addEventListener('input', updateWidgetCalc);
@@ -458,7 +600,43 @@
             }
         });
 
-        // ========== ФУНКЦИЯ ОТПРАВКИ ПИСЬМА ==========
+        // Отрисовка карточек закупок
+        function renderPurchases() {
+            const container = document.getElementById('mainPage');
+            container.innerHTML = purchases.map(purchase => `
+                <div class="purchase-card" onclick="selectPurchase(${purchase.id})">
+                    <div class="purchase-number">${purchase.id}</div>
+                    <div class="purchase-title">${purchase.title}</div>
+                    <span class="purchase-badge">${purchase.id === 1 ? 'молочка' : purchase.id === 2 ? 'гхи, сыры' : 'веган'}</span>
+                </div>
+            `).join('');
+        }
+
+        // Выбор закупки
+        function selectPurchase(purchaseId) {
+            currentPurchaseId = purchaseId;
+            document.getElementById('mainPage').style.display = 'none';
+            document.getElementById('productsContent').classList.add('active');
+            document.getElementById('backButton').style.display = 'block';
+            document.getElementById('searchBox').style.display = 'block';
+            
+            // Здесь можно загрузить товары для конкретной закупки
+            // Пока используем общий список товаров
+            displayProducts();
+            
+            showNotification(`Выбрана закупка: ${purchases.find(p => p.id === purchaseId).title}`);
+        }
+
+        // Возврат на главную
+        function goToMainPage() {
+            currentPurchaseId = null;
+            document.getElementById('mainPage').style.display = 'grid';
+            document.getElementById('productsContent').classList.remove('active');
+            document.getElementById('backButton').style.display = 'none';
+            document.getElementById('searchBox').style.display = 'none';
+        }
+
+        // ========== ФУНКЦИЯ ОТПРАВКИ ПИСЬМА ЧЕРЕЗ EMAILJS ==========
         function sendLoginLink() {
             const email = document.getElementById('loginEmail').value;
             if (!email || !email.includes('@')) {
@@ -470,22 +648,14 @@
             const btn = document.getElementById('sendLinkBtn');
             btn.disabled = true;
             
-            // Таймер на 60 секунд
+            // Таймер
             let seconds = 60;
             const timerDiv = document.getElementById('timer');
-            
-            // Очищаем предыдущий таймер если был
-            if (window.loginTimer) {
-                clearInterval(window.loginTimer);
-            }
-            
-            // Запускаем новый таймер
-            window.loginTimer = setInterval(() => {
+            const timer = setInterval(() => {
                 seconds--;
                 timerDiv.textContent = `Отправить повторно через ${seconds} сек`;
-                
                 if (seconds <= 0) {
-                    clearInterval(window.loginTimer);
+                    clearInterval(timer);
                     btn.disabled = false;
                     timerDiv.textContent = '';
                 }
@@ -502,27 +672,21 @@
             // Ссылка для входа
             const loginLink = `${window.location.origin}${window.location.pathname}?token=${token}&email=${encodeURIComponent(email)}`;
             
-            // Отправляем через EmailJS
+            // Отправляем И email И link
             emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, {
-                email: email,
-                link: loginLink
+                email: email,      // для поля To Email
+                link: loginLink    // для текста письма
             })
             .then(function() {
-                // Успешно отправлено - показываем step2
                 document.getElementById('step1').style.display = 'none';
                 document.getElementById('step2').style.display = 'block';
-                showNotification('✉️ Письмо отправлено! Проверьте почту');
-                
-                // Таймер продолжает идти, кнопка остаётся заблокированной
+                showNotification('Письмо отправлено! Проверьте почту');
             })
             .catch(function(error) {
-                // Ошибка отправки
                 console.error('Ошибка EmailJS:', error);
-                showNotification('Ошибка отправки. Попробуйте еще раз');
-                
-                // При ошибке - разблокируем кнопку и очищаем таймер
-                clearInterval(window.loginTimer);
+                showNotification('Ошибка отправки. Проверьте настройки EmailJS');
                 btn.disabled = false;
+                clearInterval(timer);
                 timerDiv.textContent = '';
             });
         }
@@ -559,13 +723,7 @@
             document.getElementById('step1').style.display = 'block';
             document.getElementById('step2').style.display = 'none';
             document.getElementById('loginEmail').value = '';
-            
-            // Очищаем таймер и разблокируем кнопку
-            if (window.loginTimer) {
-                clearInterval(window.loginTimer);
-            }
-            const btn = document.getElementById('sendLinkBtn');
-            btn.disabled = false;
+            document.getElementById('sendLinkBtn').disabled = false;
             document.getElementById('timer').textContent = '';
         }
 
@@ -602,12 +760,16 @@
                 
                 if (loadedProducts.length > 0) {
                     products = loadedProducts;
-                    displayProducts();
+                    if (currentPurchaseId) {
+                        displayProducts();
+                    }
                 }
             } catch (error) {
                 console.error('Ошибка загрузки:', error);
                 products = fallbackProducts;
-                displayProducts();
+                if (currentPurchaseId) {
+                    displayProducts();
+                }
             }
         }
 
@@ -907,7 +1069,8 @@
                 items: [...cart],
                 customerName, phone, pickupPoint, packageName,
                 userId: currentUser.id,
-                userEmail: currentUser.email || ''
+                userEmail: currentUser.email || '',
+                purchaseId: currentPurchaseId // Добавляем ID закупки
             };
             
             await saveOrderToFirebase(order);
