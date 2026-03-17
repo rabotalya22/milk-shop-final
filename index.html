@@ -185,7 +185,7 @@
         .category-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
         .category-tab { padding: 8px 16px; background: #fff2d9; border: 2px solid #d4a373; border-radius: 30px; color: #6b4f3c; cursor: pointer; font-weight: 500; font-size: 14px; white-space: nowrap; }
         .category-tab.active { background: #d4a373; color: white; }
-        .products-list { display: flex; flex-direction: column; gap: 10px; min-height: 200px; }
+        .products-list { display: flex; flex-direction: column; gap: 10px; }
         .product-item { display: grid; grid-template-columns: 2fr 1fr 1fr 120px; align-items: center; padding: 12px 15px; background: white; border: 2px solid #d4a373; border-radius: 12px; gap: 10px; font-size: 14px; transition: all 0.2s; }
         .product-item.in-cart { opacity: 0.7; background-color: #f9f9f9; }
         .product-item.blocked { opacity: 0.5; pointer-events: none; }
@@ -332,50 +332,25 @@
         .supplier-link {
             margin-top: 20px;
             text-align: center;
-            padding: 20px;
+            padding: 15px;
             background: #fff2d9;
-            border: 3px solid #d4a373;
-            border-radius: 20px;
-            font-size: 18px;
-            font-weight: bold;
+            border: 2px solid #d4a373;
+            border-radius: 12px;
         }
         
         .supplier-link a {
             color: #6b4f3c;
             font-weight: bold;
             text-decoration: none;
+            font-size: 16px;
             display: inline-flex;
             align-items: center;
-            gap: 10px;
-            padding: 15px 30px;
-            background: #d4a373;
-            color: white;
-            border-radius: 30px;
-            transition: all 0.3s;
+            gap: 8px;
         }
         
         .supplier-link a:hover {
-            background: #b87333;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        
-        .loading-spinner {
-            text-align: center;
-            padding: 40px;
-            color: #6b4f3c;
-        }
-        
-        .loading-spinner::after {
-            content: "⏳";
-            font-size: 24px;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            color: #b87333;
+            text-decoration: underline;
         }
         
         @media (max-width: 900px) {
@@ -417,11 +392,6 @@
             .current-purchase-name {
                 width: 100%;
                 white-space: normal;
-            }
-            
-            .supplier-link a {
-                padding: 12px 20px;
-                font-size: 16px;
             }
         }
     </style>
@@ -471,9 +441,7 @@
                 <div class="category-tabs" id="categoryTabs">
                     <!-- Категории будут заполняться динамически -->
                 </div>
-                <div class="products-list" id="productsList">
-                    <div class="loading-spinner">Загрузка товаров...</div>
-                </div>
+                <div class="products-list" id="productsList"></div>
             </div>
             <div class="right-column">
                 <div class="cart-desktop">
@@ -491,6 +459,10 @@
                     <div class="calc-row"><span>Нужно грамм:</span><input type="number" id="widgetGram" value="" placeholder="0" min="0" oninput="updateWidgetCalc()"></div>
                     <div class="calc-result" id="widgetResult">Стоимость: 0 ₽</div>
                 </div>
+                <!-- Ссылка на поставщика для 5 карточки -->
+                <div class="supplier-link" id="supplierLink" style="display: none;">
+                    <a href="https://vsvkus.ru/" target="_blank">🔗 Перейти на сайт поставщика vsvkus.ru</a>
+                </div>
             </div>
         </div>
 
@@ -507,8 +479,10 @@
             <div class="category-tabs" id="mobileCategoryTabs">
                 <!-- Категории для мобильной версии будут заполняться динамически -->
             </div>
-            <div class="products-list" id="mobileProductsList">
-                <div class="loading-spinner">Загрузка товаров...</div>
+            <div class="products-list" id="mobileProductsList"></div>
+            <!-- Ссылка на поставщика для 5 карточки (мобильная версия) -->
+            <div class="supplier-link" id="mobileSupplierLink" style="display: none;">
+                <a href="https://vsvkus.ru/" target="_blank">🔗 Перейти на сайт поставщика vsvkus.ru</a>
             </div>
         </div>
     </div>
@@ -631,7 +605,7 @@
             2: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ0DWx1pjpzywF78TcZmDKFG51GVV2VhXkErvGjm1EPuSqtzJIwbesscytB8EpVbp8LoZ0Q8G7ThkcL/pub?output=csv', // Закупка 2 - гхи, сыры
             3: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRRixuztqXdJV-sdQKWSvY-K1IgwfAtVpXnlsNhyCopNNB0CukCQj1Sx5nwd96A5paw7S3N1ZVa_KD/pub?output=csv', // Закупка 3 - Кукуйка
             4: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTNDjZv7z6ykwnVN5MNHX3MXUu5WRvCq3-k8f109BsL3W8O24K3ypK3yPx3vNxR9_wELYY5a9JQ5eeZ/pub?output=csv', // Закупка 4 - Веро
-            5: null // Закупка 5 - ссылка на поставщика, не загружаем товары
+            5: 'https://vsvkus.ru/' // Закупка 5 - ссылка на поставщика
         };
 
         // Запасные списки товаров для каждой карточки на случай ошибки загрузки
@@ -671,10 +645,8 @@
             ],
             4: [
                 { id: 1, name: "🌱 Стейк классический 300 г", price: 367, unit: "шт", category: "grill", orderUnit: "шт", orderNote: "стейк 300г", step: 1 },
-                { id: 2, name: "🌱 Чевапчичи колбаски 500 г", price: 380, unit: "шт", category: "grill", orderUnit: "шт", orderNote: "чевапчичи 500г", step: 1 },
-                { id: 3, name: "🌱 Австрийские колбаски 320 г", price: 365, unit: "шт", category: "grill", orderUnit: "шт", orderNote: "австрийские колбаски 320г", step: 1 },
-                { id: 4, name: "🌱 Балканские колбаски 320 г", price: 365, unit: "шт", category: "grill", orderUnit: "шт", orderNote: "балканские колбаски 320г", step: 1 }
-                // Здесь будет полный список, но для краткости показываю первые четыре
+                { id: 2, name: "🌱 Чевапчичи колбаски 500 г", price: 380, unit: "шт", category: "grill", orderUnit: "шт", orderNote: "чевапчичи 500г", step: 1 }
+                // Здесь будет полный список из 123 товаров, но для краткости показываю первые два
             ],
             5: [] // Для 5 карточки товаров нет, только ссылка на поставщика
         };
@@ -697,7 +669,6 @@
         let orders = [];
         let currentPurchaseId = null; // Текущая выбранная закупка
         let categories = {}; // Для хранения уникальных категорий каждой карточки
-        let productsLoaded = false; // Флаг загрузки товаров
         
         // ========== ПЕРЕМЕННЫЕ ДЛЯ ТАЙМЕРА ==========
         let timerInterval = null;
@@ -720,6 +691,9 @@
             
             loadCart();
             loadAllProducts(); // Загружаем товары для всех карточек
+            updateAllCarts();
+            updateAuthUI();
+            renderPurchases(); // Отрисовываем карточки закупок
             
             document.getElementById('widgetPriceKg').addEventListener('input', updateWidgetCalc);
             document.getElementById('widgetGram').addEventListener('input', updateWidgetCalc);
@@ -798,34 +772,16 @@
 
         // Загрузка товаров для всех карточек
         async function loadAllProducts() {
-            productsLoaded = false;
-            
-            // Показываем загрузку
-            document.getElementById('productsList').innerHTML = '<div class="loading-spinner">Загрузка товаров...</div>';
-            document.getElementById('mobileProductsList').innerHTML = '<div class="loading-spinner">Загрузка товаров...</div>';
-            
             for (let i = 1; i <= 5; i++) {
                 if (i === 5) {
                     // Для 5 карточки просто создаем пустой массив
                     products[5] = [];
-                    categories[5] = [];
                     console.log('Карточка 5 - ссылка на поставщика');
                 } else {
                     await loadProductsFromGoogleSheet(i);
                 }
             }
-            
-            productsLoaded = true;
             console.log('Все товары загружены');
-            
-            // Обновляем отображение если мы уже в карточке
-            if (currentPurchaseId) {
-                displayProducts();
-                renderCategoryTabs();
-            }
-            
-            updateAllCarts();
-            renderPurchases();
         }
 
         // Функция загрузки из Google Таблицы для конкретной карточки
@@ -935,8 +891,13 @@
             // Показываем/скрываем поиск в зависимости от карточки
             if (purchaseId === 5) {
                 document.getElementById('searchBox').style.display = 'none';
+                // Показываем ссылку на поставщика
+                document.getElementById('supplierLink').style.display = 'block';
+                document.getElementById('mobileSupplierLink').style.display = 'block';
             } else {
                 document.getElementById('searchBox').style.display = 'block';
+                document.getElementById('supplierLink').style.display = 'none';
+                document.getElementById('mobileSupplierLink').style.display = 'none';
             }
             
             // Показываем название текущей карточки
@@ -950,9 +911,7 @@
 
         // Отрисовка вкладок категорий
         function renderCategoryTabs() {
-            if (!currentPurchaseId) return;
-            
-            if (currentPurchaseId === 5) {
+            if (!currentPurchaseId || currentPurchaseId === 5) {
                 // Для 5 карточки скрываем категории
                 document.getElementById('categoryTabs').innerHTML = '';
                 document.getElementById('mobileCategoryTabs').innerHTML = '';
@@ -1012,12 +971,9 @@
             document.getElementById('productsContent').classList.remove('active');
             document.getElementById('backButton').style.display = 'none';
             document.getElementById('searchBox').style.display = 'none';
+            document.getElementById('supplierLink').style.display = 'none';
+            document.getElementById('mobileSupplierLink').style.display = 'none';
             document.getElementById('currentPurchaseName').textContent = '';
-            
-            // Сбрасываем фильтр
-            currentCategory = 'all';
-            searchQuery = '';
-            document.getElementById('searchInput').value = '';
         }
 
         // ========== ФУНКЦИЯ ОТПРАВКИ ПИСЬМА ЧЕРЕЗ EMAILJS ==========
@@ -1296,17 +1252,10 @@
         function displayProducts() {
             if (!currentPurchaseId) return;
             
-            // Для 5 карточки показываем красивую кнопку перехода на сайт
+            // Для 5 карточки не показываем товары
             if (currentPurchaseId === 5) {
-                const supplierHtml = `
-                    <div class="supplier-link">
-                        <a href="https://vsvkus.ru/" target="_blank">
-                            🔗 Перейти на сайт поставщика vsvkus.ru
-                        </a>
-                    </div>
-                `;
-                document.getElementById('productsList').innerHTML = supplierHtml;
-                document.getElementById('mobileProductsList').innerHTML = supplierHtml;
+                document.getElementById('productsList').innerHTML = '<p style="text-align: center; color: #6b4f3c; padding: 40px;">🔗 Это ссылка на сайт поставщика. Перейдите по ссылке справа для просмотра товаров.</p>';
+                document.getElementById('mobileProductsList').innerHTML = '<p style="text-align: center; color: #6b4f3c; padding: 20px;">🔗 Ссылка на поставщика внизу страницы</p>';
                 return;
             }
             
@@ -1319,13 +1268,6 @@
                 (currentCategory === 'all' || p.category === currentCategory) && 
                 p.name.toLowerCase().includes(searchQuery.toLowerCase())
             );
-            
-            if (filtered.length === 0 && !productsLoaded) {
-                // Если товары ещё загружаются
-                document.getElementById('productsList').innerHTML = '<div class="loading-spinner">Загрузка товаров...</div>';
-                document.getElementById('mobileProductsList').innerHTML = '<div class="loading-spinner">Загрузка товаров...</div>';
-                return;
-            }
             
             const desktopHtml = filtered.map(p => {
                 const cartItem = cart.find(item => item.id === p.id && item.purchaseId === currentPurchaseId);
