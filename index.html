@@ -539,6 +539,11 @@
         let currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
         let orders = [];
         let currentPurchaseId = null; // Текущая выбранная закупка
+        
+        // ========== ПЕРЕМЕННЫЕ ДЛЯ ТАЙМЕРА ==========
+        let timerInterval = null;
+        let authBlockedUntil = localStorage.getItem('authBlockedUntil') ? parseInt(localStorage.getItem('authBlockedUntil')) : 0;
+        let pendingEmail = localStorage.getItem('pendingEmail') || '';
 
         // ========== ПРОВЕРЯЕМ URL ПРИ ЗАГРУЗКЕ ==========
         document.addEventListener('DOMContentLoaded', function() {
@@ -573,7 +578,67 @@
             
             // По умолчанию показываем главную страницу
             goToMainPage();
+            
+            // Проверяем, нужно ли заблокировать кнопку при загрузке
+            checkTimerOnLoad();
         });
+
+        // Проверка таймера при загрузке
+        function checkTimerOnLoad() {
+            const now = Date.now();
+            
+            if (authBlockedUntil > now) {
+                // Таймер ещё активен
+                const remainingSeconds = Math.ceil((authBlockedUntil - now) / 1000);
+                startTimer(remainingSeconds);
+                
+                // Если есть сохранённый email, подставляем его
+                if (pendingEmail) {
+                    document.getElementById('loginEmail').value = pendingEmail;
+                }
+                
+                // Блокируем кнопку
+                document.getElementById('sendLinkBtn').disabled = true;
+            } else if (authBlockedUntil > 0) {
+                // Таймер истёк, очищаем localStorage
+                localStorage.removeItem('authBlockedUntil');
+                localStorage.removeItem('pendingEmail');
+                authBlockedUntil = 0;
+                pendingEmail = '';
+            }
+        }
+
+        // Запуск таймера
+        function startTimer(seconds) {
+            const btn = document.getElementById('sendLinkBtn');
+            const timerDiv = document.getElementById('timer');
+            
+            // Очищаем предыдущий интервал если есть
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            
+            let remaining = seconds;
+            timerDiv.textContent = `Повторная отправка через ${remaining} сек`;
+            
+            timerInterval = setInterval(() => {
+                remaining--;
+                timerDiv.textContent = `Повторная отправка через ${remaining} сек`;
+                
+                if (remaining <= 0) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                    btn.disabled = false;
+                    timerDiv.textContent = '';
+                    
+                    // Очищаем localStorage после окончания таймера
+                    localStorage.removeItem('authBlockedUntil');
+                    localStorage.removeItem('pendingEmail');
+                    authBlockedUntil = 0;
+                    pendingEmail = '';
+                }
+            }, 1000);
+        }
 
         // Отрисовка карточек закупок
         function renderPurchases() {
@@ -679,21 +744,14 @@
             const btn = document.getElementById('sendLinkBtn');
             btn.disabled = true;
             
-            // Таймер на 60 секунд
-            let seconds = 60;
-            const timerDiv = document.getElementById('timer');
-            timerDiv.textContent = `Повторная отправка через ${seconds} сек`;
+            // Сохраняем в localStorage
+            authBlockedUntil = Date.now() + 60000; // +60 секунд
+            pendingEmail = email;
+            localStorage.setItem('authBlockedUntil', authBlockedUntil);
+            localStorage.setItem('pendingEmail', email);
             
-            const timer = setInterval(() => {
-                seconds--;
-                timerDiv.textContent = `Повторная отправка через ${seconds} сек`;
-                
-                if (seconds <= 0) {
-                    clearInterval(timer);
-                    btn.disabled = false;
-                    timerDiv.textContent = '';
-                }
-            }, 1000);
+            // Запускаем таймер на 60 секунд
+            startTimer(60);
             
             // Генерируем токен
             const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
@@ -720,10 +778,8 @@
                 console.error('Ошибка EmailJS:', error);
                 showNotification('Ошибка отправки. Проверьте настройки EmailJS');
                 
-                // Разблокируем кнопку при ошибке
-                clearInterval(timer);
-                btn.disabled = false;
-                timerDiv.textContent = '';
+                // При ошибке НЕ разблокируем кнопку, чтобы не спамили
+                // Таймер всё равно должен дойти до конца
             });
         }
         
@@ -747,6 +803,14 @@
                 delete pendingLogins[token];
                 localStorage.setItem('pendingLogins', JSON.stringify(pendingLogins));
                 
+                // Сбрасываем таймер, если пользователь уже вошёл
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                }
+                localStorage.removeItem('authBlockedUntil');
+                localStorage.removeItem('pendingEmail');
+                
                 updateAuthUI();
                 loadUserOrdersFromFirebase();
                 showNotification('Добро пожаловать! 🙏');
@@ -758,12 +822,16 @@
         function resetAuthModal() {
             document.getElementById('step1').style.display = 'block';
             document.getElementById('step2').style.display = 'none';
-            document.getElementById('loginEmail').value = '';
+            document.getElementById('loginEmail').value = pendingEmail || '';
             
-            // Сбрасываем состояние кнопки и таймера
-            const btn = document.getElementById('sendLinkBtn');
-            btn.disabled = false;
-            document.getElementById('timer').textContent = '';
+            // Не сбрасываем кнопку, проверяем таймер
+            const now = Date.now();
+            if (authBlockedUntil > now) {
+                document.getElementById('sendLinkBtn').disabled = true;
+                // Таймер уже должен работать из checkTimerOnLoad или из предыдущего вызова
+            } else {
+                document.getElementById('sendLinkBtn').disabled = false;
+            }
         }
 
         // Форматирование количества
