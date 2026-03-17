@@ -814,6 +814,9 @@
                 updateAuthUI();
                 loadUserOrdersFromFirebase();
                 showNotification('Добро пожаловать! 🙏');
+                
+                // Закрываем модалку авторизации
+                hideAuthModal();
             } else {
                 showNotification('Ссылка устарела или недействительна');
             }
