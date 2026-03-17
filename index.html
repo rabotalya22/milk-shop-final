@@ -188,6 +188,7 @@
         .products-list { display: flex; flex-direction: column; gap: 10px; }
         .product-item { display: grid; grid-template-columns: 2fr 1fr 1fr 120px; align-items: center; padding: 12px 15px; background: white; border: 2px solid #d4a373; border-radius: 12px; gap: 10px; font-size: 14px; transition: all 0.2s; }
         .product-item.in-cart { opacity: 0.7; background-color: #f9f9f9; }
+        .product-item.blocked { opacity: 0.5; pointer-events: none; }
         .product-info { display: flex; flex-direction: column; }
         .product-name { font-weight: bold; color: #6b4f3c; }
         .product-note { font-size: 11px; color: #8b6b4f; margin-top: 2px; }
@@ -195,7 +196,8 @@
         .product-unit { color: #8b6b4f; font-size: 13px; text-align: right; }
         .product-controls { display: flex; align-items: center; gap: 5px; justify-content: flex-end; }
         .product-qty-btn { width: 30px; height: 30px; background: #d4a373; border: 2px solid #b87333; color: white; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; }
-        .product-qty-btn:hover { background: #b87333; }
+        .product-qty-btn:hover:not(:disabled) { background: #b87333; }
+        .product-qty-btn:disabled { background: #cccccc; border-color: #999999; cursor: not-allowed; opacity: 0.5; }
         .product-qty-value { font-weight: bold; color: #6b4f3c; min-width: 30px; text-align: center; font-size: 15px; }
         .right-column { position: sticky; top: 90px; display: flex; flex-direction: column; gap: 20px; }
         .cart-desktop { background: rgba(255, 248, 235, 0.95); border: 3px solid #d4a373; border-radius: 20px; padding: 20px; }
@@ -213,6 +215,7 @@
         .cart-buttons { display: flex; gap: 10px; margin-top: 15px; }
         .btn { padding: 10px 15px; border: none; border-radius: 30px; font-size: 14px; font-weight: bold; cursor: pointer; flex: 1; }
         .btn-primary { background: #d4a373; color: white; border: 2px solid #b87333; }
+        .btn-primary:disabled { background: #cccccc; border-color: #999999; cursor: not-allowed; }
         .btn-secondary { background: #fff2d9; color: #6b4f3c; border: 2px solid #d4a373; }
         .calculator-widget { background: rgba(255, 248, 235, 0.95); border: 3px solid #d4a373; border-radius: 20px; padding: 20px; }
         .calculator-widget h3 { color: #6b4f3c; font-size: 18px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
@@ -298,6 +301,32 @@
         .email-btn:hover:not(:disabled) { background: #8b6b4f; }
         .email-btn:disabled { background: #cccccc; border-color: #999999; cursor: not-allowed; opacity: 0.7; }
         .timer-text { color: #b87333; margin-top: 10px; font-size: 14px; min-height: 24px; font-weight: 500; }
+        
+        /* Стили для подсказки о смешивании */
+        .cart-warning {
+            background: #ffe4e0;
+            border: 2px solid #c41e3a;
+            border-radius: 12px;
+            padding: 10px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            color: #c41e3a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .cart-warning span {
+            font-size: 18px;
+        }
+        
+        .clear-cart-warning {
+            color: #c41e3a;
+            text-decoration: underline;
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 5px;
+        }
         
         @media (max-width: 900px) {
             .desktop-container { display: none; }
@@ -400,7 +429,10 @@
                     <h2>🛒 Моя корзина</h2>
                     <div class="cart-items" id="desktopCartItems"></div>
                     <div class="cart-total" id="desktopCartTotal">Предварительно: <span>0 ₽</span></div>
-                    <div class="cart-buttons"><button class="btn btn-primary" onclick="showOrderForm()">Оформить</button><button class="btn btn-secondary" onclick="clearCart()">Очистить</button></div>
+                    <div class="cart-buttons">
+                        <button class="btn btn-primary" onclick="showOrderForm()" id="orderBtn">Оформить</button>
+                        <button class="btn btn-secondary" onclick="clearCart()">Очистить</button>
+                    </div>
                 </div>
                 <div class="calculator-widget">
                     <h3><span class="calc-icon-new"><span>+</span><span>−</span><span>×</span><span>÷</span></span>Калькулятор</h3>
@@ -774,6 +806,26 @@
 
         // Выбор закупки
         function selectPurchase(purchaseId) {
+            // Проверяем, можно ли перейти в эту закупку
+            if (cart.length > 0) {
+                // Получаем ID закупки товаров в корзине
+                const cartPurchaseId = cart[0]?.purchaseId;
+                
+                if (cartPurchaseId && cartPurchaseId !== purchaseId) {
+                    // Если пытаемся зайти в другую закупку, пока корзина не пуста
+                    if (confirm('В вашей корзине уже есть товары из другой закупки. Хотите очистить корзину и перейти в эту закупку?')) {
+                        // Очищаем корзину
+                        cart = [];
+                        saveCart();
+                        updateAllCarts();
+                        showNotification('Корзина очищена');
+                    } else {
+                        // Отменяем переход
+                        return;
+                    }
+                }
+            }
+            
             currentPurchaseId = purchaseId;
             document.getElementById('mainPage').style.display = 'none';
             document.getElementById('productsContent').classList.add('active');
@@ -1076,6 +1128,9 @@
             
             const currentProducts = products[currentPurchaseId] || [];
             
+            // Проверяем, есть ли товары в корзине из другой закупки
+            const cartHasOtherPurchase = cart.length > 0 && cart[0].purchaseId !== currentPurchaseId;
+            
             const filtered = currentProducts.filter(p => 
                 (currentCategory === 'all' || p.category === currentCategory) && 
                 p.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -1085,8 +1140,9 @@
                 const cartItem = cart.find(item => item.id === p.id && item.purchaseId === currentPurchaseId);
                 const qty = cartItem ? formatQuantity(cartItem.count * p.step) : '0';
                 const inCartClass = cartItem ? 'in-cart' : '';
+                const blockedClass = cartHasOtherPurchase ? 'blocked' : '';
                 return `
-                    <div class="product-item ${inCartClass}" data-id="${p.id}">
+                    <div class="product-item ${inCartClass} ${blockedClass}" data-id="${p.id}">
                         <div class="product-info">
                             <div class="product-name">${p.name}</div>
                             <div class="product-note">${p.orderNote}</div>
@@ -1094,9 +1150,9 @@
                         <span class="product-price">${p.price} ₽</span>
                         <span class="product-unit">${p.unit}</span>
                         <div class="product-controls">
-                            <button class="product-qty-btn" onclick="updateProductQuantity(${p.id}, -${p.step})">−</button>
+                            <button class="product-qty-btn" onclick="updateProductQuantity(${p.id}, -${p.step})" ${cartHasOtherPurchase ? 'disabled' : ''}>−</button>
                             <span class="product-qty-value" id="qty-${p.id}">${qty}</span>
-                            <button class="product-qty-btn" onclick="updateProductQuantity(${p.id}, ${p.step})">+</button>
+                            <button class="product-qty-btn" onclick="updateProductQuantity(${p.id}, ${p.step})" ${cartHasOtherPurchase ? 'disabled' : ''}>+</button>
                         </div>
                     </div>
                 `;
@@ -1106,8 +1162,9 @@
                 const cartItem = cart.find(item => item.id === p.id && item.purchaseId === currentPurchaseId);
                 const qty = cartItem ? formatQuantity(cartItem.count * p.step) : '0';
                 const inCartClass = cartItem ? 'in-cart' : '';
+                const blockedClass = cartHasOtherPurchase ? 'blocked' : '';
                 return `
-                    <div class="product-item ${inCartClass}" data-id="${p.id}">
+                    <div class="product-item ${inCartClass} ${blockedClass}" data-id="${p.id}">
                         <div class="product-name">${p.name}</div>
                         <div class="product-note">${p.orderNote}</div>
                         <div class="product-details-row">
@@ -1116,9 +1173,9 @@
                                 <span class="product-unit">${p.unit}</span>
                             </div>
                             <div class="product-controls">
-                                <button class="product-qty-btn" onclick="updateProductQuantity(${p.id}, -${p.step})">−</button>
+                                <button class="product-qty-btn" onclick="updateProductQuantity(${p.id}, -${p.step})" ${cartHasOtherPurchase ? 'disabled' : ''}>−</button>
                                 <span class="product-qty-value" id="qty-${p.id}">${qty}</span>
-                                <button class="product-qty-btn" onclick="updateProductQuantity(${p.id}, ${p.step})">+</button>
+                                <button class="product-qty-btn" onclick="updateProductQuantity(${p.id}, ${p.step})" ${cartHasOtherPurchase ? 'disabled' : ''}>+</button>
                             </div>
                         </div>
                     </div>
@@ -1131,6 +1188,49 @@
             if (document.getElementById('mobileProductsList')) {
                 document.getElementById('mobileProductsList').innerHTML = mobileHtml;
             }
+            
+            // Добавляем предупреждение в корзину, если есть конфликт
+            updateCartWarning();
+        }
+        
+        // Обновление предупреждения в корзине
+        function updateCartWarning() {
+            const desktopCart = document.getElementById('desktopCartItems');
+            const mobileCart = document.getElementById('mobileCartItems');
+            
+            if (!desktopCart || !mobileCart) return;
+            
+            const cartHasOtherPurchase = cart.length > 0 && currentPurchaseId && cart[0].purchaseId !== currentPurchaseId;
+            
+            if (cartHasOtherPurchase) {
+                const warningHtml = `
+                    <div class="cart-warning">
+                        <span>⚠️</span>
+                        <div>
+                            В корзине товары из другой закупки. 
+                            <span class="clear-cart-warning" onclick="clearCart()">Очистить корзину</span>, чтобы добавлять товары из этой закупки.
+                        </div>
+                    </div>
+                `;
+                
+                // Добавляем предупреждение в начало корзины, если его ещё нет
+                if (!desktopCart.querySelector('.cart-warning')) {
+                    desktopCart.insertAdjacentHTML('afterbegin', warningHtml);
+                }
+                if (!mobileCart.querySelector('.cart-warning')) {
+                    mobileCart.insertAdjacentHTML('afterbegin', warningHtml);
+                }
+                
+                // Блокируем кнопку оформления
+                document.getElementById('orderBtn').disabled = true;
+            } else {
+                // Удаляем предупреждение
+                desktopCart.querySelectorAll('.cart-warning').forEach(el => el.remove());
+                mobileCart.querySelectorAll('.cart-warning').forEach(el => el.remove());
+                
+                // Разблокируем кнопку оформления
+                document.getElementById('orderBtn').disabled = false;
+            }
         }
 
         // Обновление количества товара
@@ -1140,6 +1240,12 @@
             const currentProducts = products[currentPurchaseId] || [];
             const product = currentProducts.find(p => p.id === productId);
             if (!product) return;
+            
+            // Проверяем, есть ли товары в корзине из другой закупки
+            if (cart.length > 0 && cart[0].purchaseId !== currentPurchaseId) {
+                showNotification('Сначала очистите корзину или оформите заказ из текущей закупки');
+                return;
+            }
             
             // Ищем товар в корзине с таким же ID и purchaseId
             const existingItem = cart.find(item => item.id === productId && item.purchaseId === currentPurchaseId);
@@ -1221,6 +1327,9 @@
             const mobileTotal = document.getElementById('mobileCartTotal')?.querySelector('span');
             if (mobileCart) mobileCart.innerHTML = html;
             if (mobileTotal) mobileTotal.textContent = `${total.toFixed(2)} ₽`;
+            
+            // Обновляем предупреждение
+            updateCartWarning();
         }
 
         // Удаление из корзины
