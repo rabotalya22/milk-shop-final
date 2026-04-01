@@ -1389,7 +1389,7 @@
         const TELEGRAM_BOT_TOKEN = '8553841090:AAHJx6x0qLY6Ur53cFPtuOCKRUu_JUOWT-A';
         const TELEGRAM_CHAT_ID = '353422630';
         
-        // Firebase настройки
+        // Firebase настройки (ваши данные)
         const firebaseConfig = {
             apiKey: "AIzaSyDztZkvuz3vp__7uUY9sv34R2G8d06qvZEA",
             authDomain: "moloko-15747.firebaseapp.com",
@@ -1436,96 +1436,36 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // ========== TELEGRAM MINI APP ИНИЦИАЛИЗАЦИЯ ==========
-        (function initTelegramApp() {
-            if (tg) {
-                // Сообщаем Telegram, что приложение готово
-                tg.ready();
-                
-                // Растягиваем на всю высоту
-                tg.expand();
-                
-                // Отключаем вертикальные свайпы (если поддерживается)
-                if (tg.disableVerticalSwipes) {
-                    tg.disableVerticalSwipes();
-                }
-                
-                // Устанавливаем цвет фона в соответствии с темой Telegram
-                if (tg.setHeaderColor) {
-                    tg.setHeaderColor('#fff9e6');
-                }
-                
-                console.log('Telegram Mini App инициализирован');
-                
-                // Получаем данные пользователя из Telegram
-                const initData = tg.initDataUnsafe || {};
-                const user = initData.user;
-                
-                if (user && !currentUser) {
-                    console.log('Пользователь Telegram:', user);
-                    
-                    // Автоматически авторизуем пользователя
-                    handleTelegramAuth({
-                        id: user.id,
-                        first_name: user.first_name,
-                        last_name: user.last_name,
-                        username: user.username,
-                        photo_url: user.photo_url,
-                        auth_date: Math.floor(Date.now() / 1000)
-                    });
-                }
-            } else {
-                console.log('Приложение запущено не в Telegram');
-            }
-        })();
-
-        // ========== ОБРАБОТКА ДАННЫХ ИЗ URL (от PHP) ==========
-        (function handleUrlData() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const userParam = urlParams.get('tg_user');
-            const errorParam = urlParams.get('error');
+        // ========== TELEGRAM INIT ==========
+        if (tg) {
+            tg.ready();
+            tg.expand();
+            tg.disableVerticalSwipes?.();
             
-            if (userParam) {
-                try {
-                    const userData = JSON.parse(decodeURIComponent(userParam));
-                    console.log('Получены данные авторизации из URL:', userData);
-                    
-                    // Авторизуем пользователя
-                    currentUser = {
-                        id: 'tg_' + userData.id,
-                        name: userData.first_name + (userData.last_name ? ' ' + userData.last_name : ''),
-                        username: userData.username,
-                        photo_url: userData.photo_url,
-                        authMethod: 'telegram',
-                        authDate: new Date().toISOString()
-                    };
-                    
-                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                    
-                    // Очищаем URL от параметров
-                    window.history.replaceState({}, document.title, window.location.pathname);
-                    
-                    // Обновляем UI после загрузки заказов
-                    loadUserOrdersFromFirebase().then(() => {
-                        updateAuthUI();
-                        displayProducts();
-                        updateAllCarts();
-                    });
-                    
-                } catch (e) {
-                    console.error('Ошибка парсинга данных пользователя:', e);
-                }
-            } else if (errorParam) {
-                console.error('Ошибка авторизации:', decodeURIComponent(errorParam));
-                if (tg) {
-                    tg.showPopup({
-                        title: 'Ошибка авторизации',
-                        message: decodeURIComponent(errorParam),
-                        buttons: [{ type: 'ok' }]
-                    });
-                }
+            // Получаем данные пользователя из Telegram
+            const tgUser = tg.initDataUnsafe?.user;
+            if (tgUser) {
+                handleTelegramAuth({
+                    id: tgUser.id,
+                    first_name: tgUser.first_name,
+                    last_name: tgUser.last_name,
+                    username: tgUser.username,
+                    photo_url: tgUser.photo_url,
+                    auth_date: Math.floor(Date.now() / 1000)
+                });
             }
-        })();
+            
+            // Настраиваем главную кнопку
+            tg.MainButton.setText('ОФОРМИТЬ ЗАКАЗ');
+            tg.MainButton.onClick(() => {
+                if (cart.length > 0) {
+                    showOrderForm();
+                } else {
+                    tg.showAlert('Корзина пуста!');
+                }
+            });
+            tg.MainButton.hide(); // Скрыта по умолчанию
+        }
 
         // ========== ФУНКЦИИ ==========
         
@@ -1544,37 +1484,6 @@
                     tg.HapticFeedback.notificationOccurred(type);
                 }
             }
-        }
-
-        // Обработка авторизации через Telegram
-        async function handleTelegramAuth(userData) {
-            console.log('Telegram auth:', userData);
-            
-            currentUser = {
-                id: 'tg_' + userData.id,
-                name: userData.first_name + (userData.last_name ? ' ' + userData.last_name : ''),
-                username: userData.username,
-                photo_url: userData.photo_url,
-                authMethod: 'telegram',
-                authDate: new Date().toISOString()
-            };
-            
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
-            
-            await loadUserOrdersFromFirebase();
-            updateAuthUI();
-            
-            if (tg) {
-                tg.showPopup({
-                    title: 'Добро пожаловать!',
-                    message: `🙏 Харе Кришна, ${userData.first_name}!`,
-                    buttons: [{ type: 'ok' }]
-                });
-            }
-            
-            // Обновляем отображение после авторизации
-            displayProducts();
-            updateAllCarts();
         }
 
         // Загрузка товаров из Google Sheets
@@ -1625,6 +1534,76 @@
                 products = fallbackProducts;
                 displayProducts();
                 return false;
+            }
+        }
+
+        // Обработка авторизации через Telegram
+        async function handleTelegramAuth(userData) {
+            console.log('Telegram auth:', userData);
+            
+            currentUser = {
+                id: 'tg_' + userData.id,
+                name: userData.first_name + (userData.last_name ? ' ' + userData.last_name : ''),
+                username: userData.username,
+                photo_url: userData.photo_url,
+                authMethod: 'telegram',
+                authDate: new Date().toISOString()
+            };
+            
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            await loadUserOrdersFromFirebase();
+            updateAuthUI();
+            
+            if (tg) {
+                tg.showPopup({
+                    title: 'Добро пожаловать!',
+                    message: `🙏 Харе Кришна, ${userData.first_name}!`,
+                    buttons: [{ type: 'ok' }]
+                });
+            }
+        }
+
+        // Обновление UI авторизации
+        function updateAuthUI() {
+            const navButtons = document.getElementById('navButtons');
+            const mobileAuthItem = document.getElementById('mobileAuthMenuItem');
+            const mobileLogoutItem = document.getElementById('mobileLogoutItem');
+            const mobileOrdersItem = document.getElementById('mobileOrdersItem');
+            
+            if (currentUser) {
+                const avatarHtml = currentUser.photo_url 
+                    ? `<img src="${currentUser.photo_url}" alt="avatar">` 
+                    : (currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U');
+                
+                navButtons.innerHTML = `
+                    <div class="user-info" onclick="showProfile()">
+                        <div class="user-avatar">${avatarHtml}</div>
+                        <span class="user-name">${currentUser.name || currentUser.username || 'Пользователь'}</span>
+                    </div>
+                    <button class="nav-btn" onclick="showOrders()">📋 Мои заказы</button>
+                    <button class="nav-btn" onclick="showModal('producer')">О производителе</button>
+                    <button class="nav-btn" onclick="showModal('rules')">Правила</button>
+                `;
+                
+                mobileAuthItem.innerHTML = `👤 ${currentUser.name || currentUser.username || 'Профиль'}`;
+                mobileAuthItem.onclick = () => { showProfile(); toggleMobileMenu(); };
+                
+                if (mobileOrdersItem) mobileOrdersItem.style.display = 'block';
+                if (mobileLogoutItem) mobileLogoutItem.style.display = 'block';
+                
+            } else {
+                navButtons.innerHTML = `
+                    <button class="nav-btn auth-btn" onclick="showAuthModal()">🔐 Войти</button>
+                    <button class="nav-btn" onclick="showModal('producer')">О производителе</button>
+                    <button class="nav-btn" onclick="showModal('rules')">Правила</button>
+                `;
+                
+                mobileAuthItem.innerHTML = '🔐 Войти';
+                mobileAuthItem.onclick = () => { showAuthModal(); toggleMobileMenu(); };
+                
+                if (mobileOrdersItem) mobileOrdersItem.style.display = 'none';
+                if (mobileLogoutItem) mobileLogoutItem.style.display = 'none';
             }
         }
 
@@ -1680,49 +1659,6 @@
             } catch (error) {
                 console.error('Ошибка удаления заказа:', error);
                 return false;
-            }
-        }
-
-        // Обновление UI авторизации
-        function updateAuthUI() {
-            const navButtons = document.getElementById('navButtons');
-            const mobileAuthItem = document.getElementById('mobileAuthMenuItem');
-            const mobileLogoutItem = document.getElementById('mobileLogoutItem');
-            const mobileOrdersItem = document.getElementById('mobileOrdersItem');
-            
-            if (currentUser) {
-                const avatarHtml = currentUser.photo_url 
-                    ? `<img src="${currentUser.photo_url}" alt="avatar">` 
-                    : (currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U');
-                
-                navButtons.innerHTML = `
-                    <div class="user-info" onclick="showProfile()">
-                        <div class="user-avatar">${avatarHtml}</div>
-                        <span class="user-name">${currentUser.name || currentUser.username || 'Пользователь'}</span>
-                    </div>
-                    <button class="nav-btn" onclick="showOrders()">📋 Мои заказы</button>
-                    <button class="nav-btn" onclick="showModal('producer')">О производителе</button>
-                    <button class="nav-btn" onclick="showModal('rules')">Правила</button>
-                `;
-                
-                mobileAuthItem.innerHTML = `👤 ${currentUser.name || currentUser.username || 'Профиль'}`;
-                mobileAuthItem.onclick = () => { showProfile(); toggleMobileMenu(); };
-                
-                if (mobileOrdersItem) mobileOrdersItem.style.display = 'block';
-                if (mobileLogoutItem) mobileLogoutItem.style.display = 'block';
-                
-            } else {
-                navButtons.innerHTML = `
-                    <button class="nav-btn auth-btn" onclick="showAuthModal()">🔐 Войти</button>
-                    <button class="nav-btn" onclick="showModal('producer')">О производителе</button>
-                    <button class="nav-btn" onclick="showModal('rules')">Правила</button>
-                `;
-                
-                mobileAuthItem.innerHTML = '🔐 Войти';
-                mobileAuthItem.onclick = () => { showAuthModal(); toggleMobileMenu(); };
-                
-                if (mobileOrdersItem) mobileOrdersItem.style.display = 'none';
-                if (mobileLogoutItem) mobileLogoutItem.style.display = 'none';
             }
         }
 
@@ -1833,7 +1769,6 @@
             // Показываем/скрываем кнопку Telegram
             if (tg) {
                 if (cart.length > 0) {
-                    tg.MainButton.setText('ОФОРМИТЬ ЗАКАЗ');
                     tg.MainButton.show();
                 } else {
                     tg.MainButton.hide();
@@ -2046,23 +1981,6 @@
                 tg.showAlert('Вы уже авторизованы через Telegram!');
                 return;
             }
-            
-            // Создаем модальное окно авторизации, если его нет
-            if (!document.getElementById('authModal')) {
-                const authModal = document.createElement('div');
-                authModal.className = 'modal';
-                authModal.id = 'authModal';
-                authModal.innerHTML = `
-                    <div class="modal-content auth-modal">
-                        <button class="close-modal" onclick="hideAuthModal()">×</button>
-                        <h2 style="color: #6b4f3c; margin-bottom: 20px;">🔐 Вход в аккаунт</h2>
-                        <p style="margin-bottom: 20px;">Для входа используйте Telegram:</p>
-                        <a href="auth.php" style="display: block; text-align: center; background: #0088cc; color: white; padding: 15px; border-radius: 30px; text-decoration: none; font-weight: bold;">Войти через Telegram</a>
-                    </div>
-                `;
-                document.body.appendChild(authModal);
-            }
-            
             document.getElementById('authModal').classList.add('active');
         }
 
@@ -2404,19 +2322,6 @@ ${orderText.replace(/\n/g, '\n')}
                 event.target.classList.remove('active');
             }
         };
-
-        // Настройка главной кнопки Telegram
-        if (tg) {
-            tg.MainButton.setText('ОФОРМИТЬ ЗАКАЗ');
-            tg.MainButton.onClick(() => {
-                if (cart.length > 0) {
-                    showOrderForm();
-                } else {
-                    tg.showAlert('Корзина пуста!');
-                }
-            });
-            tg.MainButton.hide(); // Скрыта по умолчанию
-        }
 
         // Инициализация при загрузке
         document.addEventListener('DOMContentLoaded', () => {
